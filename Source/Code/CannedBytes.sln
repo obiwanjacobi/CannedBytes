@@ -3,15 +3,40 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes", "CannedBytes\CannedBytes.csproj", "{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.IO", "CannedBytes.IO\CannedBytes.IO.csproj", "{6E403582-FE82-4FED-A478-03E7DB0E50B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO", "CannedBytes.Media.IO\CannedBytes.Media.IO.csproj", "{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO.UnitTests", "CannedBytes.Media.IO.UnitTests\CannedBytes.Media.IO.UnitTests.csproj", "{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B19CB88B-6167-4DBA-8114-9F6CB82029BC}"
+	ProjectSection(SolutionItems) = preProject
+		CannedBytes.vsmdi = CannedBytes.vsmdi
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs01
 		SccProjectUniqueName0 = CannedBytes\\CannedBytes.csproj
 		SccProjectName0 = CannedBytes
 		SccLocalPath0 = CannedBytes
 		SccLocalPath1 = .
+		SccProjectUniqueName2 = CannedBytes.IO\\CannedBytes.IO.csproj
+		SccProjectName2 = CannedBytes.IO
+		SccLocalPath2 = CannedBytes.IO
+		SccProjectUniqueName3 = CannedBytes.Media.IO\\CannedBytes.Media.IO.csproj
+		SccProjectName3 = CannedBytes.Media.IO
+		SccLocalPath3 = CannedBytes.Media.IO
+		SccProjectUniqueName4 = CannedBytes.Media.IO.UnitTests\\CannedBytes.Media.IO.UnitTests.csproj
+		SccProjectName4 = CannedBytes.Media.IO.UnitTests
+		SccLocalPath4 = CannedBytes.Media.IO.UnitTests
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = CannedBytes.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +47,18 @@ Global
 		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
