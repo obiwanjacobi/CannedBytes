@@ -47,9 +47,9 @@ namespace CannedBytes.Media.IO.Services
 
         public virtual object CreateChunkObject(FourCharacterCode chunkTypeId)
         {
-            Type result = null;
+            Type result = LookupChunkObjectType(chunkTypeId);
 
-            if (this.chunkMap.TryGetValue(chunkTypeId.ToString(), out result))
+            if (result != null)
             {
                 return Activator.CreateInstance(result);
             }
@@ -61,9 +61,24 @@ namespace CannedBytes.Media.IO.Services
         {
             Type result = null;
 
-            if (this.chunkMap.TryGetValue(chunkTypeId.ToString(), out result))
+            string chunkId = chunkTypeId.ToString();
+
+            if (!chunkId.HasWildcard())
             {
-                return result;
+                // try fast lookup first if the requested type has no wildcards
+                if (this.chunkMap.TryGetValue(chunkId, out result))
+                {
+                    return result;
+                }
+            }
+
+            // now match wildcards
+            foreach (var item in this.chunkMap)
+            {
+                if (chunkId.MatchesWith(item.Key))
+                {
+                    return item.Value;
+                }
             }
 
             return null;

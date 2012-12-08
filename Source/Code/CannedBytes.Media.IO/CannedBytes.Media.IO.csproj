@@ -118,6 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaAttributes\AttributeExtensions.cs" />
     <Compile Include="SchemaAttributes\ChunkAttribute.cs" />
+    <Compile Include="SchemaAttributes\ChunkTypeAttribute.cs" />
     <Compile Include="SchemaAttributes\FileChunkHandlerAttribute.cs" />
     <Compile Include="SchemaAttributes\IgnoreAttribute.cs" />
     <Compile Include="Services\BigEndianNumberReader.cs" />
