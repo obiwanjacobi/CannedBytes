@@ -8,14 +8,6 @@ namespace CannedBytes.Media.IO.UnitTests
     public class CompositionContainerFactoryTests
     {
         [TestMethod]
-        public void CreateDefault_NeverReturnsNull()
-        {
-            var container = CompositionContainerFactory.CreateDefault();
-
-            Assert.IsNotNull(container);
-        }
-
-        [TestMethod]
         public void CreateNew_NeverReturnsNull()
         {
             var factory = new CompositionContainerFactory();

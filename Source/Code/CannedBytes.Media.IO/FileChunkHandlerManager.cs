@@ -9,8 +9,11 @@ namespace CannedBytes.Media.IO
     [Export]
     public class FileChunkHandlerManager
     {
+        //warning CS0649: Field 'X' is never assigned to, and will always have its default value null
+#pragma warning disable 0649
         [ImportMany(AllowRecomposition = true)]
         Lazy<IFileChunkHandler, IFileChunkHandlerMetaInfo>[] chunkHandlers;
+#pragma warning restore 0649
 
         public IFileChunkHandler GetChunkHandler(FourCharacterCode chunkId)
         {
@@ -20,7 +23,8 @@ namespace CannedBytes.Media.IO
             var chunk4cc = chunkId.ToString();
 
             var handler = (from pair in this.chunkHandlers
-                           where pair.Metadata.ChunkId.ToString() == chunk4cc
+                           where pair.Metadata.ChunkId.ToString() != "****"
+                           where chunk4cc.MatchesWith(pair.Metadata.ChunkId.ToString())
                            select pair.Value).FirstOrDefault();
 
             if (handler == null)

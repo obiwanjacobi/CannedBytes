@@ -11,6 +11,8 @@ namespace CannedBytes.Media.IO
     {
         ChunkFileContext context;
 
+        //warning CS0649: Field 'X' is never assigned to, and will always have its default value null
+#pragma warning disable 0649
         [Import(AllowDefault = true)]
         IStreamNavigator streamNavigator;
         [Import]
@@ -21,12 +23,13 @@ namespace CannedBytes.Media.IO
         IStringReader stringReader;
         [Import]
         INumberReader numberReader;
+#pragma warning restore 0649
 
         public FileChunkReader(ChunkFileContext context)
         {
-            Contract.Requires<ArgumentNullException>(context != null);
-            Contract.Requires<InvalidDataException>(context.CompositionContainer != null,
-                "The CompositionContainer must be set on the FileContext.");
+            Contract.Requires(context != null);
+            Contract.Requires(context.CompositionContainer != null);
+            Throw.IfArgumentNull(context, "context");
 
             context.CompositionContainer.ComposeParts(this);
             context.CompositionContainer.AddInstance(this);

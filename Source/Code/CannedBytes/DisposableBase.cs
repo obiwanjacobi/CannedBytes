@@ -28,7 +28,7 @@ namespace CannedBytes
         /// <remarks>Derived classes override to Dispose their members.</remarks>
         protected virtual void Dispose(bool disposing)
         {
-            //if (!_disposed)
+            //if (!IsDisposed)
             //{
             //    if (disposing)
             //    {

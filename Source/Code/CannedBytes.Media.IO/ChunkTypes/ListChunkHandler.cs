@@ -7,11 +7,23 @@ using CannedBytes.Media.IO.Services;
 
 namespace CannedBytes.Media.IO.ChunkTypes
 {
+    /// <summary>
+    /// Called by the <see cref="ChunkFileReader"/> when a 'LIST' chunk is encountered.
+    /// </summary>
     [FileChunkHandler("LIST")]
     public class ListChunkHandler : DefaultFileChunkHandler
     {
+        /// <summary>
+        /// Reads the chunk file until the complete LIST of chunks are read.
+        /// </summary>
+        /// <param name="context">The context of the file being read. Must not be null.</param>
+        /// <returns></returns>
         public override object Read(ChunkFileContext context)
         {
+            Throw.IfArgumentNull(context, "context");
+            Throw.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
+            Throw.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
+
             // create instance and read type
             var listChunk = base.Read(context) as ListChunk;
 
@@ -25,32 +37,41 @@ namespace CannedBytes.Media.IO.ChunkTypes
             var chunk = context.ChunkStack.CurrentChunk;
             var stream = reader.CurrentStream;
             var itemType = LookupItemType(context, listChunk.ItemType);
+            IList children = null;
 
             if (itemType != null)
             {
                 // create a generic list with the correct item type.
                 var listType = typeof(List<>).MakeGenericType(new[] { itemType });
-                var children = (IList)Activator.CreateInstance(listType);
-
-                // while there is still data in the stream
-                while (chunk.DataStream.Position < chunk.DataStream.Length)
-                {
-                    var rtObj = reader.ReadRuntimeContainerChunkType(stream, listChunk.ItemType);
-
-                    // check if CLR type could be found for 'ItemType'.
-                    if (rtObj != null)
-                    {
-                        children.Add(rtObj);
-                    }
-                }
-
-                listChunk.InnerChunks = children.Cast<object>();
-                return children;
+                children = (IList)Activator.CreateInstance(listType);
             }
 
-            return null;
+            // while there is still data in the stream
+            while (chunk.DataStream.Position < chunk.DataStream.Length)
+            {
+                var rtObj = reader.ReadRuntimeContainerChunkType(stream, listChunk.ItemType);
+
+                // check if CLR type could be found for 'ItemType'.
+                if (rtObj != null && children != null)
+                {
+                    children.Add(rtObj);
+                }
+            }
+
+            if (children != null)
+            {
+                listChunk.InnerChunks = children.Cast<object>();
+            }
+
+            return children;
         }
 
+        /// <summary>
+        /// Helper to find the runtime Type for a chunk.
+        /// </summary>
+        /// <param name="context">Must not be null.</param>
+        /// <param name="chunkId">Must not be null.</param>
+        /// <returns>Returns null when not found.</returns>
         private Type LookupItemType(ChunkFileContext context, FourCharacterCode chunkId)
         {
             var factory = context.CompositionContainer.GetService<IChunkTypeFactory>();
@@ -58,6 +79,7 @@ namespace CannedBytes.Media.IO.ChunkTypes
             return factory.LookupChunkObjectType(chunkId);
         }
 
+        /// <inheritdocs/>
         public override void Write(ChunkFileContext context, object instance)
         {
             throw new NotImplementedException();

@@ -182,6 +182,8 @@ namespace CannedBytes.Media.IO
 
             foreach (var member in members)
             {
+                Contract.Assume(member != null);
+
                 string chunkId = null;
                 Type dataType = null;
 
@@ -194,6 +196,8 @@ namespace CannedBytes.Media.IO
                 {
                     dataType = member.PropertyInfo.PropertyType;
                 }
+
+                Contract.Assume(dataType != null);
 
                 if (dataType.IsGenericType)
                 {

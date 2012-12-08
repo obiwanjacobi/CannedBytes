@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		CannedBytes.vsmdi = CannedBytes.vsmdi
 		Local.testsettings = Local.testsettings
+		Settings.StyleCop = Settings.StyleCop
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
@@ -21,10 +22,10 @@ Global
 		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs01
-		SccProjectUniqueName0 = CannedBytes\\CannedBytes.csproj
-		SccProjectName0 = CannedBytes
-		SccLocalPath0 = CannedBytes
-		SccLocalPath1 = .
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = CannedBytes\\CannedBytes.csproj
+		SccProjectName1 = CannedBytes
+		SccLocalPath1 = CannedBytes
 		SccProjectUniqueName2 = CannedBytes.IO\\CannedBytes.IO.csproj
 		SccProjectName2 = CannedBytes.IO
 		SccLocalPath2 = CannedBytes.IO
