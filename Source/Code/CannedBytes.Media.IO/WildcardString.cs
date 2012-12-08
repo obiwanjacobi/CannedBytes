@@ -16,6 +16,8 @@
 
         public static bool MatchesWith(this string thisValue, string thatValue)
         {
+            if (thisValue == thatValue) return true;
+
             if (thisValue != null && thatValue != null)
             {
                 if (thisValue.Length == thatValue.Length)

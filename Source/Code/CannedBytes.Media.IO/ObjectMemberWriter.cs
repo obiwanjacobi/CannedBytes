@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
@@ -27,20 +28,6 @@ namespace CannedBytes.Media.IO
 
         public Type ObjectType { get; private set; }
 
-        public FourCharacterCode CurrentChunkId
-        {
-            get
-            {
-                if (this.memberEnum != null &&
-                    this.memberEnum.Current != null)
-                {
-                    return this.memberEnum.Current.ChunkId;
-                }
-
-                return null;
-            }
-        }
-
         public bool CanReadNext
         {
             get { return (this.members.Count() > 0); }
@@ -55,22 +42,30 @@ namespace CannedBytes.Media.IO
                 var member = memberEnum.Current;
 
                 // this member represent a chunk
-                if (member.ChunkId != null && !ignoreChunks)
+                if (member.ChunkIds != null)
                 {
-                    throw new NotSupportedException("This method does not support reading chunks.");
+                    if (!ignoreChunks)
+                    {
+                        throw new NotSupportedException("This method does not support reading chunks. No mixed (chunks and data) types allowed.");
+                    }
+
+                    continue;
                 }
 
-                if (member.FieldInfo != null)
+                try
                 {
-                    WriteField(member.FieldInfo, reader);
-                }
+                    object value = ReadValueForType(member.DataType, reader);
 
-                if (member.PropertyInfo != null)
+                    member.SetValue(Instance, value, false);
+                }
+                catch (EndOfStreamException eos)
                 {
-                    WriteProperty(member.PropertyInfo, reader);
-                }
+                    var msg = String.Format("The end of the chunk was encountered while reading data for the '{1}' member on '{0}'." +
+                        " Use the [Ignore] attribute to exclude members from serializing.",
+                        Instance.GetType().FullName, member.GetMemberName());
 
-                member.ValueAssigned = true;
+                    throw new ChunkFileException(msg, eos);
+                }
             }
         }
 
@@ -78,6 +73,7 @@ namespace CannedBytes.Media.IO
         {
             Contract.Requires<ArgumentNullException>(rtObj != null);
 
+            bool isCollection = false;
             var type = rtObj.GetType();
 
             if (type.IsGenericType)
@@ -85,6 +81,7 @@ namespace CannedBytes.Media.IO
                 // use generic parameter as type
                 type = (from typeArg in type.GetGenericArguments()
                         select typeArg).FirstOrDefault();
+                isCollection = true;
             }
 
             var chunkId = ChunkAttribute.GetChunkId(type);
@@ -94,62 +91,16 @@ namespace CannedBytes.Media.IO
 
             while (this.memberEnum.MoveNext())
             {
-                if (this.memberEnum.Current.ChunkId != null &&
-                    this.memberEnum.Current.ChunkId.ToString() == chunkId &&
-                    this.memberEnum.Current.ValueAssigned == false)
+                if (this.memberEnum.Current.ChunkMatches(chunkId) &&
+                    this.memberEnum.Current.CanSetValue)
                 {
-                    if (this.memberEnum.Current.FieldInfo != null)
-                    {
-                        this.memberEnum.Current.FieldInfo.SetValue(Instance, rtObj);
-                    }
+                    this.memberEnum.Current.SetValue(Instance, rtObj, isCollection);
 
-                    if (this.memberEnum.Current.PropertyInfo != null)
-                    {
-                        this.memberEnum.Current.PropertyInfo.SetValue(Instance, rtObj, null);
-                    }
-
-                    this.memberEnum.Current.ValueAssigned = true;
                     return true;
                 }
             }
 
             return false;
-        }
-
-        protected virtual void WriteProperty(PropertyInfo propertyInfo, FileChunkReader reader)
-        {
-            try
-            {
-                object value = ReadValueForType(propertyInfo.PropertyType, reader);
-
-                propertyInfo.SetValue(Instance, value, null);
-            }
-            catch (EndOfStreamException eos)
-            {
-                var msg = String.Format("The end of the chunk was encountered while reading data for the {1} named '{2}' on '{0}'." +
-                    " Use the [Ignore] attribute to exclude members from serializing.",
-                    propertyInfo.DeclaringType.FullName, propertyInfo.MemberType.ToString().ToLowerInvariant(), propertyInfo.Name);
-
-                throw new ChunkFileException(msg, eos);
-            }
-        }
-
-        protected virtual void WriteField(FieldInfo fieldInfo, FileChunkReader reader)
-        {
-            try
-            {
-                object value = ReadValueForType(fieldInfo.FieldType, reader);
-
-                fieldInfo.SetValue(Instance, value);
-            }
-            catch (EndOfStreamException eos)
-            {
-                var msg = String.Format("The end of the chunk was encountered while reading data for the {1} named '{2}' on '{0}'." +
-                    " Use the [Ignore] attribute to exclude members from serializing.",
-                    fieldInfo.DeclaringType.FullName, fieldInfo.MemberType.ToString().ToLowerInvariant(), fieldInfo.Name);
-
-                throw new ChunkFileException(msg, eos);
-            }
         }
 
         protected virtual object ReadValueForType(Type type, FileChunkReader reader)
@@ -214,7 +165,6 @@ namespace CannedBytes.Media.IO
             if (type.IsChunk())
             {
                 // should be handled outside the member writer
-                //return reader.ReadChunk();
                 throw new InvalidOperationException();
             }
 
@@ -253,11 +203,12 @@ namespace CannedBytes.Media.IO
                     {
                         member.DataType = (from typeArg in dataType.GetGenericArguments()
                                            select typeArg).FirstOrDefault();
+                        member.IsCollection = true;
                     }
                     else
                     {
                         var msg = String.Format(
-                            "The generic type '{0}' is not supported. Use IEnumerable<T>.",
+                            "The generic type '{0}' is not supported. Use IEnumerable<T> for collections.",
                             genType.FullName);
 
                         throw new NotSupportedException(msg);
@@ -272,7 +223,17 @@ namespace CannedBytes.Media.IO
 
                 if (!String.IsNullOrEmpty(chunkId))
                 {
-                    member.ChunkId = new FourCharacterCode(chunkId);
+                    member.ChunkIds = new List<string>();
+                    member.ChunkIds.Add(chunkId);
+                }
+                else
+                {
+                    var chunkTypes = ChunkTypeAttribute.GetChunkTypes(member.GetMemberInfo());
+
+                    if (chunkTypes != null && chunkTypes.Length > 0)
+                    {
+                        member.ChunkIds = new List<string>(chunkTypes);
+                    }
                 }
             }
 
@@ -284,8 +245,115 @@ namespace CannedBytes.Media.IO
             public FieldInfo FieldInfo;
             public PropertyInfo PropertyInfo;
             public Type DataType;
-            public FourCharacterCode ChunkId;
+            public List<string> ChunkIds;
+            public bool IsCollection;
             public bool ValueAssigned;
+
+            /// <summary>
+            /// Can always write to a collection, but not overwrite a single value.
+            /// </summary>
+            public bool CanSetValue
+            {
+                get { return (IsCollection || (!ValueAssigned && !IsCollection)); }
+            }
+
+            public bool ChunkMatches(string chunkId)
+            {
+                if (ChunkIds != null)
+                {
+                    foreach (var chunkType in ChunkIds)
+                    {
+                        if (chunkType.MatchesWith(chunkId))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            public void SetValue(object instance, object value, bool isCollection)
+            {
+                if (IsCollection && !isCollection)
+                {
+                    IList collection = GetValue(instance) as IList;
+
+                    if (collection == null)
+                    {
+                        var listType = typeof(List<>).MakeGenericType(new[] { DataType });
+                        collection = (IList)Activator.CreateInstance(listType);
+
+                        SetMemberValue(instance, collection);
+                    }
+
+                    collection.Add(value);
+                }
+                else
+                {
+                    SetMemberValue(instance, value);
+                }
+            }
+
+            private void SetMemberValue(object instance, object value)
+            {
+                if (FieldInfo != null)
+                {
+                    FieldInfo.SetValue(instance, value);
+                    ValueAssigned = true;
+                }
+
+                if (PropertyInfo != null)
+                {
+                    PropertyInfo.SetValue(instance, value, null);
+                    ValueAssigned = true;
+                }
+            }
+
+            public object GetValue(object instance)
+            {
+                if (FieldInfo != null)
+                {
+                    return FieldInfo.GetValue(instance);
+                }
+
+                if (PropertyInfo != null)
+                {
+                    return PropertyInfo.GetValue(instance, null);
+                }
+
+                return null;
+            }
+
+            public string GetMemberName()
+            {
+                if (FieldInfo != null)
+                {
+                    return FieldInfo.Name;
+                }
+
+                if (PropertyInfo != null)
+                {
+                    return PropertyInfo.Name;
+                }
+
+                return String.Empty;
+            }
+
+            public MemberInfo GetMemberInfo()
+            {
+                if (FieldInfo != null)
+                {
+                    return FieldInfo;
+                }
+
+                if (PropertyInfo != null)
+                {
+                    return PropertyInfo;
+                }
+
+                return null;
+            }
         }
     }
 }

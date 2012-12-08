@@ -175,11 +175,11 @@ namespace CannedBytes.Media.IO
             {
                 var writer = new ObjectMemberWriter(runtimeObject);
 
-                object rtChildObj = ReadNextChunk(stream);
-
                 // read all of the stream
                 while (stream.Position < stream.Length)
                 {
+                    object rtChildObj = ReadNextChunk(stream);
+
                     // if null means there was no runtime type found.
                     if (rtChildObj != null)
                     {
@@ -189,29 +189,7 @@ namespace CannedBytes.Media.IO
                             // just keep reading the stream...
                         }
                     }
-
-                    rtChildObj = ReadNextChunk(stream);
                 }
-
-                //while (stream.Position < stream.Length)
-                //{
-                //    object rtChildObj = null;
-                //    do
-                //    {
-                //        rtChildObj = ReadNextChunk(stream);
-                //        if (rtChildObj != null)
-                //        {
-                //            if (!writer.WriteNextChunkObject(rtChildObj))
-                //            {
-                //                // could not be written to object
-                //                // skip the rest of current chunk
-                //                EndStream(stream);
-                //                // will break loops
-                //            }
-                //        }
-                //    }
-                //    while (rtChildObj == null && stream.Position < stream.Length);
-                //}
             }
 
             return runtimeObject;
