@@ -3,85 +3,121 @@ using System.IO;
 
 namespace CannedBytes.IO
 {
+    /// <summary>
+    /// The SubStream wraps an existing stream and only allows access to a part of that wrapped stream.
+    /// </summary>
     public class SubStream : StreamWrapper
     {
         private long offset;
-        private long count;
+        private long length;
 
-        public SubStream(Stream stream, long count)
+        /// <summary>
+        /// Instantiates a new instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
+        /// <param name="length">Must be greater or equal to zero.</param>
+        public SubStream(Stream stream, long length)
             : base(stream)
         {
             this.offset = stream.Position;
-            SetCount(count);
+            SetSubLength(length);
         }
 
-        public SubStream(Stream stream, bool canSeek, long count)
+        /// <summary>
+        /// Instantiates a new seekable instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
+        /// <param name="length">Must be greater or equal to zero.</param>
+        /// <param name="canSeek">False to prohibit seeking.</param>
+        public SubStream(Stream stream, bool canSeek, long length)
             : base(stream, canSeek)
         {
             this.offset = stream.Position;
-            SetCount(count);
+            SetSubLength(length);
         }
 
-        public SubStream(Stream stream, long offset, long count)
-            : base(stream)
+        /// <summary>
+        /// Instantiates a new seekable instance from <paramref name="offset"/> of the <paramref name="stream"/> for <paramref name="length"/> bytes.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
+        /// <param name="offset">The offset in bytes from the start of <paramref name="stream"/>.</param>
+        /// <param name="length">Must be greater or equal to zero.</param>
+        public SubStream(Stream stream, long offset, long length)
+            : base(stream, true)
         {
             SetOffset(offset);
-            SetCount(count);
+            SetSubLength(length);
         }
 
-        public SubStream(Stream stream, bool canSeek, long offset, long count)
+        /// <summary>
+        /// Instantiates a new instance from <paramref name="offset"/> of the <paramref name="stream"/> for <paramref name="length"/> bytes.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
+        /// <param name="offset">The offset in bytes from the start of <paramref name="stream"/>.</param>
+        /// <param name="length">Must be greater or equal to zero.</param>
+        /// <param name="canSeek">False to prohibit seeking.</param>
+        public SubStream(Stream stream, bool canSeek, long offset, long length)
             : base(stream, canSeek)
         {
             SetOffset(offset);
-            SetCount(count);
+            SetSubLength(length);
         }
 
         private void SetOffset(long offset)
         {
-            if (offset >= this.InternalStream.Length)
+            if (offset >= this.InnerStream.Length)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("offset");
             }
 
             this.offset = offset;
         }
 
-        private void SetCount(long count)
+        private void SetSubLength(long length)
         {
-            if ((this.offset + count) > base.Length)
+            if ((this.offset + length) > base.Length)
             {
-                this.count = base.Length - this.offset;
+                this.length = base.Length - this.offset;
             }
             else
             {
-                this.count = count;
+                this.length = length;
             }
         }
 
         private bool AdjustCount(ref int count)
         {
-            if ((base.Position + count) > (this.offset + this.count))
+            if ((base.Position + count) > (this.offset + this.length))
             {
-                count = (int)((this.offset + this.count) - base.Position);
+                count = (int)((this.offset + this.length) - base.Position);
             }
 
             return (count > 0);
         }
 
+        /// <inheritdocs/>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            AdjustCount(ref count);
+            if (!AdjustCount(ref count))
+            {
+                throw new ArgumentException("count");
+            }
 
             return base.BeginRead(buffer, offset, count, callback, state);
         }
 
+        /// <inheritdocs/>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            AdjustCount(ref count);
+            if (!AdjustCount(ref count))
+            {
+                throw new ArgumentException("count");
+            }
 
             return base.BeginWrite(buffer, offset, count, callback, state);
         }
 
+        /// <inheritdocs/>
         public override int Read(byte[] buffer, int offset, int count)
         {
             if (AdjustCount(ref count))
@@ -92,11 +128,12 @@ namespace CannedBytes.IO
             return 0;
         }
 
+        /// <inheritdocs/>
         public override int ReadByte()
         {
-            int count = 1;
+            int length = 1;
 
-            if (AdjustCount(ref count))
+            if (AdjustCount(ref length))
             {
                 return base.ReadByte();
             }
@@ -104,6 +141,7 @@ namespace CannedBytes.IO
             return -1;
         }
 
+        /// <inheritdocs/>
         public override long Seek(long offset, SeekOrigin origin)
         {
             long absoluteOffset = 0;
@@ -117,7 +155,7 @@ namespace CannedBytes.IO
                     absoluteOffset = base.Position + offset;
                     break;
                 case SeekOrigin.End:
-                    absoluteOffset = this.offset + this.count - Math.Abs(offset);
+                    absoluteOffset = this.offset + this.length - Math.Abs(offset);
                     break;
             }
 
@@ -125,46 +163,63 @@ namespace CannedBytes.IO
             {
                 absoluteOffset = this.offset;
             }
-            else if (absoluteOffset > (this.offset + this.count))
+            else if (absoluteOffset > (this.offset + this.length))
             {
-                absoluteOffset = this.offset + this.count;
+                absoluteOffset = this.offset + this.length;
             }
 
             return base.Seek(absoluteOffset, SeekOrigin.Begin);
         }
 
+        /// <inheritdocs/>
         public override void SetLength(long value)
         {
             throw new NotSupportedException();
         }
 
+        /// <inheritdocs/>
         public override void Write(byte[] buffer, int offset, int count)
         {
             if (AdjustCount(ref count))
             {
-                InternalStream.Write(buffer, offset, count);
+                InnerStream.Write(buffer, offset, count);
             }
         }
 
+        /// <inheritdocs/>
         public override void WriteByte(byte value)
         {
-            int count = 1;
+            int length = 1;
 
-            if (AdjustCount(ref count))
+            if (AdjustCount(ref length))
             {
                 base.WriteByte(value);
             }
         }
 
+        /// <inheritdocs/>
         public override long Length
         {
-            get { return this.count; }
+            get { return this.length; }
         }
 
+        /// <inheritdocs/>
         public override long Position
         {
-            get { return base.Position - this.offset; }
-            set { base.Position = this.offset + value; }
+            get
+            {
+                // maxed out
+                if ((base.Position - this.offset) >= this.length)
+                {
+                    return this.length;
+                }
+
+                return base.Position - this.offset;
+            }
+            set
+            {
+                Seek(value, SeekOrigin.Begin);
+            }
         }
     }
 }
