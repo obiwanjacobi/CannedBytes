@@ -11,7 +11,7 @@ namespace CannedBytes.Media.IO
     {
         ChunkFileContext context;
 
-        [Import]
+        [Import(AllowDefault = true)]
         IStreamNavigator streamNavigator;
         [Import]
         IChunkTypeFactory chunkTypeFactory;
@@ -131,9 +131,12 @@ namespace CannedBytes.Media.IO
                 GetRemainingCurrentChunkBuffer();
             }
 
-            // after skipping the chunk length re-align position of the root stream.
-            // sub streams may refuse to move if they are at their end.
-            this.streamNavigator.AllignPosition(this.context.ChunkFile.BaseStream);
+            if (this.streamNavigator != null)
+            {
+                // after skipping the chunk length re-align position of the root stream.
+                // sub streams may refuse to move if they are at their end.
+                this.streamNavigator.AllignPosition(this.context.ChunkFile.BaseStream);
+            }
         }
 
         public FileChunk ReadChunkHeader(Stream stream)

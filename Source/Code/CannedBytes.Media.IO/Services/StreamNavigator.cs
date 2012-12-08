@@ -4,6 +4,7 @@ using System.IO;
 namespace CannedBytes.Media.IO.Services
 {
     [Export(typeof(IStreamNavigator))]
+    [Export(typeof(StreamNavigator))]
     public class StreamNavigator : IStreamNavigator
     {
         long currentMarker;
