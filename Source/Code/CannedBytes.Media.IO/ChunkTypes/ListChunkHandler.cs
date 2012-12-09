@@ -8,7 +8,7 @@ using CannedBytes.Media.IO.Services;
 namespace CannedBytes.Media.IO.ChunkTypes
 {
     /// <summary>
-    /// Called by the <see cref="ChunkFileReader"/> when a 'LIST' chunk is encountered.
+    /// Called by the <see cref="FileChunkReader"/> when a 'LIST' chunk is encountered.
     /// </summary>
     [FileChunkHandler("LIST")]
     public class ListChunkHandler : DefaultFileChunkHandler

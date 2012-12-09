@@ -13,7 +13,7 @@ namespace CannedBytes.Media.IO.ChunkTypes
         /// <summary>
         /// An identification of the type of items in the list.
         /// </summary>
-        /// <remarks>CLR Types marked with code are used for serialization.</remarks>
+        /// <remarks>CLR Types marked with this code are used for serialization.</remarks>
         public FourCharacterCode ItemType { get; set; }
 
         /// <summary>

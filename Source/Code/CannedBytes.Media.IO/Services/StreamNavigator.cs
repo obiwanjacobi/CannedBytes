@@ -3,28 +3,44 @@ using System.IO;
 
 namespace CannedBytes.Media.IO.Services
 {
+    /// <summary>
+    /// Implements the <see cref="IStreamNavigator"/> interface.
+    /// </summary>
     [Export(typeof(IStreamNavigator))]
-    [Export(typeof(StreamNavigator))]
     public class StreamNavigator : IStreamNavigator
     {
         long currentMarker;
-        public const int DefaultByteAllignment = 2;
 
+        /// <summary>
+        /// The default alignment is 2 bytes.
+        /// </summary>
+        public const int DefaultByteAlignment = 2;
+
+        /// <summary>
+        /// Constructs a new instance.
+        /// </summary>
         public StreamNavigator()
         {
-            ByteAllignment = DefaultByteAllignment;
+            ByteAlignment = DefaultByteAlignment;
         }
 
-        public int ByteAllignment { get; set; }
+        /// <inheritdocs/>
+        public int ByteAlignment { get; set; }
 
+        /// <inheritdocs/>
         public long SetCurrentMarker(Stream stream)
         {
+            Throw.IfArgumentNull(stream, "stream");
+
             this.currentMarker = stream.Position;
             return this.currentMarker;
         }
 
+        /// <inheritdocs/>
         public bool SeekToCurrentMarker(Stream stream)
         {
+            Throw.IfArgumentNull(stream, "stream");
+
             if (stream.CanSeek)
             {
                 stream.Seek(this.currentMarker, SeekOrigin.Begin);
@@ -34,11 +50,14 @@ namespace CannedBytes.Media.IO.Services
             return false;
         }
 
+        /// <inheritdocs/>
         public int AllignPosition(Stream stream)
         {
-            if (ByteAllignment <= 0) return 0;
+            Throw.IfArgumentNull(stream, "stream");
 
-            var rest = (int)(stream.Position % ByteAllignment);
+            if (ByteAlignment <= 0) return 0;
+
+            var rest = (int)(stream.Position % ByteAlignment);
 
             if (rest > 0)
             {

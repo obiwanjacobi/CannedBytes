@@ -61,8 +61,7 @@
     <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>1</CodeContractsAnalysisWarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Debug\CannedBytes.Media.IO.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -155,13 +154,20 @@
     <Compile Include="SchemaAttributes\ChunkAttribute.cs" />
     <Compile Include="SchemaAttributes\ChunkTypeAttribute.cs" />
     <Compile Include="SchemaAttributes\FileChunkHandlerAttribute.cs" />
+    <Compile Include="SchemaAttributes\IFileChunkHandlerMetaInfo.cs" />
     <Compile Include="SchemaAttributes\IgnoreAttribute.cs" />
     <Compile Include="Services\BigEndianNumberReader.cs" />
     <Compile Include="Services\BigEndianNumberWriter.cs" />
     <Compile Include="Services\ChunkTypeFactory.cs" />
+    <Compile Include="Services\IChunkTypeFactory.Contract.cs" />
     <Compile Include="Services\IChunkTypeFactory.cs" />
+    <Compile Include="Services\INumberReader.Contract.cs" />
+    <Compile Include="Services\INumberWriter.Contract.cs" />
+    <Compile Include="Services\IStreamNavigator.Contract.cs" />
     <Compile Include="Services\IStreamNavigator.cs" />
+    <Compile Include="Services\IStringReader.Contract.cs" />
     <Compile Include="Services\IStringReader.cs" />
+    <Compile Include="Services\IStringWriter.Contract.cs" />
     <Compile Include="Services\IStringWriter.cs" />
     <Compile Include="Services\NullTerminatedStringReader.cs" />
     <Compile Include="Services\SizePrefixedStringReader.cs" />

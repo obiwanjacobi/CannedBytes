@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace CannedBytes.Media.IO
 {
+    /// <summary>
+    /// Manages a stack of <see cref="FileChunk"/> instances.
+    /// </summary>
+    /// <remarks>Parent-child relation between chunks is also maintained.</remarks>
     public class FileChunkStack
     {
         private Stack<FileChunk> chunkStack = new Stack<FileChunk>();
 
+        /// <summary>
+        /// Removes all chunks.
+        /// </summary>
         public void Clear()
         {
             this.chunkStack.Clear();
@@ -49,8 +57,16 @@ namespace CannedBytes.Media.IO
             }
         }
 
+        /// <summary>
+        /// Pushes a new chunk up the stack.
+        /// </summary>
+        /// <param name="chunk">Must not be null.</param>
+        /// <remarks>The <paramref name="chunk"/> is added as a child to the current top chunk.</remarks>
         public void PushChunk(FileChunk chunk)
         {
+            Contract.Requires(chunk != null);
+            Throw.IfArgumentNull(chunk, "chunk");
+
             var parentChunk = CurrentChunk;
 
             // maintain child-chunks on parent.
@@ -62,6 +78,10 @@ namespace CannedBytes.Media.IO
             this.chunkStack.Push(chunk);
         }
 
+        /// <summary>
+        /// Removes the top chunk from the stack.
+        /// </summary>
+        /// <returns>Returns null if only the root chunk remains or the stack is empty.</returns>
         public FileChunk PopChunk()
         {
             // never pop the root.

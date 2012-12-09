@@ -1,13 +1,17 @@
 ﻿using System;
 using System.ComponentModel.Composition.Hosting;
+using System.Diagnostics.Contracts;
 
 namespace CannedBytes.Media.IO
 {
     /// <summary>
-    /// Represents the (R)IFF file that is being parsed.
+    /// Represents the context for the (R)IFF file that is being parsed.
     /// </summary>
-    public class ChunkFileContext : IDisposable
+    public class ChunkFileContext : DisposableBase
     {
+        /// <summary>
+        /// Constructs a new instance.
+        /// </summary>
         public ChunkFileContext()
         {
             ChunkStack = new FileChunkStack();
@@ -23,6 +27,9 @@ namespace CannedBytes.Media.IO
         /// </summary>
         public FileChunkStack ChunkStack { get; protected set; }
 
+        /// <summary>
+        /// Backing field for <see cref="P:CompositionContainer"/>.
+        /// </summary>
         private CompositionContainer compositionContainer;
 
         /// <summary>
@@ -42,8 +49,16 @@ namespace CannedBytes.Media.IO
             }
         }
 
+        /// <summary>
+        /// Creates a new context based on the specified <paramref name="filePath"/>.
+        /// </summary>
+        /// <param name="filePath">Must not be null or empty and the file pointed to must exist.</param>
+        /// <returns></returns>
         public static ChunkFileContext OpenFrom(string filePath)
         {
+            Contract.Requires(!String.IsNullOrEmpty(filePath));
+            Throw.IfArgumentNullOrEmpty(filePath, "filePath");
+
             var ctx = new ChunkFileContext();
 
             ctx.ChunkFile = ChunkFileInfo.OpenRead(filePath);
@@ -51,19 +66,20 @@ namespace CannedBytes.Media.IO
             return ctx;
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposeManagedResources)
+        /// <inheritdocs/>
+        protected override void Dispose(bool disposeManagedResources)
         {
             if (disposeManagedResources)
             {
                 ChunkFile.Dispose();
-                CompositionContainer.Dispose();
+
+                if (this.compositionContainer != null)
+                {
+                    this.compositionContainer.Dispose();
+                }
             }
+
+            base.Dispose(disposeManagedResources);
         }
     }
 }
