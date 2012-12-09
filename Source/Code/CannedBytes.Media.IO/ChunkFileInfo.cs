@@ -35,7 +35,7 @@ namespace CannedBytes.Media.IO
         /// <summary>
         /// Gets the opened file stream.
         /// </summary>
-        public Stream BaseStream { get; protected set; }
+        public Stream BaseStream { get; set; }
 
         /// <summary>
         /// Opens a file for reading.
@@ -46,6 +46,8 @@ namespace CannedBytes.Media.IO
         {
             Contract.Requires(!String.IsNullOrEmpty(filePath));
             Contract.Ensures(Contract.Result<ChunkFileInfo>() != null);
+            Contract.Ensures(Contract.Result<ChunkFileInfo>().BaseStream != null);
+
             Throw.IfArgumentNullOrEmpty(filePath, "filePath");
 
             var chunkFile = new ChunkFileInfo(filePath);

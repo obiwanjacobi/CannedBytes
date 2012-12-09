@@ -59,6 +59,7 @@ namespace CannedBytes.Media.IO
         {
             Contract.Requires(stream != null);
             Contract.Requires(stream.CanRead);
+            Contract.Ensures(Contract.Result<FourCharacterCode>() != null);
             Throw.IfArgumentNull(stream, "stream");
 
             if (!stream.CanRead)

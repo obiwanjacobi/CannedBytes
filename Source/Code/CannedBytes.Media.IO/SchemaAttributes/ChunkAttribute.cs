@@ -23,6 +23,9 @@ namespace CannedBytes.Media.IO.SchemaAttributes
         /// <param name="fourCharacterCode">The identification of the chunk in four characters.</param>
         public ChunkAttribute(string fourCharacterCode)
         {
+            Contract.Requires(!String.IsNullOrEmpty(fourCharacterCode));
+            Throw.IfArgumentNullOrEmpty(fourCharacterCode, "fourCharacterCode");
+
             ChunkTypeId = new FourCharacterCode(fourCharacterCode);
         }
 
