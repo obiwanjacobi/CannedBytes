@@ -99,6 +99,12 @@ namespace CannedBytes.Media.IO
                 // use generic parameter as type
                 type = (from typeArg in type.GetGenericArguments()
                         select typeArg).FirstOrDefault();
+
+                if (type == null)
+                {
+                    throw new ChunkFileException("Internal error. No type argument from generic type.");
+                }
+
                 isCollection = true;
             }
 
@@ -106,6 +112,11 @@ namespace CannedBytes.Media.IO
 
             foreach (var member in this.members)
             {
+                if (member == null)
+                {
+                    throw new ChunkFileException("Internal error: null references in member list.");
+                }
+
                 if (member.ChunkMatches(chunkId) &&
                     member.CanSetValue)
                 {
@@ -259,7 +270,10 @@ namespace CannedBytes.Media.IO
                     member.DataType = dataType;
                 }
 
-                chunkId = ChunkAttribute.GetChunkId(member.DataType);
+                if (member.DataType != null)
+                {
+                    chunkId = ChunkAttribute.GetChunkId(member.DataType);
+                }
 
                 if (!String.IsNullOrEmpty(chunkId))
                 {
@@ -268,11 +282,16 @@ namespace CannedBytes.Media.IO
                 }
                 else
                 {
-                    var chunkTypes = ChunkTypeAttribute.GetChunkTypes(member.GetMemberInfo());
+                    var memberInfo = member.GetMemberInfo();
 
-                    if (chunkTypes != null && chunkTypes.Length > 0)
+                    if (memberInfo != null)
                     {
-                        member.ChunkIds = new List<string>(chunkTypes);
+                        var chunkTypes = ChunkTypeAttribute.GetChunkTypes(memberInfo);
+
+                        if (chunkTypes != null && chunkTypes.Length > 0)
+                        {
+                            member.ChunkIds = new List<string>(chunkTypes);
+                        }
                     }
                 }
             }

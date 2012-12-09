@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics.Contracts;
+using System.IO;
 
 namespace CannedBytes.Media.IO
 {
@@ -59,6 +60,8 @@ namespace CannedBytes.Media.IO
         {
             get
             {
+                Contract.Ensures(Contract.Result<FileChunkCollection>() != null);
+
                 if (this.subChunks == null)
                 {
                     this.subChunks = new FileChunkCollection();

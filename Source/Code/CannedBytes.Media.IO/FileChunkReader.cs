@@ -77,6 +77,11 @@ namespace CannedBytes.Media.IO
                 stream = this.context.ChunkFile.BaseStream;
             }
 
+            if (stream == null)
+            {
+                throw new ChunkFileException("No valid stream was found to read from.");
+            }
+
             return ReadNextChunk(stream);
         }
 
@@ -130,8 +135,6 @@ namespace CannedBytes.Media.IO
         {
             get
             {
-                Contract.Ensures(Contract.Result<Stream>() != null);
-
                 Stream stream;
 
                 if (this.context.ChunkStack.CurrentChunk == null)

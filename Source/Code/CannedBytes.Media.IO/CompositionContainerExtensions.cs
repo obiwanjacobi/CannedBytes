@@ -45,7 +45,7 @@ namespace CannedBytes.Media.IO
         /// <exception cref="ChunkFileException">Thrown when no instance was found.</exception>
         public static T GetService<T>(this CompositionContainer container) where T : class
         {
-            Contract.Requires<ArgumentNullException>(container != null);
+            Contract.Requires(container != null);
             Contract.Ensures(Contract.Result<T>() != null);
 
             var result = container.GetExportedValue<T>();

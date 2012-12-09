@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using CannedBytes.Media.IO.SchemaAttributes;
 using CannedBytes.Media.IO.Services;
@@ -20,9 +21,11 @@ namespace CannedBytes.Media.IO.ChunkTypes
         /// <returns></returns>
         public override object Read(ChunkFileContext context)
         {
+            Contract.Requires(context.CompositionContainer != null);
             Throw.IfArgumentNull(context, "context");
             Throw.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
             Throw.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
+            Throw.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
 
             // create instance and read type
             var listChunk = base.Read(context) as ListChunk;
@@ -35,7 +38,8 @@ namespace CannedBytes.Media.IO.ChunkTypes
             // read child chunk of 'type'
             var reader = context.CompositionContainer.GetService<FileChunkReader>();
             var chunk = context.ChunkStack.CurrentChunk;
-            var stream = reader.CurrentStream;
+
+            var stream = chunk.DataStream;
             var itemType = LookupItemType(context, listChunk.ItemType);
             IList children = null;
 
@@ -47,7 +51,7 @@ namespace CannedBytes.Media.IO.ChunkTypes
             }
 
             // while there is still data in the stream
-            while (chunk.DataStream.Position < chunk.DataStream.Length)
+            while (stream.Position < stream.Length)
             {
                 var rtObj = reader.ReadRuntimeContainerChunkType(stream, listChunk.ItemType);
 
