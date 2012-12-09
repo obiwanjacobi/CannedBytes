@@ -4,7 +4,7 @@ using CannedBytes.Media.IO.SchemaAttributes;
 namespace CannedBytes.Media.IO
 {
     /// <summary>
-    /// abstract base implementation for a chunk handler class.
+    /// An abstract base implementation for a chunk handler class.
     /// </summary>
     /// <remarks>All chunk handler implementation classes must have a <see cref="FileChunkHandlerAttribute"/>.</remarks>
     public abstract class FileChunkHandler : IFileChunkHandler

@@ -9,47 +9,58 @@ using CannedBytes.Media.IO.SchemaAttributes;
 
 namespace CannedBytes.Media.IO
 {
+    /// <summary>
+    /// Manages writing to a runtime chunk object.
+    /// </summary>
     public class ObjectMemberWriter
     {
-        IEnumerable<MemberData> members;
-        IEnumerator<MemberData> memberEnum;
+        /// <summary>
+        /// Backing field for a list of writable public fields or properties.
+        /// </summary>
+        private IEnumerable<MemberData> members;
 
+        /// <summary>
+        /// Constructs a new instance on the specified runtime object.
+        /// </summary>
+        /// <param name="instance">Must not be null.</param>
         public ObjectMemberWriter(object instance)
         {
             Contract.Requires(instance != null);
+            Throw.IfArgumentNull(instance, "instance");
 
             Instance = instance;
             ObjectType = instance.GetType();
             this.members = BuildMemberList(ObjectType);
-            this.memberEnum = members.GetEnumerator();
         }
 
+        /// <summary>
+        /// Gets the current runtime object the writer is acting on.
+        /// </summary>
         public object Instance { get; private set; }
 
+        /// <summary>
+        /// Gets the type of the runtime object.
+        /// </summary>
         public Type ObjectType { get; private set; }
 
-        public bool CanReadNext
+        /// <summary>
+        /// Uses the <paramref name="reader"/> to populate the fields and properties of the runtime object.
+        /// </summary>
+        /// <param name="reader">Must not be null.</param>
+        public void ReadFields(FileChunkReader reader)
         {
-            get { return (this.members.Count() > 0); }
-        }
+            Contract.Requires(reader != null);
+            Throw.IfArgumentNull(reader, "reader");
 
-        public void ReadFields(FileChunkReader reader, bool ignoreChunks)
-        {
             // keep processing native data type members
-            while (reader.CurrentStreamCanRead &&
-                this.memberEnum.MoveNext())
+            foreach (var member in this.members)
             {
-                var member = memberEnum.Current;
+                if (!reader.CurrentStreamCanRead) break;
 
                 // this member represent a chunk
                 if (member.ChunkIds != null)
                 {
-                    if (!ignoreChunks)
-                    {
-                        throw new NotSupportedException("This method does not support reading chunks. No mixed (chunks and data) types allowed.");
-                    }
-
-                    continue;
+                    throw new NotSupportedException("This method does not support reading chunks. No mixed (chunks and data) types allowed.");
                 }
 
                 try
@@ -69,9 +80,16 @@ namespace CannedBytes.Media.IO
             }
         }
 
-        public bool WriteNextChunkObject(object rtObj)
+        /// <summary>
+        /// Writes the <paramref name="rtObj"/> to one of the fields or properties of the runtime object.
+        /// </summary>
+        /// <param name="rtObj">Must not be null.</param>
+        /// <returns>Returns true when the value was written.</returns>
+        /// <remarks>Once a property is set it will not be overwritten by subsequent calls to this method.</remarks>
+        public bool WriteChunkObject(object rtObj)
         {
-            Contract.Requires<ArgumentNullException>(rtObj != null);
+            Contract.Requires(rtObj != null);
+            Throw.IfArgumentNull(rtObj, "rtObj");
 
             bool isCollection = false;
             var type = rtObj.GetType();
@@ -86,15 +104,12 @@ namespace CannedBytes.Media.IO
 
             var chunkId = ChunkAttribute.GetChunkId(type);
 
-            // start from the beginning.
-            this.memberEnum.Reset();
-
-            while (this.memberEnum.MoveNext())
+            foreach (var member in this.members)
             {
-                if (this.memberEnum.Current.ChunkMatches(chunkId) &&
-                    this.memberEnum.Current.CanSetValue)
+                if (member.ChunkMatches(chunkId) &&
+                    member.CanSetValue)
                 {
-                    this.memberEnum.Current.SetValue(Instance, rtObj, isCollection);
+                    member.SetValue(Instance, rtObj, isCollection);
 
                     return true;
                 }
@@ -103,8 +118,19 @@ namespace CannedBytes.Media.IO
             return false;
         }
 
+        /// <summary>
+        /// Uses the <paramref name="reader"/> to read data for the specified <paramref name="type"/>.
+        /// </summary>
+        /// <param name="type">Must not be null.</param>
+        /// <param name="reader">Must not be null.</param>
+        /// <returns>Returns the value read or null if type is unsupported.</returns>
         protected virtual object ReadValueForType(Type type, FileChunkReader reader)
         {
+            Contract.Requires(type != null);
+            Contract.Requires(reader != null);
+            Throw.IfArgumentNull(type, "type");
+            Throw.IfArgumentNull(reader, "reader");
+
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Byte:
@@ -143,9 +169,18 @@ namespace CannedBytes.Media.IO
             return value;
         }
 
+        /// <summary>
+        /// Uses the <paramref name="reader"/> to read a custom <paramref name="type"/> (class).
+        /// </summary>
+        /// <param name="type">Must not be null.</param>
+        /// <param name="reader">Must not be null.</param>
+        /// <returns>Returns null if the custom type is not supported.</returns>
         protected virtual object ReadValueForCustomType(Type type, FileChunkReader reader)
         {
-            Contract.Requires<ArgumentNullException>(type != null);
+            Contract.Requires(type != null);
+            Contract.Requires(reader != null);
+            Throw.IfArgumentNull(type, "type");
+            Throw.IfArgumentNull(reader, "reader");
 
             if (type.FullName == typeof(FourCharacterCode).FullName)
             {
@@ -173,7 +208,8 @@ namespace CannedBytes.Media.IO
 
         private static IEnumerable<MemberData> BuildMemberList(Type type)
         {
-            Contract.Requires<ArgumentNullException>(type != null);
+            Contract.Requires(type != null);
+            Throw.IfArgumentNull(type, "type");
 
             var members = (from member in type.GetMembers()
                            where member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Field
@@ -244,13 +280,34 @@ namespace CannedBytes.Media.IO
             return members;
         }
 
+        /// <summary>
+        /// Maintains information about a member of the runtime object.
+        /// </summary>
         private class MemberData
         {
+            /// <summary>
+            /// Is set when the member is a public field.
+            /// </summary>
             public FieldInfo FieldInfo;
+            /// <summary>
+            /// Is set when the member is public property.
+            /// </summary>
             public PropertyInfo PropertyInfo;
+            /// <summary>
+            /// The data type of the member.
+            /// </summary>
             public Type DataType;
+            /// <summary>
+            /// Any chunk id's that apply to the member.
+            /// </summary>
             public List<string> ChunkIds;
+            /// <summary>
+            /// Indicates if the member is a collection (or list).
+            /// </summary>
             public bool IsCollection;
+            /// <summary>
+            /// Is set when the writer has set a value for the member.
+            /// </summary>
             public bool ValueAssigned;
 
             /// <summary>
@@ -261,6 +318,11 @@ namespace CannedBytes.Media.IO
                 get { return (IsCollection || (!ValueAssigned && !IsCollection)); }
             }
 
+            /// <summary>
+            /// Indicates if there is a macth for this member with the <paramref name="chunkId"/>.
+            /// </summary>
+            /// <param name="chunkId">Can be null or empty.</param>
+            /// <returns>Returns true if there is a match.</returns>
             public bool ChunkMatches(string chunkId)
             {
                 if (ChunkIds != null)
@@ -277,8 +339,17 @@ namespace CannedBytes.Media.IO
                 return false;
             }
 
+            /// <summary>
+            /// Sets a value for the member. Handler adding to a collection.
+            /// </summary>
+            /// <param name="instance">The runtime object. Must not be null.</param>
+            /// <param name="value">The value to set.</param>
+            /// <param name="isCollection">An indication if the <paramref name="value"/> is a collection.</param>
             public void SetValue(object instance, object value, bool isCollection)
             {
+                Contract.Requires(instance != null);
+                Throw.IfArgumentNull(instance, "instance");
+
                 if (IsCollection && !isCollection)
                 {
                     IList collection = GetValue(instance) as IList;
@@ -299,8 +370,17 @@ namespace CannedBytes.Media.IO
                 }
             }
 
+            /// <summary>
+            /// Sets the <paramref name="value"/> to either the field or the property.
+            /// </summary>
+            /// <param name="instance">Must not be null.</param>
+            /// <param name="value">The value to set.</param>
+            /// <remarks>Set <see cref="F:ValueAssigned"/> to true.</remarks>
             private void SetMemberValue(object instance, object value)
             {
+                Contract.Requires(instance != null);
+                Throw.IfArgumentNull(instance, "instance");
+
                 if (FieldInfo != null)
                 {
                     FieldInfo.SetValue(instance, value);
@@ -314,8 +394,16 @@ namespace CannedBytes.Media.IO
                 }
             }
 
+            /// <summary>
+            /// Gets the value for the property or field.
+            /// </summary>
+            /// <param name="instance">Must not be null.</param>
+            /// <returns>Can return null.</returns>
             public object GetValue(object instance)
             {
+                Contract.Requires(instance != null);
+                Throw.IfArgumentNull(instance, "instance");
+
                 if (FieldInfo != null)
                 {
                     return FieldInfo.GetValue(instance);
@@ -329,8 +417,14 @@ namespace CannedBytes.Media.IO
                 return null;
             }
 
+            /// <summary>
+            /// Retrieves the name of the member.
+            /// </summary>
+            /// <returns>Never returns null.</returns>
             public string GetMemberName()
             {
+                Contract.Ensures(Contract.Result<string>() != null);
+
                 if (FieldInfo != null)
                 {
                     return FieldInfo.Name;
@@ -344,6 +438,10 @@ namespace CannedBytes.Media.IO
                 return String.Empty;
             }
 
+            /// <summary>
+            /// Gets the <see cref="MemberInfo"/> of this member.
+            /// </summary>
+            /// <returns>Can return null.</returns>
             public MemberInfo GetMemberInfo()
             {
                 if (FieldInfo != null)

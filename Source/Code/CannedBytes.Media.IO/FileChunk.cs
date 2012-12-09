@@ -5,6 +5,8 @@ namespace CannedBytes.Media.IO
     /// <summary>
     /// The FileChunk class represents a single chunk in a (R)IIF file.
     /// </summary>
+    /// <remarks>This info is independent of any runtime chunk types that might be registered.
+    /// This allows for reconstructions of the chunk file even when some chunks weren't recognized by the application.</remarks>
     public class FileChunk
     {
         /// <summary>
@@ -37,11 +39,17 @@ namespace CannedBytes.Media.IO
         /// </summary>
         public object RuntimeInstance { get; set; }
 
+        /// <summary>
+        /// Gets an indication if this chunk has any children.
+        /// </summary>
         public bool HasSubChunks
         {
             get { return (this.subChunks != null && this.subChunks.Count > 0); }
         }
 
+        /// <summary>
+        /// Backing field for <see cref="P:Subchunks"/>.
+        /// </summary>
         private FileChunkCollection subChunks;
 
         /// <summary>

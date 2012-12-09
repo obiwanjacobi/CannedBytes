@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition.Hosting;
+﻿using System.ComponentModel.Composition.Hosting;
 using CannedBytes.ComponentModel.Composition;
 using CannedBytes.Media.IO.UnitTests.Stubs;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -43,27 +42,48 @@ namespace CannedBytes.Media.IO.UnitTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void CreateFileChunkReader_ThrowsException_OnThisNull()
         {
-            CompositionContainer container = null;
-            var expected = container.CreateFileChunkReader();
+            try
+            {
+                CompositionContainer container = null;
+                var expected = container.CreateFileChunkReader();
+
+                Assert.Fail();
+            }
+            catch
+            {
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void AddInstance_ThrowsException_OnNullArg()
         {
-            var container = CreateNewContainer();
-            container.AddInstance<object>(null);
+            try
+            {
+                var container = CreateNewContainer();
+                container.AddInstance<object>(null);
+
+                Assert.Fail();
+            }
+            catch
+            {
+            }
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void AddInstance_ThrowsException_OnThisNull()
         {
-            CompositionContainer container = null;
-            container.AddInstance<object>(null);
+            try
+            {
+                CompositionContainer container = null;
+                container.AddInstance<object>(null);
+
+                Assert.Fail();
+            }
+            catch
+            {
+            }
         }
     }
 }

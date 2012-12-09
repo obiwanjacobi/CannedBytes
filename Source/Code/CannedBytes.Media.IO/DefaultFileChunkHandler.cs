@@ -31,15 +31,20 @@ namespace CannedBytes.Media.IO
         {
             Contract.Requires(context.ChunkStack != null);
             Contract.Requires(context.ChunkStack.CurrentChunk != null);
+            Contract.Requires(context.ChunkFile != null);
+            Contract.Requires(context.ChunkFile.BaseStream != null);
             Throw.IfArgumentNull(context, "context");
             Throw.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
             Throw.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
+            Throw.IfArgumentNull(context.ChunkFile, "context.ChunkFile");
+            Throw.IfArgumentNull(context.ChunkFile.BaseStream, "context.ChunkFile.BaseStream");
 
             var reader = context.CompositionContainer.GetService<FileChunkReader>();
             var stream = context.ChunkFile.BaseStream;
+
             var chunk = context.ChunkStack.CurrentChunk;
 
-            chunk.RuntimeInstance = reader.ReadRuntimeChunkType(stream, chunk.ChunkId, true);
+            chunk.RuntimeInstance = reader.ReadRuntimeChunkType(stream, chunk.ChunkId);
 
             // extra check if type returned is correct for chunk.
             if (chunk.RuntimeInstance != null &&

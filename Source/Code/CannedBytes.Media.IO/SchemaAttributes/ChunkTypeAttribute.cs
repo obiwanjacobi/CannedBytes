@@ -12,28 +12,56 @@ namespace CannedBytes.Media.IO.SchemaAttributes
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = true)]
     public class ChunkTypeAttribute : Attribute
     {
+        /// <summary>
+        /// Constructs a new instance.
+        /// </summary>
         public ChunkTypeAttribute()
         { }
 
+        /// <summary>
+        /// Constructs a new instance.
+        /// </summary>
+        /// <param name="fourCharacterCode">The chunk id of the chunk type.</param>
         public ChunkTypeAttribute(string fourCharacterCode)
         {
+            Contract.Requires(!String.IsNullOrEmpty(fourCharacterCode));
+            Throw.IfArgumentNullOrEmpty(fourCharacterCode, "fourCharacterCode");
+
             ChunkTypeId = new FourCharacterCode(fourCharacterCode);
         }
 
-        public FourCharacterCode ChunkTypeId { get; set; }
+        /// <summary>
+        /// Gets the chunk id.
+        /// </summary>
+        public FourCharacterCode ChunkTypeId { get; private set; }
 
-        public static bool HasChunkTypes(MemberInfo memberInfo)
+        /// <summary>
+        /// Indicates if any chunk type attributes are declared on the <paramref name="member"/>.
+        /// </summary>
+        /// <param name="member">Must not be null.</param>
+        /// <returns>Returns true if any chunk types are found.</returns>
+        public static bool HasChunkTypes(MemberInfo member)
         {
-            var types = GetChunkTypes(memberInfo);
+            Contract.Requires(member != null);
+            Throw.IfArgumentNull(member, "member");
+
+            var types = GetChunkTypes(member);
 
             return (types != null && types.Length > 0);
         }
 
-        public static string[] GetChunkTypes(MemberInfo memberInfo)
+        /// <summary>
+        /// Returns the chunk types for the <paramref name="member"/>.
+        /// </summary>
+        /// <param name="member">Must not be null.</param>
+        /// <returns>Never returns null.</returns>
+        public static string[] GetChunkTypes(MemberInfo member)
         {
-            Contract.Requires(memberInfo != null);
+            Contract.Requires(member != null);
+            Contract.Ensures(Contract.Result<string[]>() != null);
+            Throw.IfArgumentNull(member, "member");
 
-            var result = (from attr in memberInfo.GetCustomAttributes(typeof(ChunkTypeAttribute), false)
+            var result = (from attr in member.GetCustomAttributes(typeof(ChunkTypeAttribute), false)
                           where attr != null
                           select ((ChunkTypeAttribute)attr).ChunkTypeId.ToString());
 
