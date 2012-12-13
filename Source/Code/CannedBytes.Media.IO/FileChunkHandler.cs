@@ -1,8 +1,9 @@
-﻿using System;
-using CannedBytes.Media.IO.SchemaAttributes;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using CannedBytes.Media.IO.SchemaAttributes;
+
     /// <summary>
     /// An abstract base implementation for a chunk handler class.
     /// </summary>
@@ -12,6 +13,7 @@ namespace CannedBytes.Media.IO
         /// <summary>
         /// Retrieves the <see cref="FileChunkHandlerAttribute"/> and initializes the <see cref="P:ChunkId"/> property.
         /// </summary>
+        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "FileChunkHandlerExportAttribute", Justification = "We want to indicate the type.")]
         protected FileChunkHandler()
         {
             var attrs = this.GetType().GetCustomAttributes(typeof(FileChunkHandlerAttribute), true);
@@ -19,10 +21,10 @@ namespace CannedBytes.Media.IO
             if (attrs == null || attrs.Length == 0)
             {
                 throw new InvalidOperationException(
-                    "A FileChunkHandler derived class must be marked with the FileChunkHandlerExportAttribute.");
+                    "A File Chunk Handler derived class must be marked with the FileChunkHandlerExportAttribute.");
             }
 
-            ChunkId = new FourCharacterCode(((FileChunkHandlerAttribute)attrs[0]).ChunkId);
+            this.ChunkId = new FourCharacterCode(((FileChunkHandlerAttribute)attrs[0]).ChunkId);
         }
 
         /// <summary>
@@ -35,9 +37,12 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="chunk">File chunk info. Must not be null.</param>
         /// <returns>Returns true if the chunk can be read by this handler.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual bool CanRead(FileChunk chunk)
         {
-            return (chunk.ChunkId.ToString() == ChunkId.ToString() &&
+            Check.IfArgumentNull(chunk, "chunk");
+
+            return (chunk.ChunkId.ToString() == this.ChunkId.ToString() &&
                 chunk.DataStream != null && chunk.DataStream.CanRead);
         }
 
@@ -49,9 +54,12 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="chunk">File chunk info. Must not be null.</param>
         /// <returns>Returns true if the chunk can be written by this handler.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual bool CanWrite(FileChunk chunk)
         {
-            return (chunk.ChunkId.ToString() == ChunkId.ToString() &&
+            Check.IfArgumentNull(chunk, "chunk");
+
+            return (chunk.ChunkId.ToString() == this.ChunkId.ToString() &&
                 chunk.DataStream != null && chunk.DataStream.CanWrite);
         }
 

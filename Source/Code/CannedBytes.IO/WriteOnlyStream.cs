@@ -1,12 +1,13 @@
-using System;
-using System.IO;
-
 namespace CannedBytes.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+
     /// <summary>
     /// Wraps an existing stream and makes it write-only.
     /// </summary>
-    public class WriteOnlyStream : StreamWrapper
+    public class WriteOnlyStream : WrappedStream
     {
         /// <summary>
         /// Instantiates a new seekable write-only stream.
@@ -29,8 +30,14 @@ namespace CannedBytes.IO
             ValidateStreamIsWritable(stream);
         }
 
+        /// <summary>
+        /// Throws an exception if the <paramref name="stream"/> can not be written to.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
         private static void ValidateStreamIsWritable(Stream stream)
         {
+            Check.IfArgumentNull(stream, "stream");
+
             if (!stream.CanWrite)
             {
                 throw new ArgumentException("Stream cannot be written.", "stream");
@@ -38,6 +45,7 @@ namespace CannedBytes.IO
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Not used.")]
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             throw new NotSupportedException();
@@ -50,6 +58,7 @@ namespace CannedBytes.IO
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Not used.")]
         public override int Read(byte[] buffer, int offset, int count)
         {
             throw new NotSupportedException();

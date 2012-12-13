@@ -27,7 +27,7 @@
     <DefineConstants>TRACE;DEBUG;CONTRACTS_FULL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
     <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
     <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
     <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
@@ -60,7 +60,7 @@
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Debug\CannedBytes.Media.IO.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -101,7 +101,7 @@
     <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
     <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
-    <CodeContractsAnalysisWarningLevel>1</CodeContractsAnalysisWarningLevel>
+    <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
     <DocumentationFile>bin\Release\CannedBytes.Media.IO.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
@@ -114,29 +114,10 @@
   <ItemGroup>
     <Compile Include="ChunkFileException.cs" />
     <Compile Include="ChunkFileInfo.cs" />
-    <Compile Include="ChunkTypes\Avi\AviAvihChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviDataChunkBase.cs" />
-    <Compile Include="ChunkTypes\Avi\AviHdrlChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviIdx1Chunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviMoviChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviRecChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviStrdChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviStrfChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviStrhChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviStrlChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviStrnChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviXxdbChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviXxdcChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviXxpcChunk.cs" />
-    <Compile Include="ChunkTypes\Avi\AviXxwbChunk.cs" />
     <Compile Include="ChunkTypes\ListChunk.cs" />
     <Compile Include="ChunkTypes\ListChunkHandler.cs" />
     <Compile Include="ChunkTypes\RiffChunk.cs" />
     <Compile Include="ChunkTypes\RiffChunkHandler.cs" />
-    <Compile Include="ChunkTypes\Wave\WaveChunk.cs" />
-    <Compile Include="ChunkTypes\Wave\WaveDataChunk.cs" />
-    <Compile Include="ChunkTypes\Wave\WaveFormatChunk.cs" />
     <Compile Include="CompositionContainerExtensions.cs" />
     <Compile Include="DefaultFileChunkHandler.cs" />
     <Compile Include="FileChunk.cs" />
@@ -147,6 +128,7 @@
     <Compile Include="FileChunkStack.cs" />
     <Compile Include="ChunkFileContext.cs" />
     <Compile Include="FourCharacterCode.cs" />
+    <Compile Include="IFileChunkHandler.Contract.cs" />
     <Compile Include="IFileChunkHandler.cs" />
     <Compile Include="ObjectMemberWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -180,8 +162,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CannedBytes.Media.IO.cd" />
-    <None Include="ChunkTypes\Avi\CannedBytes.Media.IO.ChunkTypes.Avi.cd" />
-    <None Include="ChunkTypes\Wave\CannedBytes.Media.IO.ChunkTypes.Wave.cd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CannedBytes.IO\CannedBytes.IO.csproj">

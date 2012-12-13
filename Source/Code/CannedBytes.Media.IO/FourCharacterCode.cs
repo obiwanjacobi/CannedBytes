@@ -1,10 +1,11 @@
-using System;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Text;
-
 namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.IO;
+    using System.Text;
+
     /// <summary>
     /// Represents a four character code.
     /// </summary>
@@ -19,18 +20,20 @@ namespace CannedBytes.Media.IO
         /// Block default constructor.
         /// </summary>
         private FourCharacterCode()
-        { }
+        {
+        }
 
         /// <summary>
         /// Constructs a new instance.
         /// </summary>
         /// <param name="fourCC">A byte buffer of (at least) 4 characters.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FourCharacterCode(byte[] fourCC)
         {
             Contract.Requires(fourCC != null);
             Contract.Requires(fourCC.Length >= 4);
-            Throw.IfArgumentNull(fourCC, "fourCC");
-            Throw.IfArgumentOutOfRange(fourCC.Length, 4, int.MaxValue, "fourCC.Length");
+            Check.IfArgumentNull(fourCC, "fourCC");
+            Check.IfArgumentOutOfRange(fourCC.Length, 4, int.MaxValue, "fourCC.Length");
 
             this.fourCC = new byte[4];
             fourCC.CopyTo(this.fourCC, 0);
@@ -40,12 +43,13 @@ namespace CannedBytes.Media.IO
         /// Constructs a new instance.
         /// </summary>
         /// <param name="fourCC">A string of exactly 4 characters long.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FourCharacterCode(string fourCC)
         {
             Contract.Requires(fourCC != null);
             Contract.Requires(fourCC.Length == 4);
-            Throw.IfArgumentNull(fourCC, "fourCC");
-            Throw.IfArgumentOutOfRange(fourCC.Length, 4, 4, "fourCC.Length");
+            Check.IfArgumentNull(fourCC, "fourCC");
+            Check.IfArgumentOutOfRange(fourCC.Length, 4, 4, "fourCC.Length");
 
             this.fourCC = Encoding.ASCII.GetBytes(fourCC);
         }
@@ -55,12 +59,13 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <returns>Never return null.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public static FourCharacterCode ReadFrom(Stream stream)
         {
             Contract.Requires(stream != null);
             Contract.Requires(stream.CanRead);
             Contract.Ensures(Contract.Result<FourCharacterCode>() != null);
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             if (!stream.CanRead)
             {
@@ -74,7 +79,7 @@ namespace CannedBytes.Media.IO
 
             if (bytesRead < 4)
             {
-                throw new EndOfStreamException("End of stream while reading fourCC.");
+                throw new EndOfStreamException();
             }
 
             return fourCC;
@@ -84,11 +89,12 @@ namespace CannedBytes.Media.IO
         /// Writes the four character code to the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public void WriteTo(Stream stream)
         {
             Contract.Requires(stream != null);
             Contract.Requires(stream.CanWrite);
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             if (!stream.CanWrite)
             {

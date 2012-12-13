@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.Composition;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.ComponentModel.Composition;
+    using System.IO;
+
     /// <summary>
     /// Implements the <see cref="IStringReader"/> interface for a size-prefixed string.
     /// </summary>
@@ -12,7 +12,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public string ReadString(Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             throw new System.NotImplementedException();
         }

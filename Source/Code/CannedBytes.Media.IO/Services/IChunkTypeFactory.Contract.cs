@@ -1,20 +1,14 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System;
+    using System.Diagnostics.Contracts;
+
     /// <summary>
     /// Contract for <see cref="IChunkTypeFactory"/>.
     /// </summary>
     [ContractClassFor(typeof(IChunkTypeFactory))]
     internal abstract class ChunkTypeFactoryContract : IChunkTypeFactory
     {
-        /// <summary>
-        /// Block instantiation.
-        /// </summary>
-        private ChunkTypeFactoryContract()
-        { }
-
         /// <summary>
         /// Contract.
         /// </summary>

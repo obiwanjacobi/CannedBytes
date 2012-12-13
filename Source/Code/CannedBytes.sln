@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B19CB88B-6167-4DBA-8114-9F6CB82029BC}"
 	ProjectSection(SolutionItems) = preProject
 		CannedBytes.vsmdi = CannedBytes.vsmdi
+		CodeAnalysis.ruleset = CodeAnalysis.ruleset
 		Local.testsettings = Local.testsettings
 		Settings.StyleCop = Settings.StyleCop
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings

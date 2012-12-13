@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using CannedBytes.Media.IO.SchemaAttributes;
-using CannedBytes.Media.IO.Services;
-
-namespace CannedBytes.Media.IO.ChunkTypes
+﻿namespace CannedBytes.Media.IO.ChunkTypes
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using CannedBytes.Media.IO.SchemaAttributes;
+    using CannedBytes.Media.IO.Services;
+
     /// <summary>
     /// Called by the <see cref="FileChunkReader"/> when a 'LIST' chunk is encountered.
     /// </summary>
@@ -18,14 +19,15 @@ namespace CannedBytes.Media.IO.ChunkTypes
         /// Reads the chunk file until the complete LIST of chunks are read.
         /// </summary>
         /// <param name="context">The context of the file being read. Must not be null.</param>
-        /// <returns></returns>
+        /// <returns>Returns the runtime object instance or null when no type was found.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public override object Read(ChunkFileContext context)
         {
             Contract.Requires(context.CompositionContainer != null);
-            Throw.IfArgumentNull(context, "context");
-            Throw.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
-            Throw.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
-            Throw.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
+            Check.IfArgumentNull(context, "context");
+            Check.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
+            Check.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
+            Check.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
 
             // create instance and read type
             var listChunk = base.Read(context) as ListChunk;
@@ -53,12 +55,12 @@ namespace CannedBytes.Media.IO.ChunkTypes
             // while there is still data in the stream
             while (stream.Position < stream.Length)
             {
-                var rtObj = reader.ReadRuntimeContainerChunkType(stream, listChunk.ItemType);
+                var runtimeObj = reader.ReadRuntimeContainerChunkType(stream, listChunk.ItemType);
 
                 // check if CLR type could be found for 'ItemType'.
-                if (rtObj != null && children != null)
+                if (runtimeObj != null && children != null)
                 {
-                    children.Add(rtObj);
+                    children.Add(runtimeObj);
                 }
             }
 
@@ -76,7 +78,7 @@ namespace CannedBytes.Media.IO.ChunkTypes
         /// <param name="context">Must not be null.</param>
         /// <param name="chunkId">Must not be null.</param>
         /// <returns>Returns null when not found.</returns>
-        private Type LookupItemType(ChunkFileContext context, FourCharacterCode chunkId)
+        private static Type LookupItemType(ChunkFileContext context, FourCharacterCode chunkId)
         {
             var factory = context.CompositionContainer.GetService<IChunkTypeFactory>();
 

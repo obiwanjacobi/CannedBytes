@@ -3,6 +3,7 @@
     using System;
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
@@ -35,13 +36,21 @@
         public void AddTypes(params Type[] types)
         {
             Contract.Requires(types != null);
-            Throw.IfArgumentNull(types, "types");
+            Check.IfArgumentNull(types, "types");
             ThrowIfDisposed();
 
             var cat = new TypeCatalog(types);
 
-            Contract.Assume(this.catalog.Catalogs != null);
-            this.catalog.Catalogs.Add(cat);
+            try
+            {
+                Contract.Assume(this.catalog.Catalogs != null);
+                this.catalog.Catalogs.Add(cat);
+            }
+            catch
+            {
+                cat.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -52,13 +61,21 @@
         public void AddAllMarkedTypesInAssembly(Assembly assembly)
         {
             Contract.Requires(assembly != null);
-            Throw.IfArgumentNull(assembly, "assembly");
+            Check.IfArgumentNull(assembly, "assembly");
             ThrowIfDisposed();
 
             var cat = new AssemblyCatalog(assembly);
 
-            Contract.Assume(this.catalog.Catalogs != null);
-            this.catalog.Catalogs.Add(cat);
+            try
+            {
+                Contract.Assume(this.catalog.Catalogs != null);
+                this.catalog.Catalogs.Add(cat);
+            }
+            catch
+            {
+                cat.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -70,7 +87,7 @@
         public void AddMarkedTypesInAssembly(Assembly assembly, Type contract)
         {
             Contract.Requires(contract != null);
-            Throw.IfArgumentNull(contract, "contract");
+            Check.IfArgumentNull(contract, "contract");
             ThrowIfDisposed();
 
             if (assembly == null)
@@ -87,8 +104,16 @@
 
             var cat = new TypeCatalog(result);
 
-            Contract.Assume(this.catalog.Catalogs != null);
-            this.catalog.Catalogs.Add(cat);
+            try
+            {
+                Contract.Assume(this.catalog.Catalogs != null);
+                this.catalog.Catalogs.Add(cat);
+            }
+            catch
+            {
+                cat.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
@@ -97,12 +122,13 @@
         /// </summary>
         /// <param name="assembly">Must not be null.</param>
         /// <param name="contract">The export contract. Must not be null or empty.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public void AddMarkedTypesInAssembly(Assembly assembly, string contract)
         {
             Contract.Requires(assembly != null);
             Contract.Requires(!String.IsNullOrEmpty(contract));
-            Throw.IfArgumentNull(assembly, "assembly");
-            Throw.IfArgumentNullOrEmpty(contract, "contract");
+            Check.IfArgumentNull(assembly, "assembly");
+            Check.IfArgumentNullOrEmpty(contract, "contract");
             ThrowIfDisposed();
 
             var result = from type in assembly.GetTypes()
@@ -112,35 +138,59 @@
 
             var cat = new TypeCatalog(result);
 
-            Contract.Assume(this.catalog.Catalogs != null);
-            this.catalog.Catalogs.Add(cat);
+            try
+            {
+                Contract.Assume(this.catalog.Catalogs != null);
+                this.catalog.Catalogs.Add(cat);
+            }
+            catch
+            {
+                cat.Dispose();
+                throw;
+            }
         }
 
         /// <summary>
         /// Creates a new composition container from the current catalog state.
         /// </summary>
         /// <returns>Never returns null.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Implemented the suggested pattern.")]
         public CompositionContainer CreateNew()
         {
             ThrowIfDisposed();
 
-            var container = new CompositionContainer(this.catalog);
+            CompositionContainer compositionContainer = null;
+            CompositionContainer container = null;
 
-            // add itself
-            var batch = new CompositionBatch();
-            batch.AddExportedValue(container);
-            container.Compose(batch);
+            try
+            {
+                container = new CompositionContainer(this.catalog);
+                // add itself
+                var batch = new CompositionBatch();
+                batch.AddExportedValue(container);
+                container.Compose(batch);
 
-            return container;
+                compositionContainer = container;
+                container = null;
+            }
+            finally
+            {
+                if (container != null)
+                {
+                    container.Dispose();
+                }
+            }
+
+            return compositionContainer;
         }
 
         /// <summary>
         /// Called to dispose the instance.
         /// </summary>
-        /// <param name="disposeManagedResources">True when also managed resources are disposed.</param>
-        protected override void Dispose(bool disposeManagedResources)
+        /// <param name="disposeKind">The type of resources to dispose of.</param>
+        protected override void Dispose(DisposeObjectKind disposeKind)
         {
-            if (disposeManagedResources)
+            if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
                 this.catalog.Dispose();
             }
@@ -148,6 +198,9 @@
             base.Dispose();
         }
 
+        /// <summary>
+        /// The object's invariant contract.
+        /// </summary>
         [ContractInvariantMethod]
         private void InvariantContract()
         {

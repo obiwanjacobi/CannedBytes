@@ -1,20 +1,14 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// Code contracts for <see cref="INumberReader"/>.
     /// </summary>
     [ContractClassFor(typeof(INumberReader))]
     internal abstract class NumberReaderContract : INumberReader
     {
-        /// <summary>
-        /// Block instantiation.
-        /// </summary>
-        private NumberReaderContract()
-        { }
-
         /// <summary>
         /// Contract.
         /// </summary>

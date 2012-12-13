@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -23,6 +24,8 @@ using System.Runtime.InteropServices;
 [assembly: Guid("55e3d000-ca87-47b2-bc43-dee7049ff4ce")]
 
 [assembly: CLSCompliant(true)]
+
+[assembly: NeutralResourcesLanguage("en-US")]
 
 // Version information for an assembly consists of the following four values:
 //

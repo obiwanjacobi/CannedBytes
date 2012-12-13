@@ -1,12 +1,13 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using System.Diagnostics.Contracts;
-using System.IO;
-using CannedBytes.IO;
-using CannedBytes.Media.IO.Services;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.IO;
+    using CannedBytes.IO;
+    using CannedBytes.Media.IO.Services;
+
     /// <summary>
     /// Implements the reading of file chunks, the creation of runtime objects and the serialization process.
     /// </summary>
@@ -17,45 +18,50 @@ namespace CannedBytes.Media.IO
         /// </summary>
         private ChunkFileContext context;
 
-        //warning CS0649: Field 'X' is never assigned to, and will always have its default value null
+        ////warning CS0649: Field 'X' is never assigned to, and will always have its default value null
 #pragma warning disable 0649
         /// <summary>
         /// Optional reference to the stream navigator.
         /// </summary>
         [Import(AllowDefault = true, AllowRecomposition = true)]
-        IStreamNavigator streamNavigator;
+        private IStreamNavigator streamNavigator;
+
         /// <summary>
         /// Private reference to the chunk type factory.
         /// </summary>
         [Import]
-        IChunkTypeFactory chunkTypeFactory;
+        private IChunkTypeFactory chunkTypeFactory;
+
         /// <summary>
         /// Private reference to the chunk handler manager.
         /// </summary>
         [Import]
-        FileChunkHandlerManager handlerMgr;
+        private FileChunkHandlerManager handlerMgr;
+
         /// <summary>
         /// Private reference to the string reader.
         /// </summary>
         [Import]
-        IStringReader stringReader;
+        private IStringReader stringReader;
+
         /// <summary>
         /// Private reference to the number reader.
         /// </summary>
         [Import]
-        INumberReader numberReader;
+        private INumberReader numberReader;
 #pragma warning restore 0649
 
         /// <summary>
         /// Constructs a new instance on the specified file <paramref name="context"/>.
         /// </summary>
         /// <param name="context">Must not be null.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FileChunkReader(ChunkFileContext context)
         {
             Contract.Requires(context != null);
             Contract.Requires(context.CompositionContainer != null);
-            Throw.IfArgumentNull(context, "context");
-            Throw.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
+            Check.IfArgumentNull(context, "context");
+            Check.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
 
             context.CompositionContainer.ComposeParts(this);
             context.CompositionContainer.AddInstance(this);
@@ -69,9 +75,9 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns null when there was no runtime chunk type found to represent the chunk read.</returns>
         public object ReadNextChunk()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
-            if (!CurrentStreamCanRead)
+            if (!this.CurrentStreamCanRead)
             {
                 // TODO: should we try to pop the current chunk first?
                 stream = this.context.ChunkFile.BaseStream;
@@ -82,7 +88,7 @@ namespace CannedBytes.Media.IO
                 throw new ChunkFileException("No valid stream was found to read from.");
             }
 
-            return ReadNextChunk(stream);
+            return this.ReadNextChunk(stream);
         }
 
         /// <summary>
@@ -93,11 +99,11 @@ namespace CannedBytes.Media.IO
         public object ReadNextChunk(Stream stream)
         {
             Contract.Requires(stream != null);
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             object chunkObject = null;
 
-            var chunk = ReadChunkHeader(stream);
+            var chunk = this.ReadChunkHeader(stream);
 
             if (chunk != null)
             {
@@ -114,14 +120,14 @@ namespace CannedBytes.Media.IO
 
                 // makes sure all of the chunk is 'read' (skipped)
                 // and aligns the stream position ready for the next chunk.
-                SkipChunk(chunk);
+                this.SkipChunk(chunk);
 
                 var poppedChunk = this.context.ChunkStack.PopChunk();
 
                 if (poppedChunk != null &&
                     !Object.ReferenceEquals(poppedChunk, chunk))
                 {
-                    throw new InvalidOperationException("The ChunkStack has been corrupted.");
+                    throw new InvalidOperationException("The Chunk Stack has been corrupted.");
                 }
             }
 
@@ -155,7 +161,7 @@ namespace CannedBytes.Media.IO
         /// </summary>
         public bool CurrentStreamCanRead
         {
-            get { return (CurrentStream.CanRead && (CurrentStream.Position < CurrentStream.Length)); }
+            get { return this.CurrentStream.CanRead && (this.CurrentStream.Position < this.CurrentStream.Length); }
         }
 
         /// <summary>
@@ -163,7 +169,7 @@ namespace CannedBytes.Media.IO
         /// </summary>
         public void SkipCurrentChunk()
         {
-            SkipChunk(this.context.ChunkStack.CurrentChunk);
+            this.SkipChunk(this.context.ChunkStack.CurrentChunk);
         }
 
         /// <summary>
@@ -171,33 +177,35 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="chunk">Must not be null.</param>
         /// <remarks>The underlying file stream is aligned using the <see cref="IStreamNavigator"/> implementation if available.</remarks>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         protected void SkipChunk(FileChunk chunk)
         {
             Contract.Requires(chunk != null);
             Contract.Requires(chunk.DataStream != null);
-            Throw.IfArgumentNull(chunk, "chunk");
-            Throw.IfArgumentNull(chunk.DataStream, "chunk.DataStream");
+            Check.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk.DataStream, "chunk.DataStream");
 
-            EndStream(chunk.DataStream);
+            this.EndStream(chunk.DataStream);
 
             if (this.streamNavigator != null)
             {
                 // after skipping the chunk length re-align position of the root stream.
                 // sub streams may refuse to move if they are at their end.
-                this.streamNavigator.AllignPosition(this.context.ChunkFile.BaseStream);
+                this.streamNavigator.AlignPosition(this.context.ChunkFile.BaseStream);
             }
         }
 
         /// <summary>
         /// Reads all bytes until the <paramref name="stream"/> is ended.
         /// </summary>
-        /// <param name="stream">Must not be null</param>
+        /// <param name="stream">Must not be null.</param>
         /// <remarks>If the <paramref name="stream"/> is not seekable
         /// the bytes are read which requires a buffer allocation.</remarks>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         protected void EndStream(Stream stream)
         {
             Contract.Requires(stream != null);
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             if (stream.CanSeek)
             {
@@ -206,7 +214,7 @@ namespace CannedBytes.Media.IO
             else
             {
                 // wasteful!
-                GetRemainingCurrentChunkBuffer();
+                this.GetRemainingCurrentChunkBuffer();
             }
         }
 
@@ -219,12 +227,13 @@ namespace CannedBytes.Media.IO
         /// <see cref="P:FileChunk.ChunkId"/>, <see cref="P:FileChunk.DataLength"/>,
         /// <see cref="P:FileChunk.ParentPosition"/>, <see cref="P:FileChunk.FilePosition"/>
         /// and <see cref="P:FileChunk.DataStream"/>.</remarks>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FileChunk ReadChunkHeader(Stream stream)
         {
             Contract.Requires(stream != null);
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
-            if (ValidateStreamPosition(8))
+            if (this.ValidateStreamPosition(8))
             {
                 var chunk = new FileChunk();
                 chunk.ChunkId = FourCharacterCode.ReadFrom(stream);
@@ -252,8 +261,8 @@ namespace CannedBytes.Media.IO
         {
             Contract.Requires(stream != null);
             Contract.Requires(chunkId != null);
-            Throw.IfArgumentNull(stream, "stream");
-            Throw.IfArgumentNull(chunkId, "chunkId");
+            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(chunkId, "chunkId");
 
             var runtimeObject = this.chunkTypeFactory.CreateChunkObject(chunkId);
 
@@ -276,12 +285,13 @@ namespace CannedBytes.Media.IO
         /// <remarks>Note that chunks (types) are never mixed content. They are either containing other chunks
         /// or the contain data. This method is for reading sub chunks.
         /// Use the <see cref="M:ReadRuntimteChunkType"/> to read data.</remarks>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public object ReadRuntimeContainerChunkType(Stream stream, FourCharacterCode chunkId)
         {
             Contract.Requires(stream != null);
             Contract.Requires(chunkId != null);
-            Throw.IfArgumentNull(stream, "stream");
-            Throw.IfArgumentNull(chunkId, "chunkId");
+            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(chunkId, "chunkId");
 
             var runtimeObject = this.chunkTypeFactory.CreateChunkObject(chunkId);
 
@@ -292,13 +302,13 @@ namespace CannedBytes.Media.IO
                 // read all of the stream
                 while (stream.Position < stream.Length)
                 {
-                    object rtChildObj = ReadNextChunk(stream);
+                    object runtimeChildObj = this.ReadNextChunk(stream);
 
                     // if null means there was no runtime type found.
-                    if (rtChildObj != null)
+                    if (runtimeChildObj != null)
                     {
                         // if returns false means can't find member
-                        if (!writer.WriteChunkObject(rtChildObj))
+                        if (!writer.WriteChunkObject(runtimeChildObj))
                         {
                             // just keep reading the stream...
                         }
@@ -314,25 +324,36 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="byteCount">Must be greater or equal than zero.</param>
         /// <returns>Returns true when there is enough room in the file stream.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "byte", Justification = "The method validates the number of bytes.")]
         protected bool ValidateStreamPosition(long byteCount)
         {
             Contract.Requires(byteCount >= 0);
-            Throw.IfArgumentOutOfRange(byteCount, 0, int.MaxValue, "byteCount");
+            Check.IfArgumentOutOfRange(byteCount, 0, int.MaxValue, "byteCount");
 
             var stream = this.context.ChunkFile.BaseStream;
             long curPos = stream.Position;
             long length = stream.Length;
 
-            return (byteCount <= (length - curPos));
+            return byteCount <= (length - curPos);
         }
 
         /// <summary>
         /// Creates a new <see cref="Stream"/> instance for the remaining chunk.
         /// </summary>
         /// <returns>Never returns null.</returns>
+        /// <remarks>Based on the <see cref="P:ChunkFileContext.CopyStreams"/> property
+        /// the original file <see cref="T:Stream"/> is used or an in-memory copy.</remarks>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "The MemoryStream is not an issue.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Creating a sub-stream is not something for in a property getter.")]
         public Stream GetRemainingCurrentChunkSubStream()
         {
             Contract.Ensures(Contract.Result<Stream>() != null);
+
+            if (this.context.CopyStreams)
+            {
+                var buffer = this.GetRemainingCurrentChunkBuffer();
+                return new MemoryStream(buffer, false);
+            }
 
             var chunk = this.context.ChunkStack.CurrentChunk;
             var stream = chunk.DataStream;
@@ -359,6 +380,11 @@ namespace CannedBytes.Media.IO
 
             var read = this.CurrentStream.Read(buffer, 0, length);
 
+            if (length != read)
+            {
+                throw new EndOfStreamException();
+            }
+
             return buffer;
         }
 
@@ -368,7 +394,7 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns the byte read.</returns>
         public byte ReadByte()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
             var value = stream.ReadByte();
 
@@ -386,7 +412,7 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns the character read.</returns>
         public char ReadChar()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
             var value = stream.ReadByte();
 
@@ -404,9 +430,9 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns the short read.</returns>
         public short ReadInt16()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
-            return numberReader.ReadInt16(stream);
+            return this.numberReader.ReadInt16(stream);
         }
 
         /// <summary>
@@ -415,9 +441,9 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns the integer read.</returns>
         public int ReadInt32()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
-            return numberReader.ReadInt32(stream);
+            return this.numberReader.ReadInt32(stream);
         }
 
         /// <summary>
@@ -426,9 +452,9 @@ namespace CannedBytes.Media.IO
         /// <returns>Returns the long read.</returns>
         public long ReadInt64()
         {
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
-            return numberReader.ReadInt64(stream);
+            return this.numberReader.ReadInt64(stream);
         }
 
         /// <summary>
@@ -466,9 +492,9 @@ namespace CannedBytes.Media.IO
         {
             Contract.Ensures(Contract.Result<string>() != null);
 
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
-            return stringReader.ReadString(stream);
+            return this.stringReader.ReadString(stream);
         }
 
         /// <summary>
@@ -479,7 +505,7 @@ namespace CannedBytes.Media.IO
         {
             Contract.Ensures(Contract.Result<FourCharacterCode>() != null);
 
-            var stream = CurrentStream;
+            var stream = this.CurrentStream;
 
             return FourCharacterCode.ReadFrom(stream);
         }
@@ -489,9 +515,9 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <returns>Returns the value read.</returns>
         [CLSCompliant(false)]
-        public UInt16 ReadUInt16()
+        public ushort ReadUInt16()
         {
-            return (UInt16)ReadInt16();
+            return (ushort)this.ReadInt16();
         }
 
         /// <summary>
@@ -499,9 +525,9 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <returns>Returns the value read.</returns>
         [CLSCompliant(false)]
-        public UInt32 ReadUInt32()
+        public uint ReadUInt32()
         {
-            return (UInt32)ReadInt32();
+            return (uint)this.ReadInt32();
         }
 
         /// <summary>
@@ -509,9 +535,9 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <returns>Returns the value read.</returns>
         [CLSCompliant(false)]
-        public UInt64 ReadUInt64()
+        public ulong ReadUInt64()
         {
-            return (UInt64)ReadInt64();
+            return (ulong)this.ReadInt64();
         }
     }
 }

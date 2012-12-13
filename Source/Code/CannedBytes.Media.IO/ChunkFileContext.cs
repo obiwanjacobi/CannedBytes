@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel.Composition.Hosting;
-using System.Diagnostics.Contracts;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.ComponentModel.Composition.Hosting;
+    using System.Diagnostics.Contracts;
+
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
     /// </summary>
@@ -26,6 +26,11 @@ namespace CannedBytes.Media.IO
         /// Stack of FileChunks used during file parsing.
         /// </summary>
         public FileChunkStack ChunkStack { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets an indication whether to copy data from/to the file streams or reuse the existing (sub)stream.
+        /// </summary>
+        public bool CopyStreams { get; set; }
 
         /// <summary>
         /// Backing field for <see cref="P:CompositionContainer"/>.
@@ -57,19 +62,27 @@ namespace CannedBytes.Media.IO
         public static ChunkFileContext OpenFrom(string filePath)
         {
             Contract.Requires(!String.IsNullOrEmpty(filePath));
-            Throw.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
             var ctx = new ChunkFileContext();
 
-            ctx.ChunkFile = ChunkFileInfo.OpenRead(filePath);
+            try
+            {
+                ctx.ChunkFile = ChunkFileInfo.OpenRead(filePath);
+            }
+            catch
+            {
+                ctx.Dispose();
+                throw;
+            }
 
             return ctx;
         }
 
         /// <inheritdocs/>
-        protected override void Dispose(bool disposeManagedResources)
+        protected override void Dispose(DisposeObjectKind disposeKind)
         {
-            if (disposeManagedResources)
+            if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
                 ChunkFile.Dispose();
 
@@ -78,8 +91,6 @@ namespace CannedBytes.Media.IO
                     this.compositionContainer.Dispose();
                 }
             }
-
-            base.Dispose(disposeManagedResources);
         }
     }
 }

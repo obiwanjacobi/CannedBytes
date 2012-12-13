@@ -1,8 +1,8 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System;
+    using System.Diagnostics.Contracts;
+
     /// <summary>
     /// Implemented by a factory that knows how to create runtime types for chunk identifiers.
     /// </summary>

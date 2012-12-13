@@ -1,20 +1,14 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// Code contracts for <see cref="IStringReader"/>.
     /// </summary>
     [ContractClassFor(typeof(IStringReader))]
     internal abstract class StringReaderContract : IStringReader
     {
-        /// <summary>
-        /// Block instantiation.
-        /// </summary>
-        private StringReaderContract()
-        { }
-
         /// <summary>
         /// Contracts.
         /// </summary>

@@ -1,9 +1,10 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// Represents a chunk file information.
     /// </summary>
@@ -16,10 +17,10 @@ namespace CannedBytes.Media.IO
         public ChunkFileInfo(string filePath)
         {
             Contract.Requires(!String.IsNullOrEmpty(filePath));
-            Throw.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
-            FilePath = filePath;
-            FileExtension = Path.GetExtension(filePath);
+            this.FilePath = filePath;
+            this.FileExtension = Path.GetExtension(filePath);
         }
 
         /// <summary>
@@ -42,17 +43,33 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
         /// <returns>Never returns null.</returns>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Implemented the suggested pattern.")]
         public static ChunkFileInfo OpenRead(string filePath)
         {
             Contract.Requires(!String.IsNullOrEmpty(filePath));
             Contract.Ensures(Contract.Result<ChunkFileInfo>() != null);
             Contract.Ensures(Contract.Result<ChunkFileInfo>().BaseStream != null);
 
-            Throw.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
-            var chunkFile = new ChunkFileInfo(filePath);
+            ChunkFileInfo chunkFile = null;
+            ChunkFileInfo cf = null;
 
-            chunkFile.BaseStream = File.OpenRead(filePath);
+            try
+            {
+                cf = new ChunkFileInfo(filePath);
+                cf.BaseStream = File.OpenRead(filePath);
+
+                chunkFile = cf;
+                cf = null;
+            }
+            finally
+            {
+                if (cf != null)
+                {
+                    cf.Dispose();
+                }
+            }
 
             return chunkFile;
         }
@@ -69,14 +86,15 @@ namespace CannedBytes.Media.IO
         }
 
         /// <inheritdocs/>
-        protected override void Dispose(bool disposing)
+        protected override void Dispose(DisposeObjectKind disposeKind)
         {
-            if (BaseStream != null)
+            if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
-                BaseStream.Dispose();
+                if (this.BaseStream != null)
+                {
+                    this.BaseStream.Dispose();
+                }
             }
-
-            base.Dispose(disposing);
         }
     }
 }

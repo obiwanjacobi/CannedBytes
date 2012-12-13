@@ -1,9 +1,10 @@
-using System;
-using System.ComponentModel.Composition;
-using System.IO;
-
 namespace CannedBytes.Media.IO.Services
 {
+    using System;
+    using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+
     /// <summary>
     /// Implements a number writer for little endian encoding.
     /// </summary>
@@ -13,7 +14,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt16(short value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             WriteUInt16((ushort)value, stream);
         }
@@ -21,7 +22,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt16(int value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             WriteUInt16((ushort)value, stream);
         }
@@ -29,7 +30,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt32(int value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             WriteUInt32((uint)value, stream);
         }
@@ -37,35 +38,44 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt32(long value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             WriteUInt32((uint)value, stream);
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Check is not recognized")]
         public void WriteInt64(long value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             byte[] buffer = BitConverter.GetBytes(value);
 
             stream.Write(buffer, 0, buffer.Length);
         }
 
-        /// <inheritdocs/>
-        private void WriteUInt16(UInt16 value, Stream stream)
+        /// <summary>
+        /// Writes an unsigned integer to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="stream">Must not be null.</param>
+        private static void WriteUInt16(ushort value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             byte[] buffer = BitConverter.GetBytes(value);
 
             stream.Write(buffer, 0, buffer.Length);
         }
 
-        /// <inheritdocs/>
-        private void WriteUInt32(UInt32 value, Stream stream)
+        /// <summary>
+        /// Writes an unsigned integer to the <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="stream">Must not be null.</param>
+        private static void WriteUInt32(uint value, Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             byte[] buffer = BitConverter.GetBytes(value);
 

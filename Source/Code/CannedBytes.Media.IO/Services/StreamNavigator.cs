@@ -1,14 +1,16 @@
-﻿using System.ComponentModel.Composition;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+
     /// <summary>
     /// Implements the <see cref="IStreamNavigator"/> interface.
     /// </summary>
     [Export(typeof(IStreamNavigator))]
     public class StreamNavigator : IStreamNavigator
     {
+        /// <summary>Backing field for the current stream position marker.</summary>
         long currentMarker;
 
         /// <summary>
@@ -21,25 +23,27 @@ namespace CannedBytes.Media.IO.Services
         /// </summary>
         public StreamNavigator()
         {
-            ByteAlignment = DefaultByteAlignment;
+            this.ByteAlignment = DefaultByteAlignment;
         }
 
         /// <inheritdocs/>
         public int ByteAlignment { get; set; }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public long SetCurrentMarker(Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             this.currentMarker = stream.Position;
             return this.currentMarker;
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public bool SeekToCurrentMarker(Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
             if (stream.CanSeek)
             {
@@ -51,13 +55,17 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <inheritdocs/>
-        public int AllignPosition(Stream stream)
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
+        public int AlignPosition(Stream stream)
         {
-            Throw.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, "stream");
 
-            if (ByteAlignment <= 0) return 0;
+            if (this.ByteAlignment <= 0)
+            {
+                return 0;
+            }
 
-            var rest = (int)(stream.Position % ByteAlignment);
+            var rest = (int)(stream.Position % this.ByteAlignment);
 
             if (rest > 0)
             {

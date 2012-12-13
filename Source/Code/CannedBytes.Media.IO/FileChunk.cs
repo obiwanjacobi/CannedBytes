@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// The FileChunk class represents a single chunk in a (R)IIF file.
     /// </summary>
@@ -45,7 +45,7 @@ namespace CannedBytes.Media.IO
         /// </summary>
         public bool HasSubChunks
         {
-            get { return (this.subChunks != null && this.subChunks.Count > 0); }
+            get { return this.subChunks != null && this.subChunks.Count > 0; }
         }
 
         /// <summary>
