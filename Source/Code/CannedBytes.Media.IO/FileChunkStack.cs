@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-
-namespace CannedBytes.Media.IO
+﻿namespace CannedBytes.Media.IO
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+
     /// <summary>
     /// Manages a stack of <see cref="FileChunk"/> instances.
     /// </summary>
     /// <remarks>Parent-child relation between chunks is also maintained.</remarks>
+    [SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Justification = "It is a stack, lets call it a stack.")]
     public class FileChunkStack
     {
+        /// <summary>Maintains the internal stack.</summary>
         private Stack<FileChunk> chunkStack = new Stack<FileChunk>();
 
         /// <summary>
@@ -35,12 +38,15 @@ namespace CannedBytes.Media.IO
                 // no root set yet
                 return null;
             }
+
             set
             {
                 if (this.chunkStack.Count != 0)
+                {
                     throw new InvalidOperationException("Root Chunk has already been set.");
+                }
 
-                PushChunk(value);
+                this.PushChunk(value);
             }
         }
 
@@ -51,7 +57,10 @@ namespace CannedBytes.Media.IO
         {
             get
             {
-                if (this.chunkStack.Count == 0) return null;
+                if (this.chunkStack.Count == 0)
+                {
+                    return null;
+                }
 
                 return this.chunkStack.Peek();
             }
@@ -65,9 +74,9 @@ namespace CannedBytes.Media.IO
         public void PushChunk(FileChunk chunk)
         {
             Contract.Requires(chunk != null);
-            Throw.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk, "chunk");
 
-            var parentChunk = CurrentChunk;
+            var parentChunk = this.CurrentChunk;
 
             // maintain child-chunks on parent.
             if (parentChunk != null)

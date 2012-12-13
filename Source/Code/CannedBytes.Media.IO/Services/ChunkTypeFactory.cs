@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Reflection;
-using CannedBytes.Media.IO.SchemaAttributes;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Reflection;
+    using CannedBytes.Media.IO.SchemaAttributes;
+
     /// <summary>
     /// Implementation of the <see cref="IChunkTypeFactory"/> interface.
     /// </summary>
@@ -27,7 +28,7 @@ namespace CannedBytes.Media.IO.Services
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
 
-            AddChunksFrom(assembly, true);
+            this.AddChunksFrom(assembly, true);
         }
 
         /// <summary>
@@ -37,10 +38,11 @@ namespace CannedBytes.Media.IO.Services
         /// <param name="assembly">Must not be null.</param>
         /// <param name="replace">If true the Type found in the <paramref name="assembly"/> will replace
         /// an already registered type.</param>
-        public virtual void AddChunksFrom(Assembly assembly, bool replace)
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
+        public void AddChunksFrom(Assembly assembly, bool replace)
         {
             Contract.Requires(assembly != null);
-            Throw.IfArgumentNull(assembly, "assembly");
+            Check.IfArgumentNull(assembly, "assembly");
 
             var result = from type in assembly.GetTypes()
                          from attr in type.GetCustomAttributes(typeof(ChunkAttribute), false)
@@ -68,9 +70,9 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public virtual object CreateChunkObject(FourCharacterCode chunkTypeId)
         {
-            Throw.IfArgumentNull(chunkTypeId, "chunkTypeId");
+            Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
-            Type result = LookupChunkObjectType(chunkTypeId);
+            Type result = this.LookupChunkObjectType(chunkTypeId);
 
             if (result != null)
             {
@@ -81,9 +83,10 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual Type LookupChunkObjectType(FourCharacterCode chunkTypeId)
         {
-            Throw.IfArgumentNull(chunkTypeId, "chunkTypeId");
+            Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
             string chunkId = chunkTypeId.ToString();
 

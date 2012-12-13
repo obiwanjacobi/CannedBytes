@@ -1,7 +1,7 @@
-﻿using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.IO;
+
     /// <summary>
     /// Implements a <see cref="IStringReader"/> for a null terminated string.
     /// </summary>

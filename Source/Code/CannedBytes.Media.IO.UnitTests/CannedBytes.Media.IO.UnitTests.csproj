@@ -55,6 +55,25 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChunkTypes\Avi\AviAvihChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviDataChunkBase.cs" />
+    <Compile Include="ChunkTypes\Avi\AviHdrlChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviIdx1Chunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviMoviChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviRecChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviStrdChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviStrfChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviStrhChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviStrlChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviStrnChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviXxdbChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviXxdcChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviXxpcChunk.cs" />
+    <Compile Include="ChunkTypes\Avi\AviXxwbChunk.cs" />
+    <Compile Include="ChunkTypes\Wave\WaveChunk.cs" />
+    <Compile Include="ChunkTypes\Wave\WaveDataChunk.cs" />
+    <Compile Include="ChunkTypes\Wave\WaveFormatChunk.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="Media\MediaTests.cs" />
     <Compile Include="Services\ChunkTypeFactoryTests.cs" />
@@ -83,6 +102,11 @@
     <Content Include="Media\tada.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="ChunkTypes\Avi\CannedBytes.Media.IO.ChunkTypes.Avi.cd" />
+    <None Include="ChunkTypes\Wave\CannedBytes.Media.IO.ChunkTypes.Wave.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

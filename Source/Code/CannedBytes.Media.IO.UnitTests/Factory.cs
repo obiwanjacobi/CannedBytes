@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition.Hosting;
 using System.IO;
 using CannedBytes.ComponentModel.Composition;
+using CannedBytes.Media.IO.ChunkTypes.Wave;
 using CannedBytes.Media.IO.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -31,8 +32,6 @@ namespace CannedBytes.Media.IO.UnitTests
             var factory = new CompositionContainerFactory();
 
             factory.AddMarkedTypesInAssembly(null, typeof(IFileChunkHandler));
-            // add midi exports
-            //factory.AddMarkedTypesInAssembly(typeof(MTrkChunkHandler).Assembly, typeof(IFileChunkHandler));
 
             factory.AddTypes(
                 littleEndian ? typeof(LittleEndianNumberReader) : typeof(BigEndianNumberReader),
@@ -44,8 +43,8 @@ namespace CannedBytes.Media.IO.UnitTests
             var container = factory.CreateNew();
 
             var chunkFactory = container.GetService<ChunkTypeFactory>();
-            // add midi chunks
-            //chunkFactory.AddChunksFrom(typeof(MTrkChunkHandler).Assembly, true);
+            // add test chunks
+            chunkFactory.AddChunksFrom(typeof(WaveChunk).Assembly, true);
 
             return container;
         }

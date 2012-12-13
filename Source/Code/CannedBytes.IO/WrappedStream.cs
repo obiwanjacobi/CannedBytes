@@ -1,25 +1,30 @@
-using System;
-using System.IO;
-
 namespace CannedBytes.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+
     /// <summary>
-    /// The StreamWrapper class can be used by derived classes to implement
+    /// The WrappedStream class can be used by derived classes to implement
     /// specific functionality over an existing stream instance.
     /// </summary>
     /// <remarks>Most method implementations pass the call to the <see cref="P:InnerStream"/>.</remarks>
-    public abstract class StreamWrapper : Stream
+    public abstract class WrappedStream : Stream
     {
+        /// <summary>The wrapped stream.</summary>
         private Stream stream;
+
+        /// <summary>Indication if the stream is seekable.</summary>
         private bool canSeek;
 
         /// <summary>
         /// Creates a seekable stream.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
-        protected StreamWrapper(Stream stream)
+        protected WrappedStream(Stream stream)
             : this(stream, true)
-        { }
+        {
+        }
 
         /// <summary>
         /// Creates a new stream.
@@ -28,7 +33,7 @@ namespace CannedBytes.IO
         /// <param name="canSeek">Overrides if the stream will allow seeking.</param>
         /// <remarks>Passing true to <paramref name="canSeek"/> will not guarantee the stream can seek -
         /// which also depends on the wrapped <paramref name="stream"/>- but it will not prohibit it.</remarks>
-        protected StreamWrapper(Stream stream, bool canSeek)
+        protected WrappedStream(Stream stream, bool canSeek)
         {
             if (stream == null)
             {
@@ -48,14 +53,20 @@ namespace CannedBytes.IO
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recoginized.")]
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            Check.IfArgumentNull(buffer, "buffer");
+
             return this.stream.BeginRead(buffer, offset, count, callback, state);
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
+            Check.IfArgumentNull(buffer, "buffer");
+
             return this.stream.BeginWrite(buffer, offset, count, callback, state);
         }
 
@@ -84,8 +95,11 @@ namespace CannedBytes.IO
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override int Read(byte[] buffer, int offset, int count)
         {
+            Check.IfArgumentNull(buffer, "buffer");
+
             return this.stream.Read(buffer, offset, count);
         }
 
@@ -113,8 +127,11 @@ namespace CannedBytes.IO
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(byte[] buffer, int offset, int count)
         {
+            Check.IfArgumentNull(buffer, "buffer");
+
             this.stream.Write(buffer, offset, count);
         }
 
@@ -159,7 +176,11 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override long Position
         {
-            get { return this.stream.Position; }
+            get
+            {
+                return this.stream.Position;
+            }
+
             set
             {
                 if (this.canSeek == false)

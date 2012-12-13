@@ -1,39 +1,49 @@
-using System;
-using System.IO;
-
 namespace CannedBytes.IO
 {
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+
     /// <summary>
     /// The SubStream wraps an existing stream and only allows access to a part of that wrapped stream.
     /// </summary>
-    public class SubStream : StreamWrapper
+    public class SubStream : WrappedStream
     {
-        private long offset;
-        private long length;
+        /// <summary>The offset into the base stream where the sub-stream starts.</summary>
+        private long streamOffset;
+
+        /// <summary>The length of the sub-stream.</summary>
+        private long subStreamLength;
 
         /// <summary>
         /// Instantiates a new instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <param name="length">Must be greater or equal to zero.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public SubStream(Stream stream, long length)
             : base(stream)
         {
-            this.offset = stream.Position;
-            SetSubLength(length);
+            Check.IfArgumentNull(stream, "stream");
+
+            this.streamOffset = stream.Position;
+            this.SetSubLength(length);
         }
 
         /// <summary>
         /// Instantiates a new seekable instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
-        /// <param name="length">Must be greater or equal to zero.</param>
         /// <param name="canSeek">False to prohibit seeking.</param>
+        /// <param name="length">Must be greater or equal to zero.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public SubStream(Stream stream, bool canSeek, long length)
             : base(stream, canSeek)
         {
-            this.offset = stream.Position;
-            SetSubLength(length);
+            Check.IfArgumentNull(stream, "stream");
+
+            this.streamOffset = stream.Position;
+            this.SetSubLength(length);
         }
 
         /// <summary>
@@ -45,82 +55,104 @@ namespace CannedBytes.IO
         public SubStream(Stream stream, long offset, long length)
             : base(stream, true)
         {
-            SetOffset(offset);
-            SetSubLength(length);
+            this.SetStreamOffset(offset);
+            this.SetSubLength(length);
         }
 
         /// <summary>
         /// Instantiates a new instance from <paramref name="offset"/> of the <paramref name="stream"/> for <paramref name="length"/> bytes.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
+        /// <param name="canSeek">False to prohibit seeking.</param>
         /// <param name="offset">The offset in bytes from the start of <paramref name="stream"/>.</param>
         /// <param name="length">Must be greater or equal to zero.</param>
-        /// <param name="canSeek">False to prohibit seeking.</param>
         public SubStream(Stream stream, bool canSeek, long offset, long length)
             : base(stream, canSeek)
         {
-            SetOffset(offset);
-            SetSubLength(length);
+            this.SetStreamOffset(offset);
+            this.SetSubLength(length);
         }
 
-        private void SetOffset(long offset)
+        /// <summary>
+        /// Initializes the sub-stream offset.
+        /// </summary>
+        /// <param name="offset">Must be within range.</param>
+        private void SetStreamOffset(long offset)
         {
             if (offset >= this.InnerStream.Length)
             {
                 throw new ArgumentOutOfRangeException("offset");
             }
 
-            this.offset = offset;
+            this.streamOffset = offset;
         }
 
+        /// <summary>
+        /// Initializes the sub-stream length.
+        /// </summary>
+        /// <param name="length">Is adjusted to fit within range.</param>
         private void SetSubLength(long length)
         {
-            if ((this.offset + length) > base.Length)
+            if ((this.streamOffset + length) > base.Length)
             {
-                this.length = base.Length - this.offset;
+                this.subStreamLength = base.Length - this.streamOffset;
             }
             else
             {
-                this.length = length;
+                this.subStreamLength = length;
             }
         }
 
+        /// <summary>
+        /// Adjusts the specified <paramref name="count"/> to stay within range.
+        /// </summary>
+        /// <param name="count">The parameter is in/out (ref).</param>
+        /// <returns>Returns true if the (adjusted) count is greater than zero.</returns>
         private bool AdjustCount(ref int count)
         {
-            if ((base.Position + count) > (this.offset + this.length))
+            if ((base.Position + count) > (this.streamOffset + this.subStreamLength))
             {
-                count = (int)((this.offset + this.length) - base.Position);
+                count = (int)((this.streamOffset + this.subStreamLength) - base.Position);
             }
 
-            return (count > 0);
+            return count > 0;
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            if (!AdjustCount(ref count))
+            Check.IfArgumentNull(buffer, "buffer");
+
+            if (!this.AdjustCount(ref count))
             {
-                throw new ArgumentException("count");
+                throw new ArgumentOutOfRangeException("count", count, "The count does not lie within range of this sub-stream's length.");
             }
 
             return base.BeginRead(buffer, offset, count, callback, state);
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            if (!AdjustCount(ref count))
+            Check.IfArgumentNull(buffer, "buffer");
+
+            if (!this.AdjustCount(ref count))
             {
-                throw new ArgumentException("count");
+                throw new ArgumentOutOfRangeException("count", count, "The count does not lie within range of this sub-stream's length.");
             }
 
             return base.BeginWrite(buffer, offset, count, callback, state);
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (AdjustCount(ref count))
+            Check.IfArgumentNull(buffer, "buffer");
+
+            if (this.AdjustCount(ref count))
             {
                 return base.Read(buffer, offset, count);
             }
@@ -133,7 +165,7 @@ namespace CannedBytes.IO
         {
             int length = 1;
 
-            if (AdjustCount(ref length))
+            if (this.AdjustCount(ref length))
             {
                 return base.ReadByte();
             }
@@ -149,38 +181,44 @@ namespace CannedBytes.IO
             switch (origin)
             {
                 case SeekOrigin.Begin:
-                    absoluteOffset = this.offset + offset;
+                    absoluteOffset = this.streamOffset + offset;
                     break;
                 case SeekOrigin.Current:
                     absoluteOffset = base.Position + offset;
                     break;
                 case SeekOrigin.End:
-                    absoluteOffset = this.offset + this.length - Math.Abs(offset);
+                    absoluteOffset = this.streamOffset + this.subStreamLength - Math.Abs(offset);
                     break;
             }
 
-            if (absoluteOffset < this.offset)
+            if (absoluteOffset < this.streamOffset)
             {
-                absoluteOffset = this.offset;
+                absoluteOffset = this.streamOffset;
             }
-            else if (absoluteOffset > (this.offset + this.length))
+            else if (absoluteOffset > (this.streamOffset + this.subStreamLength))
             {
-                absoluteOffset = this.offset + this.length;
+                absoluteOffset = this.streamOffset + this.subStreamLength;
             }
 
             return base.Seek(absoluteOffset, SeekOrigin.Begin);
         }
 
-        /// <inheritdocs/>
+        /// <summary>
+        /// Not supported.
+        /// </summary>
+        /// <param name="value">Not used.</param>
         public override void SetLength(long value)
         {
             throw new NotSupportedException();
         }
 
         /// <inheritdocs/>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (AdjustCount(ref count))
+            Check.IfArgumentNull(buffer, "buffer");
+
+            if (this.AdjustCount(ref count))
             {
                 InnerStream.Write(buffer, offset, count);
             }
@@ -191,7 +229,7 @@ namespace CannedBytes.IO
         {
             int length = 1;
 
-            if (AdjustCount(ref length))
+            if (this.AdjustCount(ref length))
             {
                 base.WriteByte(value);
             }
@@ -200,7 +238,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override long Length
         {
-            get { return this.length; }
+            get { return this.subStreamLength; }
         }
 
         /// <inheritdocs/>
@@ -209,16 +247,17 @@ namespace CannedBytes.IO
             get
             {
                 // maxed out
-                if ((base.Position - this.offset) >= this.length)
+                if ((base.Position - this.streamOffset) >= this.subStreamLength)
                 {
-                    return this.length;
+                    return this.subStreamLength;
                 }
 
-                return base.Position - this.offset;
+                return base.Position - this.streamOffset;
             }
+
             set
             {
-                Seek(value, SeekOrigin.Begin);
+                this.Seek(value, SeekOrigin.Begin);
             }
         }
     }

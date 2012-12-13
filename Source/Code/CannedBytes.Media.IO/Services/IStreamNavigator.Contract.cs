@@ -1,20 +1,14 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// Contract for <see cref="IStreamNavigator"/>.
     /// </summary>
     [ContractClassFor(typeof(IStreamNavigator))]
     internal abstract class StreamNavigatorContract : IStreamNavigator
     {
-        /// <summary>
-        /// Block instantiation.
-        /// </summary>
-        private StreamNavigatorContract()
-        { }
-
         /// <summary>
         /// Value must be greater or equal to  zero.
         /// </summary>
@@ -26,6 +20,7 @@ namespace CannedBytes.Media.IO.Services
 
                 throw new System.NotImplementedException();
             }
+
             set
             {
                 Contract.Requires(value >= 0);
@@ -64,7 +59,7 @@ namespace CannedBytes.Media.IO.Services
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <returns>Returns greater or equal to zero.</returns>
-        int IStreamNavigator.AllignPosition(Stream stream)
+        int IStreamNavigator.AlignPosition(Stream stream)
         {
             Contract.Requires(stream != null);
             Contract.Ensures(Contract.Result<int>() >= 0);

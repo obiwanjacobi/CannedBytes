@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// A general interface for writing strings to a <see cref="Stream"/>.
     /// </summary>

@@ -1,30 +1,32 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using System.Diagnostics.Contracts;
-
-namespace CannedBytes.Media.IO.SchemaAttributes
+﻿namespace CannedBytes.Media.IO.SchemaAttributes
 {
+    using System;
+    using System.ComponentModel.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Diagnostics.Contracts;
+
     /// <summary>
     /// A code attribute that indicates to the framework that the class is a chunk handler.
     /// </summary>
     /// <remarks>This is a MEF custom export attribute.</remarks>
     [MetadataAttribute]
     [AttributeUsage(AttributeTargets.Class)]
-    public class FileChunkHandlerAttribute : ExportAttribute, IFileChunkHandlerMetaInfo
+    public sealed class FileChunkHandlerAttribute : ExportAttribute, IFileChunkHandlerMetaInfo
     {
         /// <summary>
         /// Constructs a new instance for the specified <paramref name="chunkId"/>.
         /// </summary>
         /// <param name="chunkId">Must be 4 characters long. Must not be null or empty.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FileChunkHandlerAttribute(string chunkId)
             : base(typeof(IFileChunkHandler))
         {
             Contract.Requires(!String.IsNullOrEmpty(chunkId));
             Contract.Requires(chunkId.Length == 4);
-            Throw.IfArgumentNullOrEmpty(chunkId, "chunkId");
-            Throw.IfArgumentOutOfRange(chunkId.Length, 4, 4, "chunkId.Length");
+            Check.IfArgumentNullOrEmpty(chunkId, "chunkId");
+            Check.IfArgumentOutOfRange(chunkId.Length, 4, 4, "chunkId.Length");
 
-            ChunkId = chunkId;
+            this.ChunkId = chunkId;
         }
 
         /// <summary>

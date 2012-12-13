@@ -11,6 +11,6 @@ namespace CannedBytes
         /// Gets or sets the next implementation of interface T this
         /// instance will call.
         /// </summary>
-        T Next { get; set; }
+        T Successor { get; set; }
     }
 }

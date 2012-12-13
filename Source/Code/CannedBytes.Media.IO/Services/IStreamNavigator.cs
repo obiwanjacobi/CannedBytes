@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.Contracts;
-using System.IO;
-
-namespace CannedBytes.Media.IO.Services
+﻿namespace CannedBytes.Media.IO.Services
 {
+    using System.Diagnostics.Contracts;
+    using System.IO;
+
     /// <summary>
     /// A general interface for navigating <see cref="Stream"/>s.
     /// </summary>
@@ -31,11 +31,11 @@ namespace CannedBytes.Media.IO.Services
         bool SeekToCurrentMarker(Stream stream);
 
         /// <summary>
-        /// Alligns the position of the <paramref name="stream"/>.
+        /// Aligns the position of the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <returns>Returns the number of bytes that were skipped in order to align the stream.</returns>
         /// <remarks>The alignment value must be set through the implementation class.</remarks>
-        int AllignPosition(Stream stream);
+        int AlignPosition(Stream stream);
     }
 }

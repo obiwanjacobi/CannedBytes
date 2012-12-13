@@ -1,7 +1,7 @@
-﻿using CannedBytes.Media.IO.SchemaAttributes;
-
-namespace CannedBytes.Media.IO.ChunkTypes
+﻿namespace CannedBytes.Media.IO.ChunkTypes
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
+
     /// <summary>
     /// A chunk class that represent the 'RIFF' chunk in a RIFF file.
     /// </summary>
@@ -21,15 +21,5 @@ namespace CannedBytes.Media.IO.ChunkTypes
         /// <remarks>This member is filled by the <see cref="RiffChunkHandler"/>.</remarks>
         [Ignore]
         public object InnerChunk { get; set; }
-
-        /// <summary>
-        /// Retrieves the child chunks typed to <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The class of the item chunks.</typeparam>
-        /// <returns>Can return null.</returns>
-        public T GetInnerChunk<T>()
-        {
-            return (T)InnerChunk;
-        }
     }
 }
