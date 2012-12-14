@@ -104,6 +104,12 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
     <DocumentationFile>bin\Release\CannedBytes.Media.IO.XML</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\_keyfile\CannedBytes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -112,6 +118,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\..\..\_AssemblyInfo\AssemblyInfo.General.cs">
+      <Link>Properties\AssemblyInfo.General.cs</Link>
+    </Compile>
+    <Compile Include="..\AssemblyInfo.CannedBytes.cs">
+      <Link>Properties\AssemblyInfo.CannedBytes.cs</Link>
+    </Compile>
     <Compile Include="ChunkFileException.cs" />
     <Compile Include="ChunkFileInfo.cs" />
     <Compile Include="ChunkTypes\ListChunk.cs" />
@@ -161,6 +173,9 @@
     <Compile Include="WildcardString.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\..\..\_keyfile\CannedBytes.snk">
+      <Link>CannedBytes.snk</Link>
+    </None>
     <None Include="CannedBytes.Media.IO.cd" />
   </ItemGroup>
   <ItemGroup>

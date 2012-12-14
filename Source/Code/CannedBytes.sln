@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO.UnitTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B19CB88B-6167-4DBA-8114-9F6CB82029BC}"
 	ProjectSection(SolutionItems) = preProject
+		AssemblyInfo.CannedBytes.cs = AssemblyInfo.CannedBytes.cs
 		CannedBytes.vsmdi = CannedBytes.vsmdi
 		CodeAnalysis.ruleset = CodeAnalysis.ruleset
 		Local.testsettings = Local.testsettings

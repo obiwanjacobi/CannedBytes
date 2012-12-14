@@ -103,6 +103,12 @@
     <CodeContractsAnalysisWarningLevel>0</CodeContractsAnalysisWarningLevel>
     <DocumentationFile>bin\Release\CannedBytes.XML</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\..\..\..\..\_keyfile\CannedBytes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -114,6 +120,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\..\..\_AssemblyInfo\AssemblyInfo.General.cs">
+      <Link>Properties\AssemblyInfo.General.cs</Link>
+    </Compile>
+    <Compile Include="..\AssemblyInfo.CannedBytes.cs">
+      <Link>Properties\AssemblyInfo.CannedBytes.cs</Link>
+    </Compile>
     <Compile Include="ComponentModel\Composition\CompositionContainerFactory.cs" />
     <Compile Include="DisposableBase.cs" />
     <Compile Include="DisposeObjectKind.cs" />
@@ -132,6 +144,11 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\_keyfile\CannedBytes.snk">
+      <Link>CannedBytes.snk</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
