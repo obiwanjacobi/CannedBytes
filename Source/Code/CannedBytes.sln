@@ -19,9 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media", "CannedBytes.Media\CannedBytes.Media.csproj", "{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs01
 		SccLocalPath0 = .
@@ -37,6 +39,9 @@ Global
 		SccProjectUniqueName4 = CannedBytes.Media.IO.UnitTests\\CannedBytes.Media.IO.UnitTests.csproj
 		SccProjectName4 = CannedBytes.Media.IO.UnitTests
 		SccLocalPath4 = CannedBytes.Media.IO.UnitTests
+		SccProjectUniqueName5 = CannedBytes.Media\\CannedBytes.Media.csproj
+		SccProjectName5 = CannedBytes.Media
+		SccLocalPath5 = CannedBytes.Media
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = CannedBytes.vsmdi
@@ -62,6 +67,10 @@ Global
 		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
