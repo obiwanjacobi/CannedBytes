@@ -13,7 +13,7 @@
       <DataCollectors>
         <DataCollector uri="datacollector://microsoft/CodeCoverage/1.0" assemblyQualifiedName="Microsoft.VisualStudio.TestTools.CodeCoverage.CoveragePlugIn, Microsoft.VisualStudio.QualityTools.Plugins.CodeCoverage, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" friendlyName="Code Coverage">
           <Configuration>
-            <CodeCoverage xmlns="">
+            <CodeCoverage keyFile="D:\Projects\Personal\CannedBytes\_keyfile\CannedBytes.snk" xmlns="">
               <Regular>
                 <CodeCoverageItem binaryFile="CannedBytes.Media.IO\bin\Debug\CannedBytes.Media.IO.dll" pdbFile="CannedBytes.Media.IO\bin\Debug\CannedBytes.Media.IO.pdb" instrumentInPlace="true" />
                 <CodeCoverageItem binaryFile="CannedBytes.IO\bin\Debug\CannedBytes.IO.dll" pdbFile="CannedBytes.IO\bin\Debug\CannedBytes.IO.pdb" instrumentInPlace="true" />

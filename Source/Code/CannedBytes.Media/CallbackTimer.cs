@@ -21,6 +21,7 @@ namespace CannedBytes.Media
             Check.IfArgumentNull(callback, "callback");
 
             this.callback = callback;
+            Period = Timer.MinPeriod;
         }
 
         /// <summary>

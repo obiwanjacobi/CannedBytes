@@ -170,7 +170,7 @@ namespace CannedBytes.Media
                            this.ToIntPtr(),
                            (uint)this.Mode | NativeMethods.TIME_KILL_SYNCHRONOUS);
 
-            if (this.timerId == NativeMethods.TIMERR_NOERROR)
+            if (this.timerId == 0)
             {
                 int errorCode = Marshal.GetLastWin32Error();
                 throw new TimerException("Could not create the timer.", new Win32Exception(errorCode));
@@ -184,14 +184,14 @@ namespace CannedBytes.Media
         {
             if (this.IsRunning)
             {
-                this.timerId = 0;
-
                 var result = NativeMethods.timeKillEvent(this.timerId);
 
                 if (result == NativeMethods.MMSYSERR_INVALPARAM)
                 {
                     throw new TimerException("The timer identification is invalid (already closed?).");
                 }
+
+                this.timerId = 0;
             }
 
             ThrowIfDisposed();
