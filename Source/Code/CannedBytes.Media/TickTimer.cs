@@ -5,6 +5,8 @@ namespace CannedBytes.Media
     /// <summary>
     /// Increments a <see cref="Ticks"/> count each time the timer fires.
     /// </summary>
+    /// <remarks>The timer is created with the highest possible <see cref="P:Resolution"/>
+    /// and the minimal <see cref="P:Period"/>.</remarks>
     public class TickTimer : Timer
     {
         /// <summary>
@@ -13,6 +15,7 @@ namespace CannedBytes.Media
         public TickTimer()
             : base(TimerMode.Periodic)
         {
+            this.Period = Timer.MinPeriod;
         }
 
         /// <summary>
