@@ -1,8 +1,7 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
@@ -15,17 +14,24 @@
         public ChunkFileContext()
         {
             ChunkStack = new FileChunkStack();
+            HeaderStack = new Stack<FileChunkHeader>();
         }
 
         /// <summary>
-        /// The file (stream) object of the file currently being processed.
+        /// Gets or sets the file (stream) object of the file currently being processed.
         /// </summary>
         public ChunkFileInfo ChunkFile { get; set; }
 
         /// <summary>
-        /// Stack of FileChunks used during file parsing.
+        /// Gets the stack of FileChunks used during file parsing.
         /// </summary>
+        /// <remarks>Populated while reading, optionally used for writing.</remarks>
         public FileChunkStack ChunkStack { get; protected set; }
+
+        /// <summary>
+        /// Gets the stack of streams used for writing.
+        /// </summary>
+        public Stack<FileChunkHeader> HeaderStack { get; protected set; }
 
         /// <summary>
         /// Gets or sets an indication whether to copy data from/to the file streams or reuse the existing (sub)stream.
@@ -52,31 +58,6 @@
                     this.compositionContainer.AddInstance(this);
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates a new context based on the specified <paramref name="filePath"/>.
-        /// </summary>
-        /// <param name="filePath">Must not be null or empty and the file pointed to must exist.</param>
-        /// <returns></returns>
-        public static ChunkFileContext OpenFrom(string filePath)
-        {
-            Contract.Requires(!String.IsNullOrEmpty(filePath));
-            Check.IfArgumentNullOrEmpty(filePath, "filePath");
-
-            var ctx = new ChunkFileContext();
-
-            try
-            {
-                ctx.ChunkFile = ChunkFileInfo.OpenRead(filePath);
-            }
-            catch
-            {
-                ctx.Dispose();
-                throw;
-            }
-
-            return ctx;
         }
 
         /// <inheritdocs/>

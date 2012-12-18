@@ -3,7 +3,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
@@ -11,211 +10,155 @@
     using System.Reflection;
     using CannedBytes.Media.IO.SchemaAttributes;
 
-    /// <summary>
-    /// Manages writing to a runtime chunk object.
-    /// </summary>
-    public class ObjectMemberWriter
+    public class ObjectMemberReader
     {
-        /// <summary>
-        /// Backing field for a list of writable public fields or properties.
-        /// </summary>
         private IEnumerable<MemberData> members;
+        private IEnumerator<MemberData> enumerator;
 
-        /// <summary>
-        /// Constructs a new instance on the specified runtime object.
-        /// </summary>
-        /// <param name="instance">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
-        public ObjectMemberWriter(object instance)
+        public ObjectMemberReader(object instance)
         {
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(instance, "instance");
 
             this.Instance = instance;
             this.ObjectType = instance.GetType();
-            this.members = BuildMemberList(this.ObjectType);
+            this.members = BuildMemberList(ObjectType);
         }
 
-        /// <summary>
-        /// Gets the current runtime object the writer is acting on.
-        /// </summary>
         public object Instance { get; private set; }
 
-        /// <summary>
-        /// Gets the type of the runtime object.
-        /// </summary>
         public Type ObjectType { get; private set; }
 
-        /// <summary>
-        /// Uses the <paramref name="reader"/> to populate the fields and properties of the runtime object.
-        /// </summary>
-        /// <param name="reader">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
-        public void ReadFields(FileChunkReader reader)
+        public bool IsChunkContainer
         {
-            Contract.Requires(reader != null);
-            Check.IfArgumentNull(reader, "reader");
-
-            // keep processing native data type members
-            foreach (var member in this.members)
+            get
             {
-                if (!reader.CurrentStreamCanRead)
-                {
-                    break;
-                }
+                var result = from member in this.members
+                             where member.ChunkIds != null
+                             where member.ChunkIds.Count > 0
+                             select member;
 
-                // this member represent a chunk
-                if (member.ChunkIds != null)
-                {
-                    throw new NotSupportedException("This method does not support reading chunks. No mixed (chunks and data) types allowed.");
-                }
-
-                try
-                {
-                    object value = this.ReadValueForType(member.DataType, reader);
-
-                    member.SetValue(this.Instance, value, false);
-                }
-                catch (EndOfStreamException eos)
-                {
-                    var fmt = "The end of the chunk was encountered while reading data for the '{1}' member on '{0}'." +
-                              " Use the [Ignore] attribute to exclude members from serializing.";
-
-                    var msg = String.Format(
-                              CultureInfo.InvariantCulture,
-                              fmt,
-                              this.Instance.GetType().FullName,
-                              member.GetMemberName());
-
-                    throw new ChunkFileException(msg, eos);
-                }
+                return result.Any();
             }
         }
 
-        /// <summary>
-        /// Writes the <paramref name="value"/> to one of the fields or properties of the runtime object.
-        /// </summary>
-        /// <param name="value">Must not be null.</param>
-        /// <returns>Returns true when the value was written.</returns>
-        /// <remarks>Once a property is set it will not be overwritten by subsequent calls to this method.</remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
-        public bool WriteChunkObject(object value)
+        public bool CurrentMemberIsCollection
         {
-            Contract.Requires(value != null);
-            Check.IfArgumentNull(value, "runtimeObject");
-
-            bool isCollection = false;
-            var type = value.GetType();
-
-            if (type.IsGenericType)
+            get
             {
-                // use generic parameter as type
-                type = (from typeArg in type.GetGenericArguments()
-                        select typeArg).FirstOrDefault();
+                return this.enumerator != null &&
+                       this.enumerator.Current != null &&
+                       this.enumerator.Current.IsCollection;
+            }
+        }
 
-                if (type == null)
-                {
-                    throw new ChunkFileException("Internal error. No type argument from generic type.");
-                }
+        public bool CurrentMemberIsListChunk
+        {
+            get
+            {
+                return this.enumerator != null &&
+                       this.enumerator.Current != null &&
+                       this.enumerator.Current.IsCollection &&
+                       !this.enumerator.Current.ChunkIdsAreChunkTypes;
+            }
+        }
 
-                isCollection = true;
+        public bool GetNextChunkObject(out object chunkObject)
+        {
+            if (this.enumerator == null)
+            {
+                this.enumerator = this.members.GetEnumerator();
             }
 
-            var chunkId = ChunkAttribute.GetChunkId(type);
-
-            foreach (var member in this.members)
+            while (this.enumerator.MoveNext())
             {
-                if (member.ChunkMatches(chunkId) &&
-                    member.CanSetValue)
+                if (this.enumerator.Current.ChunkIds != null &&
+                    this.enumerator.Current.ChunkIds.Count > 0)
                 {
-                    member.SetValue(this.Instance, value, isCollection);
-
+                    chunkObject = this.enumerator.Current.GetValue(Instance);
                     return true;
                 }
             }
 
+            chunkObject = null;
             return false;
         }
 
-        /// <summary>
-        /// Uses the <paramref name="reader"/> to read data for the specified <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">Must not be null.</param>
-        /// <param name="reader">Must not be null.</param>
-        /// <returns>Returns the value read or null if type is unsupported.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
-        protected virtual object ReadValueForType(Type type, FileChunkReader reader)
+        public void WriteFields(FileChunkWriter writer)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(reader != null);
-            Check.IfArgumentNull(type, "type");
-            Check.IfArgumentNull(reader, "reader");
-
-            switch (Type.GetTypeCode(type))
+            foreach (var member in this.members)
             {
-                case TypeCode.Byte:
-                    return reader.ReadByte();
-                case TypeCode.Char:
-                    return reader.ReadChar();
-                case TypeCode.Decimal:
-                    return reader.ReadDecimal();
-                case TypeCode.Double:
-                    return reader.ReadDouble();
-                case TypeCode.Int16:
-                    return reader.ReadInt16();
-                case TypeCode.Int32:
-                    return reader.ReadInt32();
-                case TypeCode.Int64:
-                    return reader.ReadInt64();
-                case TypeCode.Single:
-                    return reader.ReadSingle();
-                case TypeCode.String:
-                    return reader.ReadString();
-                case TypeCode.UInt16:
-                    return reader.ReadUInt16();
-                case TypeCode.UInt32:
-                    return reader.ReadUInt32();
-                case TypeCode.UInt64:
-                    return reader.ReadUInt64();
-                case TypeCode.Object:
-                    // handled as custom object
-                    break;
-                default:
-                    throw new NotSupportedException();
+                if (member.ChunkIds != null && member.ChunkIds.Count > 0)
+                {
+                    throw new NotSupportedException("This method does not support writing chunks. No mixed (chunks and data) types allowed.");
+                }
+
+                WritePropertyValue(member, writer);
             }
-
-            var value = this.ReadValueForCustomType(type, reader);
-
-            return value;
         }
 
-        /// <summary>
-        /// Uses the <paramref name="reader"/> to read a custom <paramref name="type"/> (class).
-        /// </summary>
-        /// <param name="type">Must not be null.</param>
-        /// <param name="reader">Must not be null.</param>
-        /// <returns>Returns null if the custom type is not supported.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
-        protected virtual object ReadValueForCustomType(Type type, FileChunkReader reader)
+        private void WritePropertyValue(MemberData member, FileChunkWriter writer)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(reader != null);
-            Check.IfArgumentNull(type, "type");
-            Check.IfArgumentNull(reader, "reader");
+            var value = member.GetValue(Instance);
+            var type = member.DataType;
 
+            if (value != null)
+            {
+                switch (Type.GetTypeCode(type))
+                {
+                    case TypeCode.Byte:
+                        writer.WriteByte((byte)value);
+                        break;
+                    case TypeCode.Char:
+                        writer.WriteChar((char)value);
+                        break;
+                    //case TypeCode.Decimal:
+                    //case TypeCode.Double:
+                    case TypeCode.Int16:
+                        writer.WriteInt16((short)value);
+                        break;
+                    case TypeCode.Int32:
+                        writer.WriteInt32((int)value);
+                        break;
+                    case TypeCode.Int64:
+                        writer.WriteInt64((long)value);
+                        break;
+                    //case TypeCode.Single:
+                    case TypeCode.String:
+                        writer.WriteString((string)value);
+                        break;
+                    case TypeCode.UInt16:
+                        writer.WriteUInt16((ushort)value);
+                        break;
+                    case TypeCode.UInt32:
+                        writer.WriteUInt32((uint)value);
+                        break;
+                    case TypeCode.UInt64:
+                        writer.WriteUInt64((ulong)value);
+                        break;
+                    case TypeCode.Object:
+                        WriteObjectValue(writer, value, type);
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+        }
+
+        private void WriteObjectValue(FileChunkWriter writer, object value, Type type)
+        {
             if (type.FullName == typeof(FourCharacterCode).FullName)
             {
-                return reader.ReadFourCharacterCode();
+                writer.WriteFourCharacterCode((FourCharacterCode)value);
             }
 
             if (type.FullName == typeof(Stream).FullName)
             {
-                return reader.GetRemainingCurrentChunkSubStream();
+                writer.WriteStream((Stream)value);
             }
 
             if (type.FullName == typeof(byte[]).FullName)
             {
-                return reader.GetRemainingCurrentChunkBuffer();
+                writer.WriteBuffer((byte[])value);
             }
 
             if (type.IsChunk())
@@ -223,8 +166,6 @@
                 // should be handled outside the member writer
                 throw new InvalidOperationException();
             }
-
-            return null;
         }
 
         /// <summary>
@@ -232,7 +173,6 @@
         /// </summary>
         /// <param name="type">Must not be null.</param>
         /// <returns>Never returns null.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IEnumerable", Justification = "We want to indicate the type.")]
         private static IEnumerable<MemberData> BuildMemberList(Type type)
         {
             Contract.Requires(type != null);
@@ -310,6 +250,8 @@
                         {
                             member.ChunkIds = new List<string>(chunkTypes);
                         }
+
+                        member.ChunkIdsAreChunkTypes = true;
                     }
                 }
             }
@@ -344,6 +286,11 @@
             /// Any chunk id's that apply to the member.
             /// </summary>
             public List<string> ChunkIds;
+
+            /// <summary>
+            /// If true the contents of <see cref="ChunkIds"/> came from <see cref="ChunkTypeAttribute"/>s.
+            /// </summary>
+            public bool ChunkIdsAreChunkTypes;
 
             /// <summary>
             /// Indicates if the member is a collection (or list).

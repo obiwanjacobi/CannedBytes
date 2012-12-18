@@ -5,5 +5,6 @@ namespace CannedBytes.Media.IO.UnitTests.ChunkTypes.Avi
     [Chunk("strh")]
     public class AviStrhChunk
     {
+        public byte[] Data { get; set; }
     }
 }

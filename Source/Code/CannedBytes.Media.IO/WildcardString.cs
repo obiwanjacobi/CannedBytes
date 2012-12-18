@@ -1,4 +1,6 @@
-﻿namespace CannedBytes.Media.IO
+﻿using System.Text;
+
+namespace CannedBytes.Media.IO
 {
     /// <summary>
     /// Implements the logic for detecting and matching wildcards ('*' and '#').
@@ -78,6 +80,37 @@
             }
 
             return thisValue == null && thatValue == null;
+        }
+
+        public static string Merge(this string thisValue, string thatValue)
+        {
+            StringBuilder result = new StringBuilder();
+
+            if (thisValue != null && thatValue != null)
+            {
+                if (thisValue.Length == thatValue.Length)
+                {
+                    var count = thisValue.Length;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        var thisChar = thisValue[i];
+                        var thatChar = thatValue[i];
+
+                        if (thisChar == NumberWildcardChar ||
+                            thisChar == AlphaWildcardChar)
+                        {
+                            result.Append(thatChar);
+                        }
+                        else
+                        {
+                            result.Append(thisChar);
+                        }
+                    }
+                }
+            }
+
+            return result.ToString();
         }
     }
 }

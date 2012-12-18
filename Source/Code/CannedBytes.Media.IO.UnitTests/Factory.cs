@@ -14,20 +14,38 @@ namespace CannedBytes.Media.IO.UnitTests
             Assert.IsNotNull(filePath);
             Assert.IsTrue(File.Exists(filePath));
 
-            var context = ChunkFileContext.OpenFrom(filePath);
-
-            Assert.IsNotNull(context);
-
-            context.CompositionContainer = CreateCompositionContextForReading(littleEndian);
+            var context = new ChunkFileContext();
+            context.ChunkFile = ChunkFileInfo.OpenRead(filePath);
 
             Assert.IsNotNull(context.ChunkFile);
             Assert.IsNotNull(context.ChunkFile.BaseStream);
+
+            context.CompositionContainer = CreateCompositionContext(littleEndian);
+
             Assert.IsNotNull(context.CompositionContainer);
 
             return context;
         }
 
-        public static CompositionContainer CreateCompositionContextForReading(bool littleEndian)
+        public static ChunkFileContext CreateFileContextForWriting(string filePath, bool littleEndian)
+        {
+            Assert.IsNotNull(filePath);
+            Assert.IsTrue(Directory.Exists(Path.GetDirectoryName(filePath)));
+
+            var context = new ChunkFileContext();
+            context.ChunkFile = ChunkFileInfo.OpenWrite(filePath);
+
+            Assert.IsNotNull(context.ChunkFile);
+            Assert.IsNotNull(context.ChunkFile.BaseStream);
+
+            context.CompositionContainer = CreateCompositionContext(littleEndian);
+
+            Assert.IsNotNull(context.CompositionContainer);
+
+            return context;
+        }
+
+        public static CompositionContainer CreateCompositionContext(bool littleEndian)
         {
             var factory = new CompositionContainerFactory();
 
@@ -35,7 +53,9 @@ namespace CannedBytes.Media.IO.UnitTests
 
             factory.AddTypes(
                 littleEndian ? typeof(LittleEndianNumberReader) : typeof(BigEndianNumberReader),
+                littleEndian ? typeof(LittleEndianNumberWriter) : typeof(BigEndianNumberWriter),
                 typeof(SizePrefixedStringReader),
+                typeof(SizePrefixedStringWriter),
                 typeof(StreamNavigator),
                 typeof(ChunkTypeFactory),
                 typeof(FileChunkHandlerManager));

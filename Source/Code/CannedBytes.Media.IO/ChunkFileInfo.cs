@@ -82,7 +82,32 @@
         /// <remarks>Not implemented yet.</remarks>
         public static ChunkFileInfo OpenWrite(string filePath)
         {
-            throw new NotImplementedException();
+            Contract.Requires(!String.IsNullOrEmpty(filePath));
+            Contract.Ensures(Contract.Result<ChunkFileInfo>() != null);
+            Contract.Ensures(Contract.Result<ChunkFileInfo>().BaseStream != null);
+
+            Check.IfArgumentNullOrEmpty(filePath, "filePath");
+
+            ChunkFileInfo chunkFile = null;
+            ChunkFileInfo cf = null;
+
+            try
+            {
+                cf = new ChunkFileInfo(filePath);
+                cf.BaseStream = File.OpenWrite(filePath);
+
+                chunkFile = cf;
+                cf = null;
+            }
+            finally
+            {
+                if (cf != null)
+                {
+                    cf.Dispose();
+                }
+            }
+
+            return chunkFile;
         }
 
         /// <inheritdocs/>

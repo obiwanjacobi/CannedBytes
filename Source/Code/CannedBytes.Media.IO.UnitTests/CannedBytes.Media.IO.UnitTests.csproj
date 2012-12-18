@@ -75,6 +75,7 @@
     <Compile Include="ChunkTypes\Wave\WaveDataChunk.cs" />
     <Compile Include="ChunkTypes\Wave\WaveFormatChunk.cs" />
     <Compile Include="Factory.cs" />
+    <Compile Include="FileChunkWriterTests.cs" />
     <Compile Include="Media\MediaTests.cs" />
     <Compile Include="Services\ChunkTypeFactoryTests.cs" />
     <Compile Include="CompositionContainerFactoryTests.cs" />

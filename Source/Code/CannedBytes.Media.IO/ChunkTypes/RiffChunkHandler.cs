@@ -2,7 +2,6 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using CannedBytes.Media.IO.SchemaAttributes;
 
@@ -45,19 +44,32 @@
             return riffChunk;
         }
 
-        /// <summary>
-        /// Writes the <paramref name="instance"/> to the file stream.
-        /// </summary>
-        /// <param name="context">Must not be null.</param>
-        /// <param name="instance">Must not be null.</param>
+        public override bool CanWrite(object instance)
+        {
+            return base.CanWrite(instance) && instance is RiffChunk;
+        }
+
         public override void Write(ChunkFileContext context, object instance)
         {
-            Contract.Requires(context != null);
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNotOfType<RiffChunk>(instance, "instance");
 
-            throw new NotImplementedException();
+            var chunk = (RiffChunk)instance;
+            if (chunk.InnerChunk == null)
+            {
+                throw new ArgumentException("No RIFF chunk content found.", "instance.InnerChunk");
+            }
+
+            // make sure the correct file type is set.
+            chunk.FileType = new FourCharacterCode(ChunkAttribute.GetChunkId(chunk.InnerChunk));
+
+            // write out RIFF file type
+            base.Write(context, instance);
+
+            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+
+            writer.WriteRuntimeChunkType(chunk.InnerChunk);
         }
     }
 }

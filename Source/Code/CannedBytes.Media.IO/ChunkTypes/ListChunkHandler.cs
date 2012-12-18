@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.Linq;
     using CannedBytes.Media.IO.SchemaAttributes;
     using CannedBytes.Media.IO.Services;
@@ -85,10 +86,75 @@
             return factory.LookupChunkObjectType(chunkId);
         }
 
-        /// <inheritdocs/>
+        public override bool CanWrite(object instance)
+        {
+            return base.CanWrite(instance) && instance is ListChunk;
+        }
+
         public override void Write(ChunkFileContext context, object instance)
         {
-            throw new NotImplementedException();
+            Check.IfArgumentNull(context, "context");
+            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNotOfType<ListChunk>(instance, "instance");
+
+            var listChunk = (ListChunk)instance;
+
+            if (listChunk.InnerChunks == null)
+            {
+                throw new ArgumentException("No LIST content found.", "instance.InnerChunks");
+            }
+
+            listChunk.ItemType = new FourCharacterCode(GetCollectionItemChunkId(listChunk.InnerChunks));
+
+            // write out LIST chunk
+            base.Write(context, instance);
+
+            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+
+            foreach (var item in listChunk.InnerChunks)
+            {
+                writer.WriteRuntimeChunkType(item);
+            }
+        }
+
+        private string GetCollectionItemChunkId(object instance)
+        {
+            Type type = instance.GetType();
+            Type dataType = null;
+
+            if (type.IsGenericType)
+            {
+                var genType = type.GetGenericTypeDefinition();
+
+                if (genType.FullName.StartsWith("System.Collections.Generic.") &&
+                    genType.FullName.EndsWith("`1"))
+                {
+                    dataType = (from typeArg in type.GetGenericArguments()
+                                select typeArg).FirstOrDefault();
+                }
+                else
+                {
+                    var msg = String.Format(
+                              CultureInfo.InvariantCulture,
+                              "The generic type '{0}' is not supported. Use IEnumerable<T> for collections.",
+                              genType.FullName);
+
+                    throw new NotSupportedException(msg);
+                }
+            }
+            else
+            {
+                dataType = type;
+            }
+
+            string chunkId = null;
+
+            if (dataType != null)
+            {
+                chunkId = ChunkAttribute.GetChunkId(dataType);
+            }
+
+            return chunkId;
         }
     }
 }

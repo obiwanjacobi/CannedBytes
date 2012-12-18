@@ -30,9 +30,9 @@
         /// <summary>
         /// Called to ensure the handler is able to write out the <paramref name="chunk"/>.
         /// </summary>
-        /// <param name="chunk">File chunk information. Must not be null.</param>
+        /// <param name="instance">The runtime object containing the chunk data.</param>
         /// <returns>Returns true when the handler can write the chunk.</returns>
-        bool CanWrite(FileChunk chunk);
+        bool CanWrite(object instance);
 
         /// <summary>
         /// Called to write the <paramref name="instance"/> to the chunk file.
