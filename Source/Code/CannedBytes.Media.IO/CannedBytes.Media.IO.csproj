@@ -135,13 +135,16 @@
     <Compile Include="FileChunk.cs" />
     <Compile Include="FileChunkCollection.cs" />
     <Compile Include="FileChunkHandlerManager.cs" />
+    <Compile Include="FileChunkHeader.cs" />
     <Compile Include="FileChunkReader.cs" />
     <Compile Include="FileChunkHandler.cs" />
     <Compile Include="FileChunkStack.cs" />
     <Compile Include="ChunkFileContext.cs" />
+    <Compile Include="FileChunkWriter.cs" />
     <Compile Include="FourCharacterCode.cs" />
     <Compile Include="IFileChunkHandler.Contract.cs" />
     <Compile Include="IFileChunkHandler.cs" />
+    <Compile Include="ObjectMemberReader.cs" />
     <Compile Include="ObjectMemberWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaAttributes\AttributeExtensions.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Services\LittleEndianNumberWriter.cs" />
     <Compile Include="Services\INumberReader.cs" />
     <Compile Include="Services\INumberWriter.cs" />
+    <Compile Include="Services\SizePrefixedStringWriter.cs" />
     <Compile Include="Services\StreamNavigator.cs" />
     <Compile Include="WildcardString.cs" />
   </ItemGroup>

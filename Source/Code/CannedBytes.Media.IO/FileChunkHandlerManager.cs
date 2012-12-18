@@ -42,11 +42,24 @@
             Contract.Ensures(Contract.Result<IFileChunkHandler>() != null);
             Check.IfArgumentNull(chunkId, "chunkId");
 
-            var chunk4cc = chunkId.ToString();
+            return GetChunkHandler(chunkId.ToString());
+        }
+
+        /// <summary>
+        /// Retrieves a handler for the specified <paramref name="chunkId"/>.
+        /// </summary>
+        /// <param name="chunkId">Must not be null or empty.</param>
+        /// <returns>Never returns null.</returns>
+        /// <remarks>If no specific chunk handler could be found, the default handler is returned.</remarks>
+        public IFileChunkHandler GetChunkHandler(string chunkId)
+        {
+            Contract.Requires(!String.IsNullOrEmpty(chunkId));
+            Contract.Ensures(Contract.Result<IFileChunkHandler>() != null);
+            Check.IfArgumentNullOrEmpty(chunkId, "chunkId");
 
             var handler = (from pair in this.chunkHandlers
                            where pair.Metadata.ChunkId.ToString() != DefaultHandlerChunkId
-                           where chunk4cc.MatchesWith(pair.Metadata.ChunkId.ToString())
+                           where chunkId.MatchesWith(pair.Metadata.ChunkId.ToString())
                            select pair.Value).FirstOrDefault();
 
             if (handler == null)

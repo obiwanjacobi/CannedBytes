@@ -48,12 +48,10 @@
         /// <summary>
         /// Contract specification.
         /// </summary>
-        /// <param name="chunk">Must not be null.</param>
+        /// <param name="chunk">No contract.</param>
         /// <returns>No contract.</returns>
-        bool IFileChunkHandler.CanWrite(FileChunk chunk)
+        bool IFileChunkHandler.CanWrite(object instance)
         {
-            Contract.Requires(chunk != null);
-
             throw new System.NotImplementedException();
         }
 

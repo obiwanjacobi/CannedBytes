@@ -68,18 +68,14 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
-        public override bool CanWrite(FileChunk chunk)
-        {
-            Check.IfArgumentNull(chunk, "chunk");
-
-            return chunk.DataStream != null && chunk.DataStream.CanWrite;
-        }
-
-        /// <inheritdocs/>
         public override void Write(ChunkFileContext context, object instance)
         {
-            throw new NotImplementedException();
+            Check.IfArgumentNull(context, "context");
+            Check.IfArgumentNull(instance, "instance");
+
+            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+
+            writer.WriteRuntimeChunkType(instance);
         }
     }
 }

@@ -52,15 +52,11 @@
         /// <summary>
         /// Returns an indication if the <paramref name="chunk"/> can be written by the handler.
         /// </summary>
-        /// <param name="chunk">File chunk info. Must not be null.</param>
+        /// <param name="instance">The runtime object containing the chunk data.</param>
         /// <returns>Returns true if the chunk can be written by this handler.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
-        public virtual bool CanWrite(FileChunk chunk)
+        public virtual bool CanWrite(object instance)
         {
-            Check.IfArgumentNull(chunk, "chunk");
-
-            return (chunk.ChunkId.ToString() == this.ChunkId.ToString() &&
-                chunk.DataStream != null && chunk.DataStream.CanWrite);
+            return instance != null;
         }
 
         /// <inheritdocs/>
