@@ -13,8 +13,8 @@
         /// </summary>
         public ChunkFileContext()
         {
-            ChunkStack = new FileChunkStack();
-            HeaderStack = new Stack<FileChunkHeader>();
+            this.ChunkStack = new FileChunkStack();
+            this.HeaderStack = new Stack<FileChunkHeader>();
         }
 
         /// <summary>
@@ -26,12 +26,12 @@
         /// Gets the stack of FileChunks used during file parsing.
         /// </summary>
         /// <remarks>Populated while reading, optionally used for writing.</remarks>
-        public FileChunkStack ChunkStack { get; protected set; }
+        public FileChunkStack ChunkStack { get; private set; }
 
         /// <summary>
         /// Gets the stack of streams used for writing.
         /// </summary>
-        public Stack<FileChunkHeader> HeaderStack { get; protected set; }
+        public Stack<FileChunkHeader> HeaderStack { get; private set; }
 
         /// <summary>
         /// Gets or sets an indication whether to copy data from/to the file streams or reuse the existing (sub)stream.
@@ -48,7 +48,11 @@
         /// </summary>
         public CompositionContainer CompositionContainer
         {
-            get { return this.compositionContainer; }
+            get
+            {
+                return this.compositionContainer;
+            }
+
             set
             {
                 this.compositionContainer = value;
@@ -65,7 +69,7 @@
         {
             if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
-                ChunkFile.Dispose();
+                this.ChunkFile.Dispose();
 
                 if (this.compositionContainer != null)
                 {

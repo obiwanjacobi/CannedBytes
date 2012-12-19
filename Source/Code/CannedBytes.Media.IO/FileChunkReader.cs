@@ -458,33 +458,6 @@
         }
 
         /// <summary>
-        /// Reads a single decimal.
-        /// </summary>
-        /// <returns>Returns the decimal read.</returns>
-        public decimal ReadDecimal()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Reads a single double.
-        /// </summary>
-        /// <returns>Returns the double read.</returns>
-        public double ReadDouble()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Reads a single float.
-        /// </summary>
-        /// <returns>Returns the float read.</returns>
-        public float ReadSingle()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Reads a single string.
         /// </summary>
         /// <returns>Returns the string read. Never returns null.</returns>

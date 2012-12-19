@@ -144,6 +144,8 @@
     <Compile Include="FourCharacterCode.cs" />
     <Compile Include="IFileChunkHandler.Contract.cs" />
     <Compile Include="IFileChunkHandler.cs" />
+    <Compile Include="ObjectMemberData.cs" />
+    <Compile Include="ObjectMemberList.cs" />
     <Compile Include="ObjectMemberReader.cs" />
     <Compile Include="ObjectMemberWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
