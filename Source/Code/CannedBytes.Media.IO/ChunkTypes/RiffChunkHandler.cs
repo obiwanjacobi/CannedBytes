@@ -44,11 +44,23 @@
             return riffChunk;
         }
 
+        /// <summary>
+        /// Indicates if the specified chunk <paramref name="instance"/> can be written.
+        /// </summary>
+        /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="RiffChunk"/>.</param>
+        /// <returns>Returns true if there is a good chance <see cref="Write"/>
+        /// will successfully write the chunk <paramref name="instance"/>.</returns>
         public override bool CanWrite(object instance)
         {
             return base.CanWrite(instance) && instance is RiffChunk;
         }
 
+        /// <summary>
+        /// Writes the <paramref name="instance"/> to the file stream.
+        /// </summary>
+        /// <param name="context">Must not be null.</param>
+        /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="RiffChunk"/> and not null.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(ChunkFileContext context, object instance)
         {
             Check.IfArgumentNull(context, "context");
@@ -58,7 +70,7 @@
             var chunk = (RiffChunk)instance;
             if (chunk.InnerChunk == null)
             {
-                throw new ArgumentException("No RIFF chunk content found.", "instance.InnerChunk");
+                throw new ArgumentException("No RIFF chunk content found.", "instance");
             }
 
             // make sure the correct file type is set.

@@ -80,6 +80,7 @@
         /// <param name="filePath">Must not be null or empty.</param>
         /// <returns>Never returns null.</returns>
         /// <remarks>Not implemented yet.</remarks>
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Implemented suggested pattern.")]
         public static ChunkFileInfo OpenWrite(string filePath)
         {
             Contract.Requires(!String.IsNullOrEmpty(filePath));

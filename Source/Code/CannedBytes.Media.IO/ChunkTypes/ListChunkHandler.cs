@@ -86,11 +86,23 @@
             return factory.LookupChunkObjectType(chunkId);
         }
 
+        /// <summary>
+        /// Indicates if the specified chunk <paramref name="instance"/> can be written.
+        /// </summary>
+        /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="ListChunk"/>.</param>
+        /// <returns>Returns true if there is a good chance <see cref="Write"/>
+        /// will successfully write the chunk <paramref name="instance"/>.</returns>
         public override bool CanWrite(object instance)
         {
             return base.CanWrite(instance) && instance is ListChunk;
         }
 
+        /// <summary>
+        /// Writes the <paramref name="instance"/> to the file stream.
+        /// </summary>
+        /// <param name="context">Must not be null.</param>
+        /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="ListChunk"/> and not null.</param>
+        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(ChunkFileContext context, object instance)
         {
             Check.IfArgumentNull(context, "context");
@@ -101,7 +113,7 @@
 
             if (listChunk.InnerChunks == null)
             {
-                throw new ArgumentException("No LIST content found.", "instance.InnerChunks");
+                throw new ArgumentException("No LIST content found.", "instance");
             }
 
             listChunk.ItemType = new FourCharacterCode(GetCollectionItemChunkId(listChunk.InnerChunks));
@@ -117,7 +129,13 @@
             }
         }
 
-        private string GetCollectionItemChunkId(object instance)
+        /// <summary>
+        /// Returns the chunk id of the item data type for the collection <paramref name="instance"/>.
+        /// </summary>
+        /// <param name="instance">Must not be null.</param>
+        /// <returns>Can return null.</returns>
+        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IEnumerable", Justification = "We want the type name in the message.")]
+        private static string GetCollectionItemChunkId(object instance)
         {
             Type type = instance.GetType();
             Type dataType = null;
@@ -126,8 +144,8 @@
             {
                 var genType = type.GetGenericTypeDefinition();
 
-                if (genType.FullName.StartsWith("System.Collections.Generic.") &&
-                    genType.FullName.EndsWith("`1"))
+                if (genType.FullName.StartsWith("System.Collections.Generic.", StringComparison.OrdinalIgnoreCase) &&
+                    genType.FullName.EndsWith("`1", StringComparison.OrdinalIgnoreCase))
                 {
                     dataType = (from typeArg in type.GetGenericArguments()
                                 select typeArg).FirstOrDefault();

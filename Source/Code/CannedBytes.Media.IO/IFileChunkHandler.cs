@@ -28,7 +28,7 @@
         object Read(ChunkFileContext context);
 
         /// <summary>
-        /// Called to ensure the handler is able to write out the <paramref name="chunk"/>.
+        /// Called to ensure the handler is able to write out the <paramref name="instance"/>.
         /// </summary>
         /// <param name="instance">The runtime object containing the chunk data.</param>
         /// <returns>Returns true when the handler can write the chunk.</returns>

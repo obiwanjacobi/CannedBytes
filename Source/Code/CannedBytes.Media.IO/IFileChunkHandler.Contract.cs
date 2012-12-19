@@ -48,7 +48,7 @@
         /// <summary>
         /// Contract specification.
         /// </summary>
-        /// <param name="chunk">No contract.</param>
+        /// <param name="instance">No contract.</param>
         /// <returns>No contract.</returns>
         bool IFileChunkHandler.CanWrite(object instance)
         {

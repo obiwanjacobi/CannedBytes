@@ -50,7 +50,7 @@
         public abstract object Read(ChunkFileContext context);
 
         /// <summary>
-        /// Returns an indication if the <paramref name="chunk"/> can be written by the handler.
+        /// Returns an indication if the <paramref name="instance"/> can be written by the handler.
         /// </summary>
         /// <param name="instance">The runtime object containing the chunk data.</param>
         /// <returns>Returns true if the chunk can be written by this handler.</returns>
