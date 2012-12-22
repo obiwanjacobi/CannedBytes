@@ -9,7 +9,7 @@ namespace CannedBytes.Media.UnitTests
         [TestMethod]
         public void StartTimer_CleanupOnDispose_NoExceptions()
         {
-            using (var timer = new CallbackTimer(TimerMode.Periodic, (sender, e) => { }))
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
                 timer.StartTimer();
             }
@@ -18,7 +18,7 @@ namespace CannedBytes.Media.UnitTests
         [TestMethod]
         public void StartTimer_StopTimer_NoExceptions()
         {
-            using (var timer = new CallbackTimer(TimerMode.Periodic, (sender, e) => { }))
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
                 timer.StartTimer();
 
@@ -31,8 +31,9 @@ namespace CannedBytes.Media.UnitTests
         {
             bool callback = false;
 
-            using (var timer = new CallbackTimer(TimerMode.Periodic, (sender, e) => { callback = true; }))
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
+                timer.Callback += (sender, e) => { callback = true; };
                 timer.StartTimer();
 
                 Thread.Sleep(20);
@@ -42,9 +43,51 @@ namespace CannedBytes.Media.UnitTests
         }
 
         [TestMethod]
+        public void AddTwoHandlers_UseLowDivider_CallbacksFired()
+        {
+            int callback1Count = 0;
+            int callback2Count = 0;
+            int divider = 2;
+
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
+            {
+                timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1, null);
+                timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider, null);
+                timer.StartTimer();
+
+                Thread.Sleep(50);
+
+                Assert.AreNotEqual(0, callback1Count);
+                Assert.AreNotEqual(0, callback2Count);
+                Assert.AreEqual(callback1Count / divider, callback2Count);
+            }
+        }
+
+        [TestMethod]
+        public void AddTwoHandlers_UseHighDivider_CallbacksFired()
+        {
+            int callback1Count = 0;
+            int callback2Count = 0;
+            int divider = 200;
+
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
+            {
+                timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1, null);
+                timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider, null);
+                timer.StartTimer();
+
+                Thread.Sleep(500);
+
+                Assert.AreNotEqual(0, callback1Count);
+                Assert.AreNotEqual(0, callback2Count);
+                Assert.AreEqual(callback1Count / divider, callback2Count);
+            }
+        }
+
+        [TestMethod]
         public void StartTimer_OnNewInstance_StartedEventFires()
         {
-            using (var timer = new CallbackTimer(TimerMode.Periodic, (sender, e) => { }))
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
                 bool eventFired = false;
                 timer.Started += (sender, e) => { eventFired = true; };
@@ -57,7 +100,7 @@ namespace CannedBytes.Media.UnitTests
         [TestMethod]
         public void StopTimer_OnNewInstance_StoppedEventFires()
         {
-            using (var timer = new CallbackTimer(TimerMode.Periodic, (sender, e) => { }))
+            using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
                 bool eventFired = false;
                 timer.Stopped += (sender, e) => { eventFired = true; };
