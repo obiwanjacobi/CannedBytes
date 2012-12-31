@@ -79,7 +79,7 @@ namespace CannedBytes.IO
         /// <param name="offset">Must be within range.</param>
         private void SetStreamOffset(long offset)
         {
-            if (offset >= this.InnerStream.Length)
+            if (offset > 0 && offset >= this.InnerStream.Length)
             {
                 throw new ArgumentOutOfRangeException("offset");
             }
@@ -93,7 +93,8 @@ namespace CannedBytes.IO
         /// <param name="length">Is adjusted to fit within range.</param>
         private void SetSubLength(long length)
         {
-            if ((this.streamOffset + length) > base.Length)
+            if (length > 0 &&
+                (this.streamOffset + length) > base.Length)
             {
                 this.subStreamLength = base.Length - this.streamOffset;
             }
@@ -110,9 +111,12 @@ namespace CannedBytes.IO
         /// <returns>Returns true if the (adjusted) count is greater than zero.</returns>
         private bool AdjustCount(ref int count)
         {
-            if ((base.Position + count) > (this.streamOffset + this.subStreamLength))
+            if (this.subStreamLength > 0)
             {
-                count = (int)((this.streamOffset + this.subStreamLength) - base.Position);
+                if ((base.Position + count) > (this.streamOffset + this.subStreamLength))
+                {
+                    count = (int)((this.streamOffset + this.subStreamLength) - base.Position);
+                }
             }
 
             return count > 0;
