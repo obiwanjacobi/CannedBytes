@@ -16,6 +16,21 @@ namespace CannedBytes.IO
         private long subStreamLength;
 
         /// <summary>
+        /// For derived classes that wish to compute the offset and length of the sub-stream themselves.
+        /// </summary>
+        /// <param name="stream">Must not be null.</param>
+        /// <param name="canSeek">Pass true to allow seeking in the sub-stream.</param>
+        /// <remarks>The offset is initialized to the current position of the <paramref name="stream"/>
+        /// but can be overruled with a call to <see cref="SetStreamOffset"/>.</remarks>
+        protected SubStream(Stream stream, bool canSeek)
+            : base(stream, canSeek)
+        {
+            Check.IfArgumentNull(stream, "stream");
+
+            this.streamOffset = stream.Position;
+        }
+
+        /// <summary>
         /// Instantiates a new instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
@@ -31,7 +46,7 @@ namespace CannedBytes.IO
         }
 
         /// <summary>
-        /// Instantiates a new seekable instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
+        /// Instantiates a new instance from the start of the <paramref name="stream"/> for <paramref name="length"/> bytes.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <param name="canSeek">False to prohibit seeking.</param>
@@ -77,7 +92,7 @@ namespace CannedBytes.IO
         /// Initializes the sub-stream offset.
         /// </summary>
         /// <param name="offset">Must be within range.</param>
-        private void SetStreamOffset(long offset)
+        protected long SetStreamOffset(long offset)
         {
             if (offset > 0 && offset >= this.InnerStream.Length)
             {
@@ -85,15 +100,17 @@ namespace CannedBytes.IO
             }
 
             this.streamOffset = offset;
+
+            return this.streamOffset;
         }
 
         /// <summary>
         /// Initializes the sub-stream length.
         /// </summary>
-        /// <param name="length">Is adjusted to fit within range.</param>
-        private void SetSubLength(long length)
+        /// <param name="length">Is adjusted to fit within length of the base stream.</param>
+        protected long SetSubLength(long length)
         {
-            if (length > 0 &&
+            if (length > 0 && base.Length > 0 &&
                 (this.streamOffset + length) > base.Length)
             {
                 this.subStreamLength = base.Length - this.streamOffset;
@@ -102,6 +119,8 @@ namespace CannedBytes.IO
             {
                 this.subStreamLength = length;
             }
+
+            return this.subStreamLength;
         }
 
         /// <summary>
@@ -195,13 +214,16 @@ namespace CannedBytes.IO
                     break;
             }
 
-            if (absoluteOffset < this.streamOffset)
+            if (this.subStreamLength > 0)
             {
-                absoluteOffset = this.streamOffset;
-            }
-            else if (absoluteOffset > (this.streamOffset + this.subStreamLength))
-            {
-                absoluteOffset = this.streamOffset + this.subStreamLength;
+                if (absoluteOffset < this.streamOffset)
+                {
+                    absoluteOffset = this.streamOffset;
+                }
+                else if (absoluteOffset > (this.streamOffset + this.subStreamLength))
+                {
+                    absoluteOffset = this.streamOffset + this.subStreamLength;
+                }
             }
 
             return base.Seek(absoluteOffset, SeekOrigin.Begin);
@@ -213,7 +235,8 @@ namespace CannedBytes.IO
         /// <param name="value">Not used.</param>
         public override void SetLength(long value)
         {
-            throw new NotSupportedException();
+            //throw new NotSupportedException();
+            base.SetLength(value);
         }
 
         /// <inheritdocs/>
@@ -242,7 +265,15 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override long Length
         {
-            get { return this.subStreamLength; }
+            get
+            {
+                if (this.subStreamLength == 0)
+                {
+                    return base.Length;
+                }
+
+                return this.subStreamLength;
+            }
         }
 
         /// <inheritdocs/>
@@ -251,12 +282,20 @@ namespace CannedBytes.IO
             get
             {
                 // maxed out
-                if ((base.Position - this.streamOffset) >= this.subStreamLength)
+                if (this.subStreamLength > 0)
                 {
-                    return this.subStreamLength;
+                    if ((base.Position - this.streamOffset) >= this.subStreamLength)
+                    {
+                        return this.subStreamLength;
+                    }
                 }
 
-                return base.Position - this.streamOffset;
+                if ((base.Position - this.streamOffset) >= 0)
+                {
+                    return base.Position - this.streamOffset;
+                }
+
+                return 0;
             }
 
             set
