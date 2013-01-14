@@ -35,10 +35,7 @@ namespace CannedBytes.IO
         /// which also depends on the wrapped <paramref name="stream"/>- but it will not prohibit it.</remarks>
         protected WrappedStream(Stream stream, bool canSeek)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
+            Check.IfArgumentNull(stream, "stream");
 
             this.stream = stream;
             this.canSeek = canSeek;
