@@ -9,6 +9,11 @@
     <Description>Media IO Library for other Canned Bytes projects.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Configurations>Debug;Release</Configurations>
+    <Copyright>Copyright © 2012-2020 Canned Bytes / Jacobi Software</Copyright>
+    <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/obiwanjacobi/CannedBytes</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/obiwanjacobi/CannedBytes</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net4'">

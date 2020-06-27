@@ -27,6 +27,7 @@ namespace CannedBytes.Media.UnitTests
             }
         }
 
+        [TestCategory("LocalOnly")]
         [TestMethod]
         public void StartTimer_WithShortWait_CallbackFired()
         {

@@ -7,11 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes", "CannedBytes\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes.Media", "CannedBytes.Media\CannedBytes.Media.csproj", "{36201C05-8459-4FC9-BAED-E7C0B936467E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO", "CannedBytes.Media.IO\CannedBytes.Media.IO.csproj", "{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes.Media.IO", "CannedBytes.Media.IO\CannedBytes.Media.IO.csproj", "{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO.UnitTests", "CannedBytes.Media.IO.UnitTests\CannedBytes.Media.IO.UnitTests.csproj", "{332D614D-A5CD-4551-A2F1-91A98E44976C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes.Media.IO.UnitTests", "CannedBytes.Media.IO.UnitTests\CannedBytes.Media.IO.UnitTests.csproj", "{332D614D-A5CD-4551-A2F1-91A98E44976C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.UnitTests", "CannedBytes.Media.UnitTests\CannedBytes.Media.UnitTests.csproj", "{A1B4F075-C62E-4F84-9388-1867DFF791EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes.Media.UnitTests", "CannedBytes.Media.UnitTests\CannedBytes.Media.UnitTests.csproj", "{A1B4F075-C62E-4F84-9388-1867DFF791EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{4B1942A5-6A63-41E4-8564-5B8FA18611C7}"
+	ProjectSection(SolutionItems) = preProject
+		push-test.cmd = push-test.cmd
+		..\..\.github\workflows\release-ci.yml = ..\..\.github\workflows\release-ci.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
