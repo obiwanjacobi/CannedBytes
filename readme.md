@@ -1,16 +1,13 @@
-**Project Description**
-A C# code repository for backing other codeplex open source projects I'm doing.
+# Canned Bytes
 
+An assortment of libraries used in my other projects.
+
+![Release-CI](https://github.com/obiwanjacobi/CannedBytes/workflows/Release-CI/badge.svg)
 
 ## CannedBytes
 
-Contains general non-related code. Code for implementing Disposable objects, checking method parameters, that sort of thing.
-
-## CannedBytes.IO
-
-Contains enhancements on the System.IO namespace. Some Stream variations are available.
+Contains general non-related code. Code for implementing Disposable objects and checking method parameters. Several Stream classes are available for instance a WrapperStream and a SubStream class.
 
 ## CannedBytes.Media.IO
 
-Implements a generic serialization mechanism based on the RIFF/IFF specification. Uses MEF.
-
+Implements a generic serialization mechanism based on the RIFF/IFF specification also known as chunked-files. There are several media file types that are based on chunked-files, like .wav and .avi.
