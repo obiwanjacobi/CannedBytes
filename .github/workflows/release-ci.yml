@@ -1,4 +1,4 @@
-name: .NET Core
+name: Release-CI
 
 on:
   push:
@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore
+      run: dotnet Source/Code/CannedBytes.sln restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet Source/Code/CannedBytes.sln build --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      run: dotnet Source/Code/CannedBytes.sln test --no-restore --verbosity normal
