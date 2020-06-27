@@ -1,17 +1,11 @@
 namespace CannedBytes.Media.IO.Services
 {
-#if NET4
-    using System.ComponentModel.Composition;
-#else
-    using System.Composition;
-#endif
-
     using System.IO;
 
     /// <summary>
     /// An implementation of the <see cref="INumberReader"/> for big-endian encoding.
     /// </summary>
-    [Export(typeof(INumberReader))]
+//    [Export(typeof(INumberReader))]
     public class BigEndianNumberReader : INumberReader
     {
         /// <inheritdocs/>

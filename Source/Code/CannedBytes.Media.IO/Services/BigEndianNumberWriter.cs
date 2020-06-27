@@ -1,13 +1,12 @@
 namespace CannedBytes.Media.IO.Services
 {
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
 
     /// <summary>
     /// Implements the <see cref="INumberWriter"/> interface for a big-endian encoding.
     /// </summary>
-    [Export(typeof(INumberWriter))]
+//    [Export(typeof(INumberWriter))]
     public class BigEndianNumberWriter : INumberWriter
     {
         /// <inheritdocs/>

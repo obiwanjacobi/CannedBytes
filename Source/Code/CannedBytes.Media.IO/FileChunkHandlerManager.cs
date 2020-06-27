@@ -2,7 +2,6 @@
 {
     using CannedBytes.Media.IO.SchemaAttributes;
     using System;
-    using System.ComponentModel.Composition;
     using System.Linq;
 
     /// <summary>
@@ -10,7 +9,7 @@
     /// </summary>
     /// <remarks>Uses composition to retrieve the chunk handler implementations.
     /// Each chunk handler must be marked with the <see cref="FileChunkHandlerAttribute"/>.</remarks>
-    [Export]
+//    [Export]
     public class FileChunkHandlerManager
     {
         /// <summary>
@@ -18,14 +17,11 @@
         /// </summary>
         public const string DefaultHandlerChunkId = "****";
 
-        ////warning CS0649: Field 'X' is never assigned to, and will always have its default value null
-#pragma warning disable 0649
         /// <summary>
         /// The list of chunk handlers.
         /// </summary>
-        [ImportMany(AllowRecomposition = true)]
-        private Lazy<IFileChunkHandler, IFileChunkHandlerMetaInfo>[] chunkHandlers;
-#pragma warning restore 0649
+//        [ImportMany(AllowRecomposition = true)]
+        private Lazy<(IFileChunkHandler Handler, IFileChunkHandlerMetaInfo Metadata)>[] chunkHandlers;
 
         /// <summary>
         /// Retrieves a handler for the specified <paramref name="chunkId"/>.

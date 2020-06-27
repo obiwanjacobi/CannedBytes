@@ -1,13 +1,12 @@
 namespace CannedBytes.Media.IO.Services
 {
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
 
     /// <summary>
     /// Implements a number writer for little endian encoding.
     /// </summary>
-    [Export(typeof(INumberWriter))]
+//    [Export(typeof(INumberWriter))]
     public class LittleEndianNumberWriter : INumberWriter
     {
         /// <inheritdocs/>

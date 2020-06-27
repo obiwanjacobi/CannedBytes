@@ -2,11 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-#if NET4
-    using System.ComponentModel.Composition.Hosting;
-#else
-    using System.Composition.Hosting;
-#endif
 
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
@@ -43,53 +38,53 @@
         /// </summary>
         public bool CopyStreams { get; set; }
 
-#if NET4
-        private CompositionContainer _compositionContainer;
+        //#if NET4
+        //        private CompositionContainer _compositionContainer;
 
-        /// <summary>
-        /// A container used for satisfying (external) object references.
-        /// </summary>
-        public CompositionContainer Container
-        {
-            get
-            {
-                return _compositionContainer;
-            }
+        //        /// <summary>
+        //        /// A container used for satisfying (external) object references.
+        //        /// </summary>
+        //        public CompositionContainer Container
+        //        {
+        //            get
+        //            {
+        //                return _compositionContainer;
+        //            }
 
-            set
-            {
-                _compositionContainer = value;
+        //            set
+        //            {
+        //                _compositionContainer = value;
 
-                if (_compositionContainer != null)
-                {
-                    _compositionContainer.AddInstance(this);
-                }
-            }
-        }
-#else
-        private CompositionHost _compositionContainer;
+        //                if (_compositionContainer != null)
+        //                {
+        //                    _compositionContainer.AddInstance(this);
+        //                }
+        //            }
+        //        }
+        //#else
+        //        private CompositionHost _compositionContainer;
 
-        /// <summary>
-        /// A container used for satisfying (external) object references.
-        /// </summary>
-        public CompositionHost Container
-        {
-            get
-            {
-                return _compositionContainer;
-            }
+        //        /// <summary>
+        //        /// A container used for satisfying (external) object references.
+        //        /// </summary>
+        //        public CompositionHost Container
+        //        {
+        //            get
+        //            {
+        //                return _compositionContainer;
+        //            }
 
-            set
-            {
-                _compositionContainer = value;
+        //            set
+        //            {
+        //                _compositionContainer = value;
 
-                if (_compositionContainer != null)
-                {
-                    _compositionContainer.AddInstance(this);
-                }
-            }
-        }
-#endif
+        //                if (_compositionContainer != null)
+        //                {
+        //                    _compositionContainer.AddInstance(this);
+        //                }
+        //            }
+        //        }
+        //#endif
 
         /// <summary>
         /// Services from the container.
@@ -98,7 +93,8 @@
         {
             get
             {
-                return _compositionContainer;
+                //return _compositionContainer;
+                return null;
             }
         }
 
@@ -109,10 +105,10 @@
             {
                 ChunkFile.Dispose();
 
-                if (_compositionContainer != null)
-                {
-                    _compositionContainer.Dispose();
-                }
+                //if (_compositionContainer != null)
+                //{
+                //    _compositionContainer.Dispose();
+                //}
             }
         }
     }

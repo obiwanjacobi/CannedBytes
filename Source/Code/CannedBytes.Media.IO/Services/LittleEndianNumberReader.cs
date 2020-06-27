@@ -1,17 +1,11 @@
 namespace CannedBytes.Media.IO.Services
 {
-#if NET4
-    using System.ComponentModel.Composition;
-#else
-    using System.Composition;
-#endif
-
     using System.IO;
 
     /// <summary>
     /// Implements the <see cref="INumberReader"/> interface for little-endian encoding.
     /// </summary>
-    [Export(typeof(INumberReader))]
+//    [Export(typeof(INumberReader))]
     public class LittleEndianNumberReader : INumberReader
     {
         /// <inheritdocs/>

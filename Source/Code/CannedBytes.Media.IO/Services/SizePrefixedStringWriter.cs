@@ -2,17 +2,11 @@
 {
     using System;
     using System.IO;
-#if NET4
-    using System.ComponentModel.Composition;
-#else
-    using System.Composition;
-#endif
-
 
     /// <summary>
     /// A string writer implementation that prefixes the length of the string before the string is written.
     /// </summary>
-    [Export(typeof(IStringWriter))]
+//    [Export(typeof(IStringWriter))]
     public class SizePrefixedStringWriter : IStringWriter
     {
         /// <summary>

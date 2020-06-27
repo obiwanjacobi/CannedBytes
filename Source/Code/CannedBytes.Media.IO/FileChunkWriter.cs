@@ -5,7 +5,6 @@
     using CannedBytes.Media.IO.Services;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.Composition;
     using System.Globalization;
     using System.IO;
 
@@ -19,32 +18,29 @@
         /// </summary>
         private ChunkFileContext _context;
 
-        ////warning CS0649: Field 'X' is never assigned to, and will always have its default value null
-#pragma warning disable 0649
         /// <summary>
         /// Optional reference to the stream navigator.
         /// </summary>
-        [Import(AllowDefault = true, AllowRecomposition = true)]
+//        [Import(AllowDefault = true, AllowRecomposition = true)]
         private IStreamNavigator _streamNavigator;
 
         /// <summary>
         /// Private reference to the chunk handler manager.
         /// </summary>
-        [Import]
+//        [Import]
         private FileChunkHandlerManager _handlerMgr;
 
         /// <summary>
         /// Private reference to the string writer.
         /// </summary>
-        [Import]
+//        [Import]
         private IStringWriter _stringWriter;
 
         /// <summary>
         /// Private reference to the number writer.
         /// </summary>
-        [Import]
+//        [Import]
         private INumberWriter _numberWriter;
-#pragma warning restore 0649
 
         /// <summary>
         /// Constructs a new writer instance.
@@ -55,8 +51,8 @@
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
-            context.Services.ComposeParts(this);
-            context.Services.AddInstance(this);
+            //            context.Services.ComposeParts(this);
+            //            context.Services.AddInstance(this);
 
             _context = context;
         }
@@ -320,7 +316,6 @@
         /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
         /// </summary>
         /// <param name="value">The value to be written.</param>
-        [CLSCompliant(false)]
         public void WriteUInt16(ushort value)
         {
             _numberWriter.WriteInt16((short)value, CurrentStream);
@@ -330,7 +325,6 @@
         /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
         /// </summary>
         /// <param name="value">The value to be written.</param>
-        [CLSCompliant(false)]
         public void WriteUInt32(uint value)
         {
             _numberWriter.WriteInt32((int)value, CurrentStream);
@@ -340,7 +334,6 @@
         /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
         /// </summary>
         /// <param name="value">The value to be written.</param>
-        [CLSCompliant(false)]
         public void WriteUInt64(ulong value)
         {
             _numberWriter.WriteInt64((long)value, CurrentStream);

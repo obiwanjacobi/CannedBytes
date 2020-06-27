@@ -3,15 +3,14 @@
     using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reflection;
 
     /// <summary>
     /// Implementation of the <see cref="IChunkTypeFactory"/> interface.
     /// </summary>
-    [Export(typeof(ChunkTypeFactory))]
-    [Export(typeof(IChunkTypeFactory))]
+    //    [Export(typeof(ChunkTypeFactory))]
+    //    [Export(typeof(IChunkTypeFactory))]
     public class ChunkTypeFactory : IChunkTypeFactory
     {
         /// <summary>
@@ -26,7 +25,7 @@
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
 
-            this.AddChunksFrom(assembly, true);
+            AddChunksFrom(assembly, true);
         }
 
         /// <summary>
@@ -49,16 +48,16 @@
             {
                 var chunkId = item.Attribute.ChunkTypeId.ToString();
 
-                if (this.chunkMap.ContainsKey(chunkId))
+                if (chunkMap.ContainsKey(chunkId))
                 {
                     if (replace)
                     {
-                        this.chunkMap[chunkId] = item.Type;
+                        chunkMap[chunkId] = item.Type;
                     }
                 }
                 else
                 {
-                    this.chunkMap.Add(chunkId, item.Type);
+                    chunkMap.Add(chunkId, item.Type);
                 }
             }
         }
@@ -68,7 +67,7 @@
         {
             Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
-            Type result = this.LookupChunkObjectType(chunkTypeId);
+            Type result = LookupChunkObjectType(chunkTypeId);
 
             if (result != null)
             {
@@ -83,21 +82,17 @@
         {
             Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
-            string chunkId = chunkTypeId.ToString();
+            var chunkId = chunkTypeId.ToString();
 
-            if (!chunkId.HasWildcard())
+            // try fast lookup first if the requested type has no wildcards
+            if (!chunkId.HasWildcard() &&
+                chunkMap.TryGetValue(chunkId, out Type result))
             {
-                Type result = null;
-
-                // try fast lookup first if the requested type has no wildcards
-                if (this.chunkMap.TryGetValue(chunkId, out result))
-                {
-                    return result;
-                }
+                return null;
             }
 
             // now match wildcards
-            foreach (var item in this.chunkMap)
+            foreach (var item in chunkMap)
             {
                 if (chunkId.MatchesWith(item.Key))
                 {

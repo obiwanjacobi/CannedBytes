@@ -3,7 +3,6 @@
     using CannedBytes.IO;
     using CannedBytes.Media.IO.Services;
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
 
     /// <summary>
@@ -21,31 +20,31 @@
         /// <summary>
         /// Optional reference to the stream navigator.
         /// </summary>
-        [Import(AllowDefault = true, AllowRecomposition = true)]
+//        [Import(AllowDefault = true, AllowRecomposition = true)]
         private IStreamNavigator _streamNavigator;
 
         /// <summary>
         /// Private reference to the chunk type factory.
         /// </summary>
-        [Import]
+//        [Import]
         private IChunkTypeFactory _chunkTypeFactory;
 
         /// <summary>
         /// Private reference to the chunk handler manager.
         /// </summary>
-        [Import]
+//        [Import]
         private FileChunkHandlerManager _handlerMgr;
 
         /// <summary>
         /// Private reference to the string reader.
         /// </summary>
-        [Import]
+        //[Import]
         private IStringReader _stringReader;
 
         /// <summary>
         /// Private reference to the number reader.
         /// </summary>
-        [Import]
+        //[Import]
         private INumberReader _numberReader;
 #pragma warning restore 0649
 
@@ -58,8 +57,8 @@
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
-            context.Container.ComposeParts(this);
-            context.Container.AddInstance(this);
+            //context.Container.ComposeParts(this);
+            //context.Container.AddInstance(this);
 
             _context = context;
         }
@@ -457,7 +456,6 @@
         /// Reads a single unsigned short.
         /// </summary>
         /// <returns>Returns the value read.</returns>
-        [CLSCompliant(false)]
         public ushort ReadUInt16()
         {
             return (ushort)ReadInt16();
@@ -467,7 +465,6 @@
         /// Reads a single unsigned integer.
         /// </summary>
         /// <returns>Returns the value read.</returns>
-        [CLSCompliant(false)]
         public uint ReadUInt32()
         {
             return (uint)ReadInt32();
@@ -477,7 +474,6 @@
         /// Reads a single unsigned long.
         /// </summary>
         /// <returns>Returns the value read.</returns>
-        [CLSCompliant(false)]
         public ulong ReadUInt64()
         {
             return (ulong)ReadInt64();
