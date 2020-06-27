@@ -95,8 +95,9 @@ namespace CannedBytes.Media
                     return;
                 }
 #endif
-                InvokeHandlerDirect(registration);
             }
+
+            InvokeHandlerDirect(registration);
         }
 
         /// <summary>

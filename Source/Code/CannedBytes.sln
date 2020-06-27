@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO", "Can
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO.UnitTests", "CannedBytes.Media.IO.UnitTests\CannedBytes.Media.IO.UnitTests.csproj", "{332D614D-A5CD-4551-A2F1-91A98E44976C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.UnitTests", "CannedBytes.Media.UnitTests\CannedBytes.Media.UnitTests.csproj", "{A1B4F075-C62E-4F84-9388-1867DFF791EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{332D614D-A5CD-4551-A2F1-91A98E44976C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{332D614D-A5CD-4551-A2F1-91A98E44976C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{332D614D-A5CD-4551-A2F1-91A98E44976C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B4F075-C62E-4F84-9388-1867DFF791EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B4F075-C62E-4F84-9388-1867DFF791EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B4F075-C62E-4F84-9388-1867DFF791EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B4F075-C62E-4F84-9388-1867DFF791EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
