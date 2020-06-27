@@ -20,6 +20,6 @@ jobs:
     - name: Install dependencies
       run: dotnet restore Source/Code/CannedBytes.sln
     - name: Build
-      run: dotnet build --configuration Release --no-restore Source/Code/CannedBytes.sln
+      run: dotnet build Source/Code/CannedBytes.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test --no-restore --verbosity normal Source/Code/CannedBytes.sln
+      run: dotnet test Source/Code/CannedBytes.sln --no-restore --verbosity normal
