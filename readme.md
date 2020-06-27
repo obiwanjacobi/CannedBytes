@@ -1,6 +1,6 @@
 # Canned Bytes
 
-An assortment of libraries used in my other projects.
+An assortment of libraries used in my other projects. Targets .NET 4.x and .NET Core 3.1.
 
 ![Release-CI](https://github.com/obiwanjacobi/CannedBytes/workflows/Release-CI/badge.svg)
 
