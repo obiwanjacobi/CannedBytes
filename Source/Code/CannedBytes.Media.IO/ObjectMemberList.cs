@@ -1,14 +1,12 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Manages a collection of <see cref="ObjectMemberData"/> instances.
@@ -36,10 +34,8 @@
         /// </summary>
         /// <param name="type">Must not be null.</param>
         /// <returns>Never returns null.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IEnumerable", Justification = "We want to indicate the type.")]
         private static IEnumerable<ObjectMemberData> BuildMemberList(Type type)
         {
-            Contract.Requires(type != null);
             Check.IfArgumentNull(type, "type");
 
             var members = (from member in type.GetMembers()
@@ -49,8 +45,6 @@
 
             foreach (var member in members)
             {
-                Contract.Assume(member != null);
-
                 string chunkId = null;
                 Type dataType = null;
 
@@ -63,8 +57,6 @@
                 {
                     dataType = member.PropertyInfo.PropertyType;
                 }
-
-                Contract.Assume(dataType != null);
 
                 if (dataType.IsGenericType)
                 {

@@ -1,11 +1,10 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System.Diagnostics.Contracts;
+
 
     /// <summary>
     /// Stateless object that knows how to process a specific type of file chunk.
     /// </summary>
-    [ContractClass(typeof(FileChunkHandlerContract))]
     public interface IFileChunkHandler
     {
         /// <summary>

@@ -1,7 +1,6 @@
 namespace CannedBytes
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
 
     /// <summary>
@@ -18,12 +17,11 @@ namespace CannedBytes
         /// <summary>
         /// Call to dispose of this instance.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "We don't have Dispose(true).")]
         public void Dispose()
         {
-            this.Dispose(DisposeObjectKind.ManagedAndUnmanagedResources);
+            Dispose(DisposeObjectKind.ManagedAndUnmanagedResources);
             GC.SuppressFinalize(this);
-            this.IsDisposed = true;
+            IsDisposed = true;
         }
 
         /// <summary>
@@ -57,7 +55,7 @@ namespace CannedBytes
         /// <exception cref="ObjectDisposedException">Thrown when the instance is disposed.</exception>
         protected virtual void ThrowIfDisposed()
         {
-            if (this.IsDisposed)
+            if (IsDisposed)
             {
                 var msg = String.Format(
                           CultureInfo.InvariantCulture,

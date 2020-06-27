@@ -1,13 +1,11 @@
 namespace CannedBytes.Media.IO.Services
 {
-    using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     /// <summary>
     /// An implementation of the <see cref="INumberReader"/> for big-endian encoding.
     /// </summary>
-    [Export(typeof(INumberReader))]
+//    [Export(typeof(INumberReader))]
     public class BigEndianNumberReader : INumberReader
     {
         /// <inheritdocs/>
@@ -27,7 +25,6 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public long ReadInt64(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");
@@ -40,9 +37,9 @@ namespace CannedBytes.Media.IO.Services
                 throw new EndOfStreamException();
             }
 
-            int highWord = (((buffer[0] << 0x18) | (buffer[1] << 0x10)) | (buffer[2] << 8)) | buffer[3];
-            int lowWord = (((buffer[4] << 0x18) | (buffer[5] << 0x10)) | (buffer[6] << 8)) | buffer[7];
-            return (long)(((ulong)lowWord) | (ulong)(highWord << 0x20));
+            ulong highWord = (ulong)((((buffer[0] << 0x18) | (buffer[1] << 0x10)) | (buffer[2] << 8)) | buffer[3]);
+            ulong lowWord = (ulong)((((buffer[4] << 0x18) | (buffer[5] << 0x10)) | (buffer[6] << 8)) | buffer[7]);
+            return (long)(lowWord | (highWord << 0x20));
         }
 
         /// <inheritdocs/>

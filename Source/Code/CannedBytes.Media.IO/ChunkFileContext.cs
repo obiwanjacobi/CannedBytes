@@ -1,7 +1,7 @@
 ﻿namespace CannedBytes.Media.IO
 {
     using System.Collections.Generic;
-    using System.ComponentModel.Composition.Hosting;
+    using System.ComponentModel.Design;
 
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
@@ -13,8 +13,8 @@
         /// </summary>
         public ChunkFileContext()
         {
-            this.ChunkStack = new FileChunkStack();
-            this.HeaderStack = new Stack<FileChunkHeader>();
+            ChunkStack = new FileChunkStack();
+            HeaderStack = new Stack<FileChunkHeader>();
         }
 
         /// <summary>
@@ -38,28 +38,25 @@
         /// </summary>
         public bool CopyStreams { get; set; }
 
-        /// <summary>
-        /// Backing field for <see cref="P:CompositionContainer"/>.
-        /// </summary>
-        private CompositionContainer compositionContainer;
+        private ServiceContainer _services;
 
         /// <summary>
-        /// A container used for satisfying (external) object references.
+        /// Services from the container.
         /// </summary>
-        public CompositionContainer CompositionContainer
+        public ServiceContainer Services
         {
             get
             {
-                return this.compositionContainer;
+                return _services;
             }
 
             set
             {
-                this.compositionContainer = value;
+                _services = value;
 
-                if (this.compositionContainer != null)
+                if (_services != null)
                 {
-                    this.compositionContainer.AddInstance(this);
+                    _services.AddService(GetType(), this);
                 }
             }
         }
@@ -69,11 +66,11 @@
         {
             if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
-                this.ChunkFile.Dispose();
+                ChunkFile.Dispose();
 
-                if (this.compositionContainer != null)
+                if (_services != null)
                 {
-                    this.compositionContainer.Dispose();
+                    _services.Dispose();
                 }
             }
         }

@@ -1,12 +1,10 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
     /// A general interface for navigating <see cref="Stream"/>s.
     /// </summary>
-    [ContractClass(typeof(StreamNavigatorContract))]
     public interface IStreamNavigator
     {
         /// <summary>

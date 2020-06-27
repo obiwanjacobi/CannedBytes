@@ -3,7 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.Contracts;
+
     using System.Reflection;
 
     /// <summary>
@@ -51,7 +51,7 @@
         /// </summary>
         public bool CanSetValue
         {
-            get { return this.IsCollection || (!this.ValueAssigned && !this.IsCollection); }
+            get { return IsCollection || (!ValueAssigned && !IsCollection); }
         }
 
         /// <summary>
@@ -61,9 +61,9 @@
         /// <returns>Returns true if there is a match.</returns>
         public bool ChunkMatches(string chunkId)
         {
-            if (this.ChunkIds != null)
+            if (ChunkIds != null)
             {
-                foreach (var chunkType in this.ChunkIds)
+                foreach (var chunkType in ChunkIds)
                 {
                     if (chunkType.MatchesWith(chunkId))
                     {
@@ -83,26 +83,23 @@
         /// <param name="isCollection">An indication if the <paramref name="value"/> is a collection.</param>
         public void SetValue(object instance, object value, bool isCollection)
         {
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(instance, "instance");
 
-            if (this.IsCollection && !isCollection)
+            if (IsCollection && !isCollection)
             {
-                IList collection = this.GetValue(instance) as IList;
-
-                if (collection == null)
+                if (!(GetValue(instance) is IList collection))
                 {
-                    var listType = typeof(List<>).MakeGenericType(new[] { this.DataType });
+                    var listType = typeof(List<>).MakeGenericType(new[] { DataType });
                     collection = (IList)Activator.CreateInstance(listType);
 
-                    this.SetMemberValue(instance, collection);
+                    SetMemberValue(instance, collection);
                 }
 
                 collection.Add(value);
             }
             else
             {
-                this.SetMemberValue(instance, value);
+                SetMemberValue(instance, value);
             }
         }
 
@@ -114,19 +111,18 @@
         /// <remarks>Set <see cref="F:ValueAssigned"/> to true.</remarks>
         private void SetMemberValue(object instance, object value)
         {
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(instance, "instance");
 
-            if (this.FieldInfo != null)
+            if (FieldInfo != null)
             {
-                this.FieldInfo.SetValue(instance, value);
-                this.ValueAssigned = true;
+                FieldInfo.SetValue(instance, value);
+                ValueAssigned = true;
             }
 
-            if (this.PropertyInfo != null)
+            if (PropertyInfo != null)
             {
-                this.PropertyInfo.SetValue(instance, value, null);
-                this.ValueAssigned = true;
+                PropertyInfo.SetValue(instance, value, null);
+                ValueAssigned = true;
             }
         }
 
@@ -137,17 +133,16 @@
         /// <returns>Can return null.</returns>
         public object GetValue(object instance)
         {
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(instance, "instance");
 
-            if (this.FieldInfo != null)
+            if (FieldInfo != null)
             {
-                return this.FieldInfo.GetValue(instance);
+                return FieldInfo.GetValue(instance);
             }
 
-            if (this.PropertyInfo != null)
+            if (PropertyInfo != null)
             {
-                return this.PropertyInfo.GetValue(instance, null);
+                return PropertyInfo.GetValue(instance, null);
             }
 
             return null;
@@ -159,16 +154,14 @@
         /// <returns>Never returns null.</returns>
         public string GetMemberName()
         {
-            Contract.Ensures(Contract.Result<string>() != null);
-
-            if (this.FieldInfo != null)
+            if (FieldInfo != null)
             {
-                return this.FieldInfo.Name;
+                return FieldInfo.Name;
             }
 
-            if (this.PropertyInfo != null)
+            if (PropertyInfo != null)
             {
-                return this.PropertyInfo.Name;
+                return PropertyInfo.Name;
             }
 
             return String.Empty;
@@ -180,14 +173,14 @@
         /// <returns>Can return null.</returns>
         public MemberInfo GetMemberInfo()
         {
-            if (this.FieldInfo != null)
+            if (FieldInfo != null)
             {
-                return this.FieldInfo;
+                return FieldInfo;
             }
 
-            if (this.PropertyInfo != null)
+            if (PropertyInfo != null)
             {
-                return this.PropertyInfo;
+                return PropertyInfo;
             }
 
             return null;

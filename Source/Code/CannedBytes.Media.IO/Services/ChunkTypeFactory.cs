@@ -1,34 +1,25 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Implementation of the <see cref="IChunkTypeFactory"/> interface.
     /// </summary>
-    [Export(typeof(ChunkTypeFactory))]
-    [Export(typeof(IChunkTypeFactory))]
     public class ChunkTypeFactory : IChunkTypeFactory
     {
         /// <summary>
         /// The Type lookup table.
         /// </summary>
-        private Dictionary<string, Type> chunkMap = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> _chunkMap = new Dictionary<string, Type>();
 
-        /// <summary>
-        /// Constructs a new instance.
-        /// </summary>
-        public ChunkTypeFactory()
+        public void AddChunkType(Type chunkType, AddMode addMode)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            this.AddChunksFrom(assembly, true);
+            var chunkId = ChunkAttribute.GetChunkId(chunkType);
+            AddChunkType(chunkId, chunkType, addMode);
         }
 
         /// <summary>
@@ -38,32 +29,43 @@
         /// <param name="assembly">Must not be null.</param>
         /// <param name="replace">If true the Type found in the <paramref name="assembly"/> will replace
         /// an already registered type.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
-        public void AddChunksFrom(Assembly assembly, bool replace)
+        public void AddChunksFrom(Assembly assembly, AddMode addMode)
         {
-            Contract.Requires(assembly != null);
             Check.IfArgumentNull(assembly, "assembly");
 
             var result = from type in assembly.GetTypes()
-                         from attr in type.GetCustomAttributes(typeof(ChunkAttribute), false)
-                         where attr != null
-                         select new { Type = type, Attribute = attr as ChunkAttribute };
+                         where type.IsClass && type.IsChunk()
+                         select new { ChunkId = ChunkAttribute.GetChunkId(type), Type = type };
 
             foreach (var item in result)
             {
-                var chunkId = item.Attribute.ChunkTypeId.ToString();
+                AddChunkType(item.ChunkId, item.Type, addMode);
+            }
+        }
 
-                if (this.chunkMap.ContainsKey(chunkId))
+        private void AddChunkType(string chunkId, Type chunkType, AddMode addMode)
+        {
+            Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
+            Check.IfArgumentNull(chunkType, nameof(chunkType));
+
+            if (_chunkMap.ContainsKey(chunkId))
+            {
+                switch (addMode)
                 {
-                    if (replace)
-                    {
-                        this.chunkMap[chunkId] = item.Type;
-                    }
+                    case AddMode.ThrowIfExists:
+                        throw new ChunkFileException($"The Chunk Id {chunkId} is already registered.");
+                    case AddMode.SkipIfExists:
+                        break;
+                    case AddMode.OverwriteExisting:
+                        _chunkMap[chunkId] = chunkType;
+                        break;
+                    default:
+                        throw new NotImplementedException("Illegal AddMode Enum value.");
                 }
-                else
-                {
-                    this.chunkMap.Add(chunkId, item.Type);
-                }
+            }
+            else
+            {
+                _chunkMap.Add(chunkId, chunkType);
             }
         }
 
@@ -72,7 +74,7 @@
         {
             Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
-            Type result = this.LookupChunkObjectType(chunkTypeId);
+            Type result = LookupChunkObjectType(chunkTypeId);
 
             if (result != null)
             {
@@ -83,26 +85,24 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual Type LookupChunkObjectType(FourCharacterCode chunkTypeId)
         {
             Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
 
-            string chunkId = chunkTypeId.ToString();
+            var chunkId = chunkTypeId.ToString();
 
             if (!chunkId.HasWildcard())
             {
-                Type result = null;
-
                 // try fast lookup first if the requested type has no wildcards
-                if (this.chunkMap.TryGetValue(chunkId, out result))
+                if (!_chunkMap.TryGetValue(chunkId, out Type result))
                 {
-                    return result;
+                    return null;
                 }
+                return result;
             }
 
             // now match wildcards
-            foreach (var item in this.chunkMap)
+            foreach (var item in _chunkMap)
             {
                 if (chunkId.MatchesWith(item.Key))
                 {

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Timer_FailedToGetCaps" xml:space="preserve">
-    <value>Failed to retrieve timer capabilities in static constructor of Timer.</value>
+    <value>Failed to retrieve timer capabilities in static constructor of Timer ({0}).</value>
     <comment>InfoText</comment>
   </data>
   <data name="Timer_FailedToKillTimer" xml:space="preserve">

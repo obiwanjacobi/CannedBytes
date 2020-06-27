@@ -1,30 +1,27 @@
 ﻿namespace CannedBytes.Media.IO.ChunkTypes
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using CannedBytes.Media.IO.SchemaAttributes;
+    using System;
+    using System.Globalization;
 
     /// <summary>
     /// Handles serialization of a RIFF chunk.
     /// </summary>
-    [FileChunkHandler("RIFF")]
+    [FileChunkHandlerAttribute("RIFF")]
     public class RiffChunkHandler : DefaultFileChunkHandler
     {
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public override object Read(ChunkFileContext context)
         {
             // create instance and read type
-            var riffChunk = base.Read(context) as RiffChunk;
 
-            if (riffChunk == null)
+            if (!(base.Read(context) is RiffChunk riffChunk))
             {
                 throw new InvalidOperationException();
             }
 
             // read child chunk of 'type'
-            var reader = context.CompositionContainer.GetService<FileChunkReader>();
+            var reader = context.Services.GetService<FileChunkReader>();
             var stream = reader.CurrentStream;
 
             riffChunk.InnerChunk = reader.ReadRuntimeContainerChunkType(stream, riffChunk.FileType);
@@ -60,7 +57,6 @@
         /// </summary>
         /// <param name="context">Must not be null.</param>
         /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="RiffChunk"/> and not null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(ChunkFileContext context, object instance)
         {
             Check.IfArgumentNull(context, "context");
@@ -79,7 +75,7 @@
             // write out RIFF file type
             base.Write(context, instance);
 
-            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+            var writer = context.Services.GetService<FileChunkWriter>();
 
             writer.WriteRuntimeChunkType(chunk.InnerChunk);
         }

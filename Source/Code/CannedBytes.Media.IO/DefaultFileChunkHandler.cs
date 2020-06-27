@@ -1,10 +1,8 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Globalization;
     using CannedBytes.Media.IO.SchemaAttributes;
+    using System;
+    using System.Globalization;
 
     /// <summary>
     /// This chunk handler matches any chunk and handles it in a generic way.
@@ -17,7 +15,6 @@
         /// </summary>
         /// <param name="chunk">Must not be null.</param>
         /// <returns>Returns true if the <paramref name="chunk"/> can be read.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public override bool CanRead(FileChunk chunk)
         {
             Check.IfArgumentNull(chunk, "chunk");
@@ -30,20 +27,15 @@
         /// </summary>
         /// <param name="context">The context of the chunk file being read. Must not be null.</param>
         /// <returns>Returns null if there was no runtime type found for the current chunk.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public override object Read(ChunkFileContext context)
         {
-            Contract.Requires(context.ChunkStack != null);
-            Contract.Requires(context.ChunkStack.CurrentChunk != null);
-            Contract.Requires(context.ChunkFile != null);
-            Contract.Requires(context.ChunkFile.BaseStream != null);
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
             Check.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
             Check.IfArgumentNull(context.ChunkFile, "context.ChunkFile");
             Check.IfArgumentNull(context.ChunkFile.BaseStream, "context.ChunkFile.BaseStream");
 
-            var reader = context.CompositionContainer.GetService<FileChunkReader>();
+            var reader = context.Services.GetService<FileChunkReader>();
             var stream = context.ChunkFile.BaseStream;
 
             var chunk = context.ChunkStack.CurrentChunk;
@@ -68,13 +60,12 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(ChunkFileContext context, object instance)
         {
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(instance, "instance");
 
-            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+            var writer = context.Services.GetService<FileChunkWriter>();
 
             writer.WriteRuntimeChunkType(instance);
         }

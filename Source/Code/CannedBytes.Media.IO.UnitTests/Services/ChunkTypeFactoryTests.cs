@@ -1,5 +1,5 @@
-﻿using CannedBytes.Media.IO.ChunkTypes.Wave;
-using CannedBytes.Media.IO.Services;
+﻿using CannedBytes.Media.IO.Services;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CannedBytes.Media.IO.UnitTests.Services
@@ -11,8 +11,9 @@ namespace CannedBytes.Media.IO.UnitTests.Services
         {
             var factory = new ChunkTypeFactory();
 
-            factory.AddChunksFrom(typeof(WaveChunk).Assembly, true);
-
+            factory.AddChunksFrom(typeof(ChunkTypeFactoryTests).Assembly, AddMode.OverwriteExisting);
+            factory.AddChunksFrom(typeof(ChunkTypeFactory).Assembly, AddMode.OverwriteExisting);
+            
             return factory;
         }
 
@@ -23,8 +24,7 @@ namespace CannedBytes.Media.IO.UnitTests.Services
             var fourcc = new FourCharacterCode("RIFF");
 
             var chunk = factory.CreateChunkObject(fourcc);
-
-            Assert.IsNotNull(chunk);
+            chunk.Should().NotBeNull();
         }
 
         [TestMethod]
@@ -34,8 +34,7 @@ namespace CannedBytes.Media.IO.UnitTests.Services
             var fourcc = new FourCharacterCode("WAVE");
 
             var chunk = factory.CreateChunkObject(fourcc);
-
-            Assert.IsNotNull(chunk);
+            chunk.Should().NotBeNull();
         }
 
         [TestMethod]
@@ -45,8 +44,7 @@ namespace CannedBytes.Media.IO.UnitTests.Services
             var fourcc = new FourCharacterCode("fmt ");
 
             var chunk = factory.CreateChunkObject(fourcc);
-
-            Assert.IsNotNull(chunk);
+            chunk.Should().NotBeNull();
         }
 
         [TestMethod]
@@ -56,8 +54,7 @@ namespace CannedBytes.Media.IO.UnitTests.Services
             var fourcc = new FourCharacterCode("data");
 
             var chunk = factory.CreateChunkObject(fourcc);
-
-            Assert.IsNotNull(chunk);
+            chunk.Should().NotBeNull();
         }
     }
 }

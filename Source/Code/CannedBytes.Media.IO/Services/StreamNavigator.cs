@@ -1,13 +1,11 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
-    using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     /// <summary>
     /// Implements the <see cref="IStreamNavigator"/> interface.
     /// </summary>
-    [Export(typeof(IStreamNavigator))]
+//    [Export(typeof(IStreamNavigator))]
     public class StreamNavigator : IStreamNavigator
     {
         /// <summary>Backing field for the current stream position marker.</summary>
@@ -30,7 +28,6 @@
         public int ByteAlignment { get; set; }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public long SetCurrentMarker(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");
@@ -40,7 +37,6 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public bool SeekToCurrentMarker(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");
@@ -55,7 +51,6 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public int AlignPosition(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");

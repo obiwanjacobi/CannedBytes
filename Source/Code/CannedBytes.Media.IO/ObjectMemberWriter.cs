@@ -1,12 +1,10 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Manages writing to a runtime chunk object.
@@ -22,15 +20,13 @@
         /// Constructs a new instance on the specified runtime object.
         /// </summary>
         /// <param name="instance">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public ObjectMemberWriter(object instance)
         {
-            Contract.Requires(instance != null);
             Check.IfArgumentNull(instance, "instance");
 
-            this.Instance = instance;
-            this.ObjectType = instance.GetType();
-            this.members = new ObjectMemberList(this.ObjectType);
+            Instance = instance;
+            ObjectType = instance.GetType();
+            members = new ObjectMemberList(ObjectType);
         }
 
         /// <summary>
@@ -47,14 +43,12 @@
         /// Uses the <paramref name="reader"/> to populate the fields and properties of the runtime object.
         /// </summary>
         /// <param name="reader">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public void ReadFields(FileChunkReader reader)
         {
-            Contract.Requires(reader != null);
             Check.IfArgumentNull(reader, "reader");
 
             // keep processing native data type members
-            foreach (var member in this.members)
+            foreach (var member in members)
             {
                 if (!reader.CurrentStreamCanRead)
                 {
@@ -69,9 +63,9 @@
 
                 try
                 {
-                    object value = this.ReadValueForType(member.DataType, reader);
+                    object value = ReadValueForType(member.DataType, reader);
 
-                    member.SetValue(this.Instance, value, false);
+                    member.SetValue(Instance, value, false);
                 }
                 catch (EndOfStreamException eos)
                 {
@@ -81,7 +75,7 @@
                     var msg = String.Format(
                               CultureInfo.InvariantCulture,
                               fmt,
-                              this.Instance.GetType().FullName,
+                              Instance.GetType().FullName,
                               member.GetMemberName());
 
                     throw new ChunkFileException(msg, eos);
@@ -95,10 +89,8 @@
         /// <param name="value">Must not be null.</param>
         /// <returns>Returns true when the value was written.</returns>
         /// <remarks>Once a property is set it will not be overwritten by subsequent calls to this method.</remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
         public bool WriteChunkObject(object value)
         {
-            Contract.Requires(value != null);
             Check.IfArgumentNull(value, "runtimeObject");
 
             bool isCollection = false;
@@ -120,12 +112,12 @@
 
             var chunkId = ChunkAttribute.GetChunkId(type);
 
-            foreach (var member in this.members)
+            foreach (var member in members)
             {
                 if (member.ChunkMatches(chunkId) &&
                     member.CanSetValue)
                 {
-                    member.SetValue(this.Instance, value, isCollection);
+                    member.SetValue(Instance, value, isCollection);
 
                     return true;
                 }
@@ -140,11 +132,8 @@
         /// <param name="type">Must not be null.</param>
         /// <param name="reader">Must not be null.</param>
         /// <returns>Returns the value read or null if type is unsupported.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
         protected virtual object ReadValueForType(Type type, FileChunkReader reader)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(reader != null);
             Check.IfArgumentNull(type, "type");
             Check.IfArgumentNull(reader, "reader");
 
@@ -175,7 +164,7 @@
                     throw new NotSupportedException();
             }
 
-            var value = this.ReadValueForCustomType(type, reader);
+            var value = ReadValueForCustomType(type, reader);
 
             return value;
         }
@@ -186,11 +175,8 @@
         /// <param name="type">Must not be null.</param>
         /// <param name="reader">Must not be null.</param>
         /// <returns>Returns null if the custom type is not supported.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", Justification = "Check is not recognized")]
         protected virtual object ReadValueForCustomType(Type type, FileChunkReader reader)
         {
-            Contract.Requires(type != null);
-            Contract.Requires(reader != null);
             Check.IfArgumentNull(type, "type");
             Check.IfArgumentNull(reader, "reader");
 

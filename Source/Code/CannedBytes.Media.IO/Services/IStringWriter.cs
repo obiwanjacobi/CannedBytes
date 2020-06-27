@@ -1,12 +1,10 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
     /// A general interface for writing strings to a <see cref="Stream"/>.
     /// </summary>
-    [ContractClass(typeof(StringWriterContract))]
     public interface IStringWriter
     {
         /// <summary>

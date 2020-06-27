@@ -1,13 +1,12 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
 
     /// <summary>
     /// A string writer implementation that prefixes the length of the string before the string is written.
     /// </summary>
-    [Export(typeof(IStringWriter))]
+//    [Export(typeof(IStringWriter))]
     public class SizePrefixedStringWriter : IStringWriter
     {
         /// <summary>

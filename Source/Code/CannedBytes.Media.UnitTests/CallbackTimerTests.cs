@@ -1,5 +1,6 @@
-﻿using System.Threading;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading;
 
 namespace CannedBytes.Media.UnitTests
 {
@@ -36,9 +37,9 @@ namespace CannedBytes.Media.UnitTests
                 timer.Callback += (sender, e) => { callback = true; };
                 timer.StartTimer();
 
-                Thread.Sleep(20);
+                Thread.Sleep(50);
 
-                Assert.IsTrue(callback);
+                callback.Should().BeTrue();
             }
         }
 
@@ -51,15 +52,20 @@ namespace CannedBytes.Media.UnitTests
 
             using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
+#if NET4
                 timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1, null);
                 timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider, null);
+#else
+                timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1);
+                timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider);
+#endif
                 timer.StartTimer();
 
                 Thread.Sleep(50);
 
-                Assert.AreNotEqual(0, callback1Count);
-                Assert.AreNotEqual(0, callback2Count);
-                Assert.AreEqual(callback1Count / divider, callback2Count);
+                callback1Count.Should().BeGreaterThan(0);
+                callback2Count.Should().BeGreaterThan(0);
+                callback2Count.Should().Be(callback1Count / divider);
             }
         }
 
@@ -72,15 +78,20 @@ namespace CannedBytes.Media.UnitTests
 
             using (var timer = new CallbackTimer(TimerMode.Periodic))
             {
+#if NET4
                 timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1, null);
                 timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider, null);
+#else
+                timer.AddCallbackHandler((sender, e) => { callback1Count++; }, 1);
+                timer.AddCallbackHandler((sender, e) => { callback2Count++; }, divider);
+#endif
                 timer.StartTimer();
 
                 Thread.Sleep(500);
 
-                Assert.AreNotEqual(0, callback1Count);
-                Assert.AreNotEqual(0, callback2Count);
-                Assert.AreEqual(callback1Count / divider, callback2Count);
+                callback1Count.Should().BeGreaterThan(0);
+                callback2Count.Should().BeGreaterThan(0);
+                callback2Count.Should().Be(callback1Count / divider);
             }
         }
 
@@ -93,7 +104,7 @@ namespace CannedBytes.Media.UnitTests
                 timer.Started += (sender, e) => { eventFired = true; };
                 timer.StartTimer();
 
-                Assert.IsTrue(eventFired);
+                eventFired.Should().BeTrue();
             }
         }
 
@@ -108,7 +119,7 @@ namespace CannedBytes.Media.UnitTests
                 timer.StartTimer();
                 timer.StopTimer();
 
-                Assert.IsTrue(eventFired);
+                eventFired.Should().BeTrue();
             }
         }
     }

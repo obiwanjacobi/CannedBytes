@@ -1,7 +1,9 @@
 namespace CannedBytes.Media
 {
     using System;
+#if NET4
     using System.Windows.Threading;
+#endif
 
     /// <summary>
     /// Implements a timer that calls back when it fires.
@@ -12,7 +14,8 @@ namespace CannedBytes.Media
         private const string CallbackEventName = "cb";
 
         /// <summary>Backing field for the callback.</summary>
-        private EventHandlerCollection<CallbackRegistration> callbacks = new EventHandlerCollection<CallbackRegistration>();
+        private readonly EventHandlerCollection<CallbackRegistration> _callbacks =
+            new EventHandlerCollection<CallbackRegistration>();
 
         /// <summary>
         /// Constructs a new instance.
@@ -29,8 +32,8 @@ namespace CannedBytes.Media
         /// </summary>
         public event EventHandler Callback
         {
-            add { this.callbacks.AddEventRegistration(CallbackEventName, value); }
-            remove { this.callbacks.RemoveEventRegistration(CallbackEventName, value); }
+            add { _callbacks.AddEventRegistration(CallbackEventName, value); }
+            remove { _callbacks.RemoveEventRegistration(CallbackEventName, value); }
         }
 
         /// <summary>
@@ -39,19 +42,27 @@ namespace CannedBytes.Media
         /// <param name="handler">Must not be null.</param>
         /// <param name="divider">A divider used to lower callback frequency. Use zero (0) or one (1) when not used.</param>
         /// <param name="dispatcher">An optional dispatcher object to synchronize callbacks to the UI thread. Can be null.</param>
+#if NET4
         public void AddCallbackHandler(EventHandler handler, int divider, Dispatcher dispatcher)
+#else
+        public void AddCallbackHandler(EventHandler handler, int divider)
+#endif
         {
-            var reg = this.callbacks.AddEventRegistration(CallbackEventName, handler);
+            var reg = _callbacks.AddEventRegistration(CallbackEventName, handler);
 
             if (divider <= 0)
             {
                 divider = 1;
             }
 
-            reg.UserData = new CallbackRegistration();
-            reg.UserData.Dispatcher = dispatcher;
-            reg.UserData.DividerCount = divider;
-            reg.UserData.RunningDivider = divider;
+            reg.UserData = new CallbackRegistration
+            {
+#if NET4
+                Dispatcher = dispatcher,
+#endif
+                DividerCount = divider,
+                RunningDivider = divider
+            };
         }
 
         /// <summary>
@@ -76,21 +87,17 @@ namespace CannedBytes.Media
 
                     registration.UserData.RunningDivider = registration.UserData.DividerCount;
                 }
-
+#if NET4
                 if (registration.UserData.Dispatcher != null)
                 {
                     registration.UserData.Dispatcher.BeginInvoke(
                         new Action(() => { InvokeHandlerDirect(registration); }));
+                    return;
                 }
-                else
-                {
-                    this.InvokeHandlerDirect(registration);
-                }
+#endif
             }
-            else
-            {
-                this.InvokeHandlerDirect(registration);
-            }
+
+            InvokeHandlerDirect(registration);
         }
 
         /// <summary>
@@ -101,12 +108,7 @@ namespace CannedBytes.Media
         {
             try
             {
-                var handler = registration.Handler;
-
-                if (handler != null)
-                {
-                    handler.DynamicInvoke(this, EventArgs.Empty);
-                }
+                registration.Handler?.DynamicInvoke(this, EventArgs.Empty);
             }
             catch (Exception e)
             {
@@ -124,12 +126,7 @@ namespace CannedBytes.Media
         /// </summary>
         private void OnStarted()
         {
-            var handler = this.Started;
-
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            Started?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -142,12 +139,7 @@ namespace CannedBytes.Media
         /// </summary>
         private void OnStopped()
         {
-            var handler = this.Stopped;
-
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            Stopped?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -157,9 +149,9 @@ namespace CannedBytes.Media
         {
             try
             {
-                foreach (var reg in this.callbacks.GetEventRegistrations(CallbackEventName))
+                foreach (var reg in _callbacks.GetEventRegistrations(CallbackEventName))
                 {
-                    this.InvokeEventHandler(reg);
+                    InvokeEventHandler(reg);
                 }
             }
             finally
@@ -177,7 +169,7 @@ namespace CannedBytes.Media
             {
                 if (!IsRunning)
                 {
-                    this.OnStarted();
+                    OnStarted();
                 }
             }
             finally
@@ -197,7 +189,7 @@ namespace CannedBytes.Media
 
             if (wasRunning)
             {
-                this.OnStopped();
+                OnStopped();
             }
         }
 
@@ -206,8 +198,10 @@ namespace CannedBytes.Media
         /// </summary>
         private class CallbackRegistration
         {
+#if NET4
             /// <summary>An optional dispatcher to synchronize calling into the UI thread.</summary>
             public Dispatcher Dispatcher { get; set; }
+#endif
 
             /// <summary>A divider that is used for lower callback frequency.</summary>
             public long DividerCount { get; set; }

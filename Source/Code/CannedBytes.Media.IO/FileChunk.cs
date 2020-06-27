@@ -1,6 +1,6 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System.Diagnostics.Contracts;
+
     using System.IO;
 
     /// <summary>
@@ -45,13 +45,13 @@
         /// </summary>
         public bool HasSubChunks
         {
-            get { return this.subChunks != null && this.subChunks.Count > 0; }
+            get { return _subChunks != null && _subChunks.Count > 0; }
         }
 
         /// <summary>
         /// Backing field for <see cref="P:Subchunks"/>.
         /// </summary>
-        private FileChunkCollection subChunks;
+        private FileChunkCollection _subChunks;
 
         /// <summary>
         /// Child chunks. Filled after they're parsed when reading.
@@ -60,14 +60,12 @@
         {
             get
             {
-                Contract.Ensures(Contract.Result<FileChunkCollection>() != null);
-
-                if (this.subChunks == null)
+                if (_subChunks == null)
                 {
-                    this.subChunks = new FileChunkCollection();
+                    _subChunks = new FileChunkCollection();
                 }
 
-                return this.subChunks;
+                return _subChunks;
             }
         }
     }

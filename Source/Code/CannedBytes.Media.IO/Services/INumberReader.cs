@@ -1,12 +1,10 @@
 namespace CannedBytes.Media.IO.Services
 {
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
     /// A general interface for reading numbers from a <see cref="Stream"/>.
     /// </summary>
-    [ContractClass(typeof(NumberReaderContract))]
     public interface INumberReader
     {
         /// <summary>

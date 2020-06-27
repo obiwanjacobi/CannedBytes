@@ -1,12 +1,10 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
     using System;
-    using System.Diagnostics.Contracts;
 
     /// <summary>
     /// Implemented by a factory that knows how to create runtime types for chunk identifiers.
     /// </summary>
-    [ContractClass(typeof(ChunkTypeFactoryContract))]
     public interface IChunkTypeFactory
     {
         /// <summary>

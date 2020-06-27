@@ -1,5 +1,6 @@
-﻿using System.IO;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace CannedBytes.Media.IO.UnitTests.Media
 {
@@ -13,13 +14,13 @@ namespace CannedBytes.Media.IO.UnitTests.Media
         [TestMethod]
         public void Check_Tada_Wav_Exists()
         {
-            Assert.IsTrue(File.Exists(Path.Combine(TestContext.DeploymentDirectory, TestMedia.WaveFileName)));
+            File.Exists(Path.Combine(TestContext.DeploymentDirectory, TestMedia.WaveFileName)).Should().BeTrue();
         }
 
         [TestMethod]
         public void Check_BoxedDelete_Avi_Exists()
         {
-            Assert.IsTrue(File.Exists(Path.Combine(TestContext.DeploymentDirectory, TestMedia.AviFileName)));
+            File.Exists(Path.Combine(TestContext.DeploymentDirectory, TestMedia.AviFileName)).Should().BeTrue();
         }
     }
 }
