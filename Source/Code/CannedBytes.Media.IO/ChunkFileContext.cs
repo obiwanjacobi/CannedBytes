@@ -1,7 +1,7 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Design;
 
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
@@ -38,63 +38,26 @@
         /// </summary>
         public bool CopyStreams { get; set; }
 
-        //#if NET4
-        //        private CompositionContainer _compositionContainer;
-
-        //        /// <summary>
-        //        /// A container used for satisfying (external) object references.
-        //        /// </summary>
-        //        public CompositionContainer Container
-        //        {
-        //            get
-        //            {
-        //                return _compositionContainer;
-        //            }
-
-        //            set
-        //            {
-        //                _compositionContainer = value;
-
-        //                if (_compositionContainer != null)
-        //                {
-        //                    _compositionContainer.AddInstance(this);
-        //                }
-        //            }
-        //        }
-        //#else
-        //        private CompositionHost _compositionContainer;
-
-        //        /// <summary>
-        //        /// A container used for satisfying (external) object references.
-        //        /// </summary>
-        //        public CompositionHost Container
-        //        {
-        //            get
-        //            {
-        //                return _compositionContainer;
-        //            }
-
-        //            set
-        //            {
-        //                _compositionContainer = value;
-
-        //                if (_compositionContainer != null)
-        //                {
-        //                    _compositionContainer.AddInstance(this);
-        //                }
-        //            }
-        //        }
-        //#endif
+        private ServiceContainer _services;
 
         /// <summary>
         /// Services from the container.
         /// </summary>
-        public IServiceProvider Services
+        public ServiceContainer Services
         {
             get
             {
-                //return _compositionContainer;
-                return null;
+                return _services;
+            }
+
+            set
+            {
+                _services = value;
+
+                if (_services != null)
+                {
+                    _services.AddService(GetType(), this);
+                }
             }
         }
 
@@ -105,10 +68,10 @@
             {
                 ChunkFile.Dispose();
 
-                //if (_compositionContainer != null)
-                //{
-                //    _compositionContainer.Dispose();
-                //}
+                if (_services != null)
+                {
+                    _services.Dispose();
+                }
             }
         }
     }

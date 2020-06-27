@@ -11,7 +11,7 @@
         /// Constructs a new instance for the specified <paramref name="filePath"/>.
         /// </summary>
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
-        public ChunkFileInfo(string filePath)
+        protected ChunkFileInfo(string filePath)
         {
             Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
@@ -32,7 +32,9 @@
         /// <summary>
         /// Gets the opened file stream.
         /// </summary>
-        public Stream BaseStream { get; set; }
+        public Stream BaseStream { get; protected set; }
+
+        public FileAccess FileAccess { get; protected set; }
 
         /// <summary>
         /// Opens a file for reading.
@@ -45,7 +47,8 @@
 
             return new ChunkFileInfo(filePath)
             {
-                BaseStream = File.OpenRead(filePath)
+                BaseStream = File.OpenRead(filePath),
+                FileAccess = FileAccess.Read
             };
         }
 
@@ -61,7 +64,8 @@
 
             return new ChunkFileInfo(filePath)
             {
-                BaseStream = File.OpenWrite(filePath)
+                BaseStream = File.OpenWrite(filePath),
+                FileAccess = FileAccess.Write
             };
         }
 

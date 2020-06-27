@@ -10,43 +10,12 @@
     /// </summary>
     public class FileChunkReader
     {
-        /// <summary>
-        /// Private reference to the file context.
-        /// </summary>
-        private ChunkFileContext _context;
-
-        ////warning CS0649: Field 'X' is never assigned to, and will always have its default value null
-#pragma warning disable 0649
-        /// <summary>
-        /// Optional reference to the stream navigator.
-        /// </summary>
-//        [Import(AllowDefault = true, AllowRecomposition = true)]
-        private IStreamNavigator _streamNavigator;
-
-        /// <summary>
-        /// Private reference to the chunk type factory.
-        /// </summary>
-//        [Import]
-        private IChunkTypeFactory _chunkTypeFactory;
-
-        /// <summary>
-        /// Private reference to the chunk handler manager.
-        /// </summary>
-//        [Import]
-        private FileChunkHandlerManager _handlerMgr;
-
-        /// <summary>
-        /// Private reference to the string reader.
-        /// </summary>
-        //[Import]
-        private IStringReader _stringReader;
-
-        /// <summary>
-        /// Private reference to the number reader.
-        /// </summary>
-        //[Import]
-        private INumberReader _numberReader;
-#pragma warning restore 0649
+        private readonly ChunkFileContext _context;
+        private readonly IStreamNavigator _streamNavigator;
+        private readonly IChunkTypeFactory _chunkTypeFactory;
+        private readonly FileChunkHandlerManager _handlerMgr;
+        private readonly IStringReader _stringReader;
+        private readonly INumberReader _numberReader;
 
         /// <summary>
         /// Constructs a new instance on the specified file <paramref name="context"/>.
@@ -57,10 +26,14 @@
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
-            //context.Container.ComposeParts(this);
-            //context.Container.AddInstance(this);
-
+            _streamNavigator = context.Services.GetService<IStreamNavigator>();
+            _chunkTypeFactory = context.Services.GetService<IChunkTypeFactory>();
+            _handlerMgr = context.Services.GetService<FileChunkHandlerManager>();
+            _stringReader = context.Services.GetService<IStringReader>();
+            _numberReader = context.Services.GetService<INumberReader>();
             _context = context;
+
+            context.Services.AddService(GetType(), this);
         }
 
         /// <summary>
@@ -221,11 +194,13 @@
 
             if (ValidateStreamPosition(8))
             {
-                var chunk = new FileChunk();
-                chunk.ChunkId = FourCharacterCode.ReadFrom(stream);
-                chunk.DataLength = _numberReader.ReadUInt32AsInt64(stream);
-                chunk.ParentPosition = stream.Position;
-                chunk.FilePosition = _context.ChunkFile.BaseStream.Position;
+                var chunk = new FileChunk
+                {
+                    ChunkId = FourCharacterCode.ReadFrom(stream),
+                    DataLength = _numberReader.ReadUInt32AsInt64(stream),
+                    ParentPosition = stream.Position,
+                    FilePosition = _context.ChunkFile.BaseStream.Position
+                };
                 chunk.DataStream = new SubStream(stream, chunk.DataLength);
 
                 return chunk;
@@ -291,6 +266,7 @@
                         // if returns false means can't find member
                         if (!writer.WriteChunkObject(runtimeChildObj))
                         {
+                            // TODO: Log?
                             // just keep reading the stream...
                         }
                     }

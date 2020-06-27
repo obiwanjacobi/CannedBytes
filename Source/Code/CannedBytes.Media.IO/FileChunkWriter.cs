@@ -13,34 +13,11 @@
     /// </summary>
     public class FileChunkWriter
     {
-        /// <summary>
-        /// Private reference to the file context.
-        /// </summary>
-        private ChunkFileContext _context;
-
-        /// <summary>
-        /// Optional reference to the stream navigator.
-        /// </summary>
-//        [Import(AllowDefault = true, AllowRecomposition = true)]
-        private IStreamNavigator _streamNavigator;
-
-        /// <summary>
-        /// Private reference to the chunk handler manager.
-        /// </summary>
-//        [Import]
-        private FileChunkHandlerManager _handlerMgr;
-
-        /// <summary>
-        /// Private reference to the string writer.
-        /// </summary>
-//        [Import]
-        private IStringWriter _stringWriter;
-
-        /// <summary>
-        /// Private reference to the number writer.
-        /// </summary>
-//        [Import]
-        private INumberWriter _numberWriter;
+        private readonly ChunkFileContext _context;
+        private readonly IStreamNavigator _streamNavigator;
+        private readonly FileChunkHandlerManager _handlerMgr;
+        private readonly IStringWriter _stringWriter;
+        private readonly INumberWriter _numberWriter;
 
         /// <summary>
         /// Constructs a new writer instance.
@@ -51,10 +28,13 @@
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
-            //            context.Services.ComposeParts(this);
-            //            context.Services.AddInstance(this);
-
+            _streamNavigator = context.Services.GetService<IStreamNavigator>();
+            _handlerMgr = context.Services.GetService<FileChunkHandlerManager>();
+            _stringWriter = context.Services.GetService<IStringWriter>();
+            _numberWriter = context.Services.GetService<INumberWriter>();
             _context = context;
+
+            context.Services.AddService(GetType(), this);
         }
 
         /// <summary>
@@ -340,38 +320,38 @@
         }
 
         /// <summary>
-        /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
+        /// Writes the <paramref name="buffer"/> to the <see cref="CurrentStream"/>.
         /// </summary>
-        /// <param name="value">The value to be written.</param>
-        public void WriteBuffer(byte[] value)
+        /// <param name="buffer">The value to be written.</param>
+        public void WriteBuffer(byte[] buffer)
         {
-            Check.IfArgumentNull(value, "value");
+            Check.IfArgumentNull(buffer, "value");
 
-            CurrentStream.Write(value, 0, value.Length);
+            CurrentStream.Write(buffer, 0, buffer.Length);
         }
 
         /// <summary>
-        /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
+        /// Writes the <paramref name="stream"/> to the <see cref="CurrentStream"/>.
         /// </summary>
-        /// <param name="value">The value to be written.</param>
-        public void WriteStream(Stream value)
+        /// <param name="stream">The value to be written.</param>
+        public void WriteStream(Stream stream)
         {
-            Check.IfArgumentNull(value, "value");
-            if (!value.CanRead)
+            Check.IfArgumentNull(stream, "value");
+            if (!stream.CanRead)
             {
-                throw new ArgumentException("Cannot read from stream.", "value");
+                throw new ArgumentException("Cannot read from stream.", nameof(stream));
             }
-            if (!value.CanSeek && value.Position != 0)
+            if (!stream.CanSeek && stream.Position != 0)
             {
-                throw new ArgumentException("Cannot seek in stream.", "value");
-            }
-
-            if (value.CanSeek)
-            {
-                value.Position = 0;
+                throw new ArgumentException("Cannot seek in stream.", nameof(stream));
             }
 
-            value.CopyTo(CurrentStream);
+            if (stream.CanSeek)
+            {
+                stream.Position = 0;
+            }
+
+            stream.CopyTo(CurrentStream);
         }
     }
 }

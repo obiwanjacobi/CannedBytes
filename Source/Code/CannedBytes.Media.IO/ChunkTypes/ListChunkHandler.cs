@@ -11,7 +11,7 @@
     /// <summary>
     /// Called by the <see cref="FileChunkReader"/> when a 'LIST' chunk is encountered.
     /// </summary>
-    [FileChunkHandler("LIST")]
+    [FileChunkHandlerAttribute("LIST")]
     public class ListChunkHandler : DefaultFileChunkHandler
     {
         /// <summary>

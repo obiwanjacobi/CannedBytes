@@ -3,8 +3,6 @@
     using System;
     using System.Collections.Generic;
 
-
-
     /// <summary>
     /// Manages a stack of <see cref="FileChunk"/> instances.
     /// </summary>

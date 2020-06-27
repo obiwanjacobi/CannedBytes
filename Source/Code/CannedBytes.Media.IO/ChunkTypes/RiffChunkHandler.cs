@@ -7,7 +7,7 @@
     /// <summary>
     /// Handles serialization of a RIFF chunk.
     /// </summary>
-    [FileChunkHandler("RIFF")]
+    [FileChunkHandlerAttribute("RIFF")]
     public class RiffChunkHandler : DefaultFileChunkHandler
     {
         /// <inheritdocs/>

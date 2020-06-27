@@ -9,23 +9,17 @@
     /// <summary>
     /// Implementation of the <see cref="IChunkTypeFactory"/> interface.
     /// </summary>
-    //    [Export(typeof(ChunkTypeFactory))]
-    //    [Export(typeof(IChunkTypeFactory))]
     public class ChunkTypeFactory : IChunkTypeFactory
     {
         /// <summary>
         /// The Type lookup table.
         /// </summary>
-        private readonly Dictionary<string, Type> chunkMap = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> _chunkMap = new Dictionary<string, Type>();
 
-        /// <summary>
-        /// Constructs a new instance.
-        /// </summary>
-        public ChunkTypeFactory()
+        public void AddChunkType(Type chunkType, AddMode addMode)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-
-            AddChunksFrom(assembly, true);
+            var chunkId = ChunkAttribute.GetChunkId(chunkType);
+            AddChunkType(chunkId, chunkType, addMode);
         }
 
         /// <summary>
@@ -35,30 +29,43 @@
         /// <param name="assembly">Must not be null.</param>
         /// <param name="replace">If true the Type found in the <paramref name="assembly"/> will replace
         /// an already registered type.</param>
-        public void AddChunksFrom(Assembly assembly, bool replace)
+        public void AddChunksFrom(Assembly assembly, AddMode addMode)
         {
             Check.IfArgumentNull(assembly, "assembly");
 
             var result = from type in assembly.GetTypes()
-                         from attr in type.GetCustomAttributes(typeof(ChunkAttribute), false)
-                         where attr != null
-                         select new { Type = type, Attribute = attr as ChunkAttribute };
+                         where type.IsClass && type.IsChunk()
+                         select new { ChunkId = ChunkAttribute.GetChunkId(type), Type = type };
 
             foreach (var item in result)
             {
-                var chunkId = item.Attribute.ChunkTypeId.ToString();
+                AddChunkType(item.ChunkId, item.Type, addMode);
+            }
+        }
 
-                if (chunkMap.ContainsKey(chunkId))
+        private void AddChunkType(string chunkId, Type chunkType, AddMode addMode)
+        {
+            Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
+            Check.IfArgumentNull(chunkType, nameof(chunkType));
+
+            if (_chunkMap.ContainsKey(chunkId))
+            {
+                switch (addMode)
                 {
-                    if (replace)
-                    {
-                        chunkMap[chunkId] = item.Type;
-                    }
+                    case AddMode.ThrowIfExists:
+                        throw new ChunkFileException($"The Chunk Id {chunkId} is already registered.");
+                    case AddMode.SkipIfExists:
+                        break;
+                    case AddMode.OverwriteExisting:
+                        _chunkMap[chunkId] = chunkType;
+                        break;
+                    default:
+                        throw new NotImplementedException("Illegal AddMode Enum value.");
                 }
-                else
-                {
-                    chunkMap.Add(chunkId, item.Type);
-                }
+            }
+            else
+            {
+                _chunkMap.Add(chunkId, chunkType);
             }
         }
 
@@ -84,15 +91,18 @@
 
             var chunkId = chunkTypeId.ToString();
 
-            // try fast lookup first if the requested type has no wildcards
-            if (!chunkId.HasWildcard() &&
-                chunkMap.TryGetValue(chunkId, out Type result))
+            if (!chunkId.HasWildcard())
             {
-                return null;
+                // try fast lookup first if the requested type has no wildcards
+                if (!_chunkMap.TryGetValue(chunkId, out Type result))
+                {
+                    return null;
+                }
+                return result;
             }
 
             // now match wildcards
-            foreach (var item in chunkMap)
+            foreach (var item in _chunkMap)
             {
                 if (chunkId.MatchesWith(item.Key))
                 {

@@ -1,8 +1,6 @@
 namespace CannedBytes.Media.IO
 {
     using System;
-
-
     using System.IO;
     using System.Text;
 

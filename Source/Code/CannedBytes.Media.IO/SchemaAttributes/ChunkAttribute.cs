@@ -13,18 +13,18 @@
         /// <summary>
         /// Instantiates a new instance.
         /// </summary>
-        /// <param name="chunkTypeId">The identification of the chunk in four characters.</param>
-        public ChunkAttribute(string chunkTypeId)
+        /// <param name="chunkId">The identification of the chunk in four characters.</param>
+        public ChunkAttribute(string chunkId)
         {
-            Check.IfArgumentNullOrEmpty(chunkTypeId, nameof(chunkTypeId));
+            Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
 
-            this.ChunkTypeId = new FourCharacterCode(chunkTypeId);
+            this.ChunkId = new FourCharacterCode(chunkId);
         }
 
         /// <summary>
         /// The identification of the chunk in four characters.
         /// </summary>
-        public FourCharacterCode ChunkTypeId { get; private set; }
+        public FourCharacterCode ChunkId { get; private set; }
 
         /// <summary>
         /// Returns the identification of a chunk declared in a ChunkAttribute on the specified <paramref name="type"/>.
@@ -37,7 +37,7 @@
 
             var result = (from attr in type.GetCustomAttributes(typeof(ChunkAttribute), false)
                           where attr != null
-                          select ((ChunkAttribute)attr).ChunkTypeId.ToString()).FirstOrDefault();
+                          select ((ChunkAttribute)attr).ChunkId.ToString()).FirstOrDefault();
 
             return result;
         }
