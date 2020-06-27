@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build Source/Code/CannedBytes.sln --configuration Release --no-restore
     - name: Test
-      run: dotnet test Source/Code/CannedBytes.sln --no-restore --verbosity normal --filter TestCategory!=LocalOnly
+      run: dotnet test Source/Code/CannedBytes.sln --no-restore --verbosity normal
