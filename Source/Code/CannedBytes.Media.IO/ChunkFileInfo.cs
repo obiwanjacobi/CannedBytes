@@ -34,6 +34,9 @@
         /// </summary>
         public Stream BaseStream { get; protected set; }
 
+        /// <summary>
+        /// File Stream for reading or writing?
+        /// </summary>
         public FileAccess FileAccess { get; protected set; }
 
         /// <summary>

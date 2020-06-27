@@ -11,9 +11,8 @@
     /// <summary>
     /// Implements the writing of chunks.
     /// </summary>
-    public class FileChunkWriter
+    public class FileChunkWriter : ChunkFileContextOwner
     {
-        private readonly ChunkFileContext _context;
         private readonly IStreamNavigator _streamNavigator;
         private readonly FileChunkHandlerManager _handlerMgr;
         private readonly IStringWriter _stringWriter;
@@ -24,6 +23,7 @@
         /// </summary>
         /// <param name="context">Must not be null. Can be reused from a read operation.</param>
         public FileChunkWriter(ChunkFileContext context)
+            : base(context)
         {
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
@@ -32,7 +32,6 @@
             _handlerMgr = context.Services.GetService<FileChunkHandlerManager>();
             _stringWriter = context.Services.GetService<IStringWriter>();
             _numberWriter = context.Services.GetService<INumberWriter>();
-            _context = context;
 
             context.Services.AddService(GetType(), this);
         }
@@ -43,7 +42,7 @@
         /// <returns>Returns the header popped of the stack.</returns>
         private FileChunkHeader PopHeader()
         {
-            return _context.HeaderStack.Pop();
+            return Context.HeaderStack.Pop();
         }
 
         /// <summary>
@@ -59,7 +58,7 @@
                 ChunkId = chunkId
             };
 
-            _context.HeaderStack.Push(header);
+            Context.HeaderStack.Push(header);
 
             return header;
         }
@@ -106,13 +105,13 @@
                 throw new ArgumentException(msg);
             }
 
-            int stackPos = _context.HeaderStack.Count;
+            int stackPos = Context.HeaderStack.Count;
             var header = PushNewHeader(chunkTypeId);
 
-            chunkHandler.Write(_context, chunk);
+            chunkHandler.Write(Context, chunk);
 
             // wind down the stack to the level it was before we started.
-            while (_context.HeaderStack.Count > stackPos)
+            while (Context.HeaderStack.Count > stackPos)
             {
                 var poppedHeader = PopHeader();
                 WriteChunkHeader(poppedHeader);
@@ -164,9 +163,7 @@
 
             if (objectReader.IsChunkContainer)
             {
-                object childObject = null;
-
-                while (objectReader.GetNextChunkObject(out childObject))
+                while (objectReader.GetNextChunkObject(out object childObject))
                 {
                     // property value is null, skip it.
                     if (childObject == null)
@@ -181,8 +178,10 @@
                         if (objectReader.CurrentMemberIsListChunk)
                         {
                             // insert a LIST chunk.
-                            var listChunk = new ListChunk();
-                            listChunk.InnerChunks = collection;
+                            var listChunk = new ListChunk
+                            {
+                                InnerChunks = collection
+                            };
 
                             WriteNextChunk(listChunk);
                         }
@@ -213,12 +212,12 @@
         {
             get
             {
-                if (_context.HeaderStack.Count > 0)
+                if (Context.HeaderStack.Count > 0)
                 {
-                    return _context.HeaderStack.Peek().DataStream;
+                    return Context.HeaderStack.Peek().DataStream;
                 }
 
-                return _context.ChunkFile.BaseStream;
+                return Context.ChunkFile.BaseStream;
             }
         }
 

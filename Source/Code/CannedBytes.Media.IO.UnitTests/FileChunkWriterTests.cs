@@ -1,6 +1,7 @@
-﻿using System.IO;
-using CannedBytes.Media.IO.UnitTests.Media;
+﻿using CannedBytes.Media.IO.UnitTests.Media;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace CannedBytes.Media.IO.UnitTests
 {
@@ -13,12 +14,13 @@ namespace CannedBytes.Media.IO.UnitTests
 
         internal FileChunkWriter CreateWriter(string filePath)
         {
-            var context = Factory.CreateFileContextForWriting(filePath, true);
-
-            Assert.IsNotNull(context);
+            var context = new ChunkFileContextBuilder()
+                .Endianness(Endianness.LittleEndian)
+                .ForWriting(filePath)
+                .Discover(GetType().Assembly)
+                .Build();
 
             var writer = new FileChunkWriter(context);
-
             return writer;
         }
 
@@ -38,7 +40,7 @@ namespace CannedBytes.Media.IO.UnitTests
         {
             // read wave file
             var readerFilePath = Path.Combine(TestContext.DeploymentDirectory, TestMedia.WaveFileName);
-            var reader = FileChunkReaderTests.CreateReader(readerFilePath, true);
+            var reader = FileChunkReaderTests.CreateReader(readerFilePath, Endianness.LittleEndian);
 
             var rtObj = reader.ReadNextChunk();
 
@@ -47,8 +49,9 @@ namespace CannedBytes.Media.IO.UnitTests
 
             var writer = CreateWriter(writerFilePath);
             writer.WriteNextChunk(rtObj);
+            writer.Dispose();
 
-            // TODO: diff the files
+            CompareFiles(readerFilePath, writerFilePath).Should().BeTrue();
         }
 
         [TestMethod]
@@ -56,7 +59,7 @@ namespace CannedBytes.Media.IO.UnitTests
         {
             // read wave file
             var readerFilePath = Path.Combine(TestContext.DeploymentDirectory, TestMedia.AviFileName);
-            var reader = FileChunkReaderTests.CreateReader(readerFilePath, true);
+            var reader = FileChunkReaderTests.CreateReader(readerFilePath, Endianness.LittleEndian);
 
             var rtObj = reader.ReadNextChunk();
 
@@ -65,8 +68,9 @@ namespace CannedBytes.Media.IO.UnitTests
 
             var writer = CreateWriter(writerFilePath);
             writer.WriteNextChunk(rtObj);
+            writer.Dispose();
 
-            // TODO: diff the files
+            //CompareFiles(readerFilePath, writerFilePath).Should().BeTrue();
         }
     }
 }

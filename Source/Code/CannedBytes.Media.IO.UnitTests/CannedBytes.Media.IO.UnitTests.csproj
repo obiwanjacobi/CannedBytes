@@ -43,4 +43,13 @@
 
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Media\boxed-delete.avi">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Media\tada.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

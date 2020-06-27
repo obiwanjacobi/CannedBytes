@@ -8,9 +8,8 @@
     /// <summary>
     /// Implements the reading of file chunks, the creation of runtime objects and the serialization process.
     /// </summary>
-    public class FileChunkReader
+    public class FileChunkReader : ChunkFileContextOwner
     {
-        private readonly ChunkFileContext _context;
         private readonly IStreamNavigator _streamNavigator;
         private readonly IChunkTypeFactory _chunkTypeFactory;
         private readonly FileChunkHandlerManager _handlerMgr;
@@ -22,6 +21,7 @@
         /// </summary>
         /// <param name="context">Must not be null.</param>
         public FileChunkReader(ChunkFileContext context)
+            : base(context)
         {
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.Services, "context.CompositionContainer");
@@ -31,7 +31,6 @@
             _handlerMgr = context.Services.GetService<FileChunkHandlerManager>();
             _stringReader = context.Services.GetService<IStringReader>();
             _numberReader = context.Services.GetService<INumberReader>();
-            _context = context;
 
             context.Services.AddService(GetType(), this);
         }
@@ -47,7 +46,7 @@
             if (!CurrentStreamCanRead)
             {
                 // TODO: should we try to pop the current chunk first?
-                stream = _context.ChunkFile.BaseStream;
+                stream = Context.ChunkFile.BaseStream;
             }
 
             if (stream == null)
@@ -73,13 +72,13 @@
 
             if (chunk != null)
             {
-                _context.ChunkStack.PushChunk(chunk);
+                Context.ChunkStack.PushChunk(chunk);
 
                 var chunkHandler = _handlerMgr.GetChunkHandler(chunk.ChunkId);
 
                 if (chunkHandler.CanRead(chunk))
                 {
-                    chunkObject = chunkHandler.Read(_context);
+                    chunkObject = chunkHandler.Read(Context);
 
                     chunk.RuntimeInstance = chunkObject;
                 }
@@ -88,7 +87,7 @@
                 // and aligns the stream position ready for the next chunk.
                 SkipChunk(chunk);
 
-                var poppedChunk = _context.ChunkStack.PopChunk();
+                var poppedChunk = Context.ChunkStack.PopChunk();
 
                 if (poppedChunk != null &&
                     !Object.ReferenceEquals(poppedChunk, chunk))
@@ -109,13 +108,13 @@
             {
                 Stream stream;
 
-                if (_context.ChunkStack.CurrentChunk == null)
+                if (Context.ChunkStack.CurrentChunk == null)
                 {
-                    stream = _context.ChunkFile.BaseStream;
+                    stream = Context.ChunkFile.BaseStream;
                 }
                 else
                 {
-                    stream = _context.ChunkStack.CurrentChunk.DataStream;
+                    stream = Context.ChunkStack.CurrentChunk.DataStream;
                 }
 
                 return stream;
@@ -135,7 +134,7 @@
         /// </summary>
         public void SkipCurrentChunk()
         {
-            SkipChunk(_context.ChunkStack.CurrentChunk);
+            SkipChunk(Context.ChunkStack.CurrentChunk);
         }
 
         /// <summary>
@@ -154,7 +153,7 @@
             {
                 // after skipping the chunk length re-align position of the root stream.
                 // sub streams may refuse to move if they are at their end.
-                _streamNavigator.AlignPosition(_context.ChunkFile.BaseStream);
+                _streamNavigator.AlignPosition(Context.ChunkFile.BaseStream);
             }
         }
 
@@ -199,7 +198,7 @@
                     ChunkId = FourCharacterCode.ReadFrom(stream),
                     DataLength = _numberReader.ReadUInt32AsInt64(stream),
                     ParentPosition = stream.Position,
-                    FilePosition = _context.ChunkFile.BaseStream.Position
+                    FilePosition = Context.ChunkFile.BaseStream.Position
                 };
                 chunk.DataStream = new SubStream(stream, chunk.DataLength);
 
@@ -285,7 +284,7 @@
         {
             Check.IfArgumentOutOfRange(byteCount, 0, int.MaxValue, "byteCount");
 
-            var stream = _context.ChunkFile.BaseStream;
+            var stream = Context.ChunkFile.BaseStream;
             long curPos = stream.Position;
             long length = stream.Length;
 
@@ -300,13 +299,13 @@
         /// the original file <see cref="T:Stream"/> is used or an in-memory copy.</remarks>
         public Stream GetRemainingCurrentChunkSubStream()
         {
-            if (_context.CopyStreams)
+            if (Context.CopyStreams)
             {
                 var buffer = GetRemainingCurrentChunkBuffer();
                 return new MemoryStream(buffer, false);
             }
 
-            var chunk = _context.ChunkStack.CurrentChunk;
+            var chunk = Context.ChunkStack.CurrentChunk;
             var stream = chunk.DataStream;
 
             var curPos = stream.Position;
@@ -321,7 +320,7 @@
         /// <returns>Never returns null.</returns>
         public byte[] GetRemainingCurrentChunkBuffer()
         {
-            var chunk = _context.ChunkStack.CurrentChunk;
+            var chunk = Context.ChunkStack.CurrentChunk;
             var stream = chunk.DataStream;
 
             var length = (int)(chunk.DataLength - stream.Position);
