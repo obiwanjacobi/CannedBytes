@@ -1,8 +1,8 @@
 namespace CannedBytes.Media.IO
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
+
+
     using System.IO;
     using System.Text;
 
@@ -14,7 +14,7 @@ namespace CannedBytes.Media.IO
         /// <summary>
         /// Backing field for the 4cc.
         /// </summary>
-        private byte[] fourCC;
+        private byte[] _fourCC;
 
         /// <summary>
         /// Block default constructor.
@@ -27,31 +27,25 @@ namespace CannedBytes.Media.IO
         /// Constructs a new instance.
         /// </summary>
         /// <param name="fourCC">A byte buffer of (at least) 4 characters.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FourCharacterCode(byte[] fourCC)
         {
-            Contract.Requires(fourCC != null);
-            Contract.Requires(fourCC.Length >= 4);
             Check.IfArgumentNull(fourCC, "fourCC");
             Check.IfArgumentOutOfRange(fourCC.Length, 4, int.MaxValue, "fourCC.Length");
 
-            this.fourCC = new byte[4];
-            fourCC.CopyTo(this.fourCC, 0);
+            _fourCC = new byte[4];
+            fourCC.CopyTo(_fourCC, 0);
         }
 
         /// <summary>
         /// Constructs a new instance.
         /// </summary>
         /// <param name="fourCC">A string of exactly 4 characters long.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public FourCharacterCode(string fourCC)
         {
-            Contract.Requires(fourCC != null);
-            Contract.Requires(fourCC.Length == 4);
             Check.IfArgumentNull(fourCC, "fourCC");
             Check.IfArgumentOutOfRange(fourCC.Length, 4, 4, "fourCC.Length");
 
-            this.fourCC = Encoding.ASCII.GetBytes(fourCC);
+            _fourCC = Encoding.ASCII.GetBytes(fourCC);
         }
 
         /// <summary>
@@ -59,23 +53,21 @@ namespace CannedBytes.Media.IO
         /// </summary>
         /// <param name="stream">Must not be null.</param>
         /// <returns>Never return null.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public static FourCharacterCode ReadFrom(Stream stream)
         {
-            Contract.Requires(stream != null);
-            Contract.Requires(stream.CanRead);
-            Contract.Ensures(Contract.Result<FourCharacterCode>() != null);
             Check.IfArgumentNull(stream, "stream");
 
             if (!stream.CanRead)
             {
-                throw new ArgumentException("The stream does not support reading.", "stream");
+                throw new ArgumentException("The stream does not support reading.", nameof(stream));
             }
 
-            var fourCC = new FourCharacterCode();
-            fourCC.fourCC = new byte[4];
+            var fourCC = new FourCharacterCode
+            {
+                _fourCC = new byte[4]
+            };
 
-            int bytesRead = stream.Read(fourCC.fourCC, 0, 4);
+            int bytesRead = stream.Read(fourCC._fourCC, 0, 4);
 
             if (bytesRead < 4)
             {
@@ -89,11 +81,8 @@ namespace CannedBytes.Media.IO
         /// Writes the four character code to the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public void WriteTo(Stream stream)
         {
-            Contract.Requires(stream != null);
-            Contract.Requires(stream.CanWrite);
             Check.IfArgumentNull(stream, "stream");
 
             if (!stream.CanWrite)
@@ -101,7 +90,7 @@ namespace CannedBytes.Media.IO
                 throw new ArgumentException("The stream does not support writing.", "stream");
             }
 
-            stream.Write(this.fourCC, 0, 4);
+            stream.Write(_fourCC, 0, 4);
         }
 
         /// <summary>
@@ -110,9 +99,9 @@ namespace CannedBytes.Media.IO
         /// <returns>Never returns null.</returns>
         public override string ToString()
         {
-            if (this.fourCC != null)
+            if (_fourCC != null)
             {
-                return Encoding.ASCII.GetString(this.fourCC);
+                return Encoding.ASCII.GetString(_fourCC);
             }
 
             return String.Empty;

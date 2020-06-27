@@ -1,7 +1,12 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using System;
     using System.Collections.Generic;
+#if NET4
     using System.ComponentModel.Composition.Hosting;
+#else
+    using System.Composition.Hosting;
+#endif
 
     /// <summary>
     /// Represents the context for the (R)IFF file that is being parsed.
@@ -13,8 +18,8 @@
         /// </summary>
         public ChunkFileContext()
         {
-            this.ChunkStack = new FileChunkStack();
-            this.HeaderStack = new Stack<FileChunkHeader>();
+            ChunkStack = new FileChunkStack();
+            HeaderStack = new Stack<FileChunkHeader>();
         }
 
         /// <summary>
@@ -38,29 +43,62 @@
         /// </summary>
         public bool CopyStreams { get; set; }
 
-        /// <summary>
-        /// Backing field for <see cref="P:CompositionContainer"/>.
-        /// </summary>
-        private CompositionContainer compositionContainer;
+#if NET4
+        private CompositionContainer _compositionContainer;
 
         /// <summary>
         /// A container used for satisfying (external) object references.
         /// </summary>
-        public CompositionContainer CompositionContainer
+        public CompositionContainer Container
         {
             get
             {
-                return this.compositionContainer;
+                return _compositionContainer;
             }
 
             set
             {
-                this.compositionContainer = value;
+                _compositionContainer = value;
 
-                if (this.compositionContainer != null)
+                if (_compositionContainer != null)
                 {
-                    this.compositionContainer.AddInstance(this);
+                    _compositionContainer.AddInstance(this);
                 }
+            }
+        }
+#else
+        private CompositionHost _compositionContainer;
+
+        /// <summary>
+        /// A container used for satisfying (external) object references.
+        /// </summary>
+        public CompositionHost Container
+        {
+            get
+            {
+                return _compositionContainer;
+            }
+
+            set
+            {
+                _compositionContainer = value;
+
+                if (_compositionContainer != null)
+                {
+                    _compositionContainer.AddInstance(this);
+                }
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Services from the container.
+        /// </summary>
+        public IServiceProvider Services
+        {
+            get
+            {
+                return _compositionContainer;
             }
         }
 
@@ -69,11 +107,11 @@
         {
             if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
             {
-                this.ChunkFile.Dispose();
+                ChunkFile.Dispose();
 
-                if (this.compositionContainer != null)
+                if (_compositionContainer != null)
                 {
-                    this.compositionContainer.Dispose();
+                    _compositionContainer.Dispose();
                 }
             }
         }

@@ -1,7 +1,6 @@
 namespace CannedBytes
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Xml;
 
@@ -93,7 +92,6 @@ namespace CannedBytes
         /// <param name="argumentName">The parameter name.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="argument"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown when <paramref name="argument"/> is empty.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "IfArgumentNull call not recognized.")]
         public static void IfArgumentNullOrEmpty(XmlQualifiedName argument, string argumentName)
         {
             IfArgumentNull(argument, argumentName);
@@ -113,7 +111,6 @@ namespace CannedBytes
         /// <param name="maxValue">The parameter's maximal value.</param>
         /// <param name="argumentName">The parameter name.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="argument"/> is out of range.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Is a value type.")]
         public static void IfArgumentOutOfRange<T>(IComparable<T> argument, T minValue, T maxValue, string argumentName)
             where T : struct
         {
@@ -159,7 +156,6 @@ namespace CannedBytes
         /// <param name="argument">The parameter value.</param>
         /// <param name="argumentName">The name of the parameter being checked.</param>
         /// <exception cref="ArgumentException">Thrown when <paramref name="argument"/> is not of Type <b>T</b>.</exception>
-        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "Too much hassle with inheritance.")]
         public static void IfArgumentNotOfType<T>(object argument, string argumentName)
         {
             if (!(argument is T))

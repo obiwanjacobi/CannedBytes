@@ -1,14 +1,12 @@
 ﻿namespace CannedBytes.Media.IO.ChunkTypes
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
+    using CannedBytes.Media.IO.Services;
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
-    using CannedBytes.Media.IO.SchemaAttributes;
-    using CannedBytes.Media.IO.Services;
 
     /// <summary>
     /// Called by the <see cref="FileChunkReader"/> when a 'LIST' chunk is encountered.
@@ -21,25 +19,21 @@
         /// </summary>
         /// <param name="context">The context of the file being read. Must not be null.</param>
         /// <returns>Returns the runtime object instance or null when no type was found.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public override object Read(ChunkFileContext context)
         {
-            Contract.Requires(context.CompositionContainer != null);
             Check.IfArgumentNull(context, "context");
             Check.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
             Check.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
-            Check.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
+            Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
             // create instance and read type
-            var listChunk = base.Read(context) as ListChunk;
-
-            if (listChunk == null)
+            if (!(base.Read(context) is ListChunk listChunk))
             {
                 throw new InvalidOperationException();
             }
 
             // read child chunk of 'type'
-            var reader = context.CompositionContainer.GetService<FileChunkReader>();
+            var reader = context.Services.GetService<FileChunkReader>();
             var chunk = context.ChunkStack.CurrentChunk;
 
             var stream = chunk.DataStream;
@@ -81,7 +75,7 @@
         /// <returns>Returns null when not found.</returns>
         private static Type LookupItemType(ChunkFileContext context, FourCharacterCode chunkId)
         {
-            var factory = context.CompositionContainer.GetService<IChunkTypeFactory>();
+            var factory = context.Services.GetService<IChunkTypeFactory>();
 
             return factory.LookupChunkObjectType(chunkId);
         }
@@ -102,7 +96,6 @@
         /// </summary>
         /// <param name="context">Must not be null.</param>
         /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="ListChunk"/> and not null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public override void Write(ChunkFileContext context, object instance)
         {
             Check.IfArgumentNull(context, "context");
@@ -121,7 +114,7 @@
             // write out LIST chunk
             base.Write(context, instance);
 
-            var writer = context.CompositionContainer.GetService<FileChunkWriter>();
+            var writer = context.Services.GetService<FileChunkWriter>();
 
             foreach (var item in listChunk.InnerChunks)
             {
@@ -134,7 +127,6 @@
         /// </summary>
         /// <param name="instance">Must not be null.</param>
         /// <returns>Can return null.</returns>
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "IEnumerable", Justification = "We want the type name in the message.")]
         private static string GetCollectionItemChunkId(object instance)
         {
             Type type = instance.GetType();

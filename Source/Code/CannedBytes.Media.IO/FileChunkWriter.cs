@@ -1,15 +1,13 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
-    using System.Globalization;
-    using System.IO;
     using CannedBytes.Media.IO.ChunkTypes;
     using CannedBytes.Media.IO.SchemaAttributes;
     using CannedBytes.Media.IO.Services;
+    using System;
+    using System.Collections.Generic;
+    using System.ComponentModel.Composition;
+    using System.Globalization;
+    using System.IO;
 
     /// <summary>
     /// Implements the writing of chunks.
@@ -19,7 +17,7 @@
         /// <summary>
         /// Private reference to the file context.
         /// </summary>
-        private ChunkFileContext context;
+        private ChunkFileContext _context;
 
         ////warning CS0649: Field 'X' is never assigned to, and will always have its default value null
 #pragma warning disable 0649
@@ -27,43 +25,40 @@
         /// Optional reference to the stream navigator.
         /// </summary>
         [Import(AllowDefault = true, AllowRecomposition = true)]
-        private IStreamNavigator streamNavigator;
+        private IStreamNavigator _streamNavigator;
 
         /// <summary>
         /// Private reference to the chunk handler manager.
         /// </summary>
         [Import]
-        private FileChunkHandlerManager handlerMgr;
+        private FileChunkHandlerManager _handlerMgr;
 
         /// <summary>
         /// Private reference to the string writer.
         /// </summary>
         [Import]
-        private IStringWriter stringWriter;
+        private IStringWriter _stringWriter;
 
         /// <summary>
         /// Private reference to the number writer.
         /// </summary>
         [Import]
-        private INumberWriter numberWriter;
+        private INumberWriter _numberWriter;
 #pragma warning restore 0649
 
         /// <summary>
         /// Constructs a new writer instance.
         /// </summary>
         /// <param name="context">Must not be null. Can be reused from a read operation.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public FileChunkWriter(ChunkFileContext context)
         {
-            Contract.Requires(context != null);
-            Contract.Requires(context.CompositionContainer != null);
             Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(context.CompositionContainer, "context.CompositionContainer");
+            Check.IfArgumentNull(context.Services, "context.CompositionContainer");
 
-            context.CompositionContainer.ComposeParts(this);
-            context.CompositionContainer.AddInstance(this);
+            context.Services.ComposeParts(this);
+            context.Services.AddInstance(this);
 
-            this.context = context;
+            _context = context;
         }
 
         /// <summary>
@@ -72,7 +67,7 @@
         /// <returns>Returns the header popped of the stack.</returns>
         private FileChunkHeader PopHeader()
         {
-            return this.context.HeaderStack.Pop();
+            return _context.HeaderStack.Pop();
         }
 
         /// <summary>
@@ -82,11 +77,13 @@
         /// <returns>Returns the header object. Never returns null.</returns>
         private FileChunkHeader PushNewHeader(FourCharacterCode chunkId)
         {
-            var header = new FileChunkHeader();
-            header.DataStream = new MemoryStream();
-            header.ChunkId = chunkId;
+            var header = new FileChunkHeader
+            {
+                DataStream = new MemoryStream(),
+                ChunkId = chunkId
+            };
 
-            this.context.HeaderStack.Push(header);
+            _context.HeaderStack.Push(header);
 
             return header;
         }
@@ -96,10 +93,8 @@
         /// </summary>
         /// <param name="chunk">Must not be null.</param>
         /// <returns>Returns the header information for the chunk that has just been written.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public FileChunkHeader WriteNextChunk(object chunk)
         {
-            Contract.Requires(chunk != null);
             Check.IfArgumentNull(chunk, "chunk");
 
             // find chunk id
@@ -123,7 +118,7 @@
             }
 
             var chunkTypeId = new FourCharacterCode(chunkId);
-            var chunkHandler = this.handlerMgr.GetChunkHandler(chunkTypeId);
+            var chunkHandler = _handlerMgr.GetChunkHandler(chunkTypeId);
 
             if (!chunkHandler.CanWrite(chunk))
             {
@@ -135,16 +130,16 @@
                 throw new ArgumentException(msg);
             }
 
-            int stackPos = this.context.HeaderStack.Count;
-            var header = this.PushNewHeader(chunkTypeId);
+            int stackPos = _context.HeaderStack.Count;
+            var header = PushNewHeader(chunkTypeId);
 
-            chunkHandler.Write(this.context, chunk);
+            chunkHandler.Write(_context, chunk);
 
             // wind down the stack to the level it was before we started.
-            while (this.context.HeaderStack.Count > stackPos)
+            while (_context.HeaderStack.Count > stackPos)
             {
-                var poppedHeader = this.PopHeader();
-                this.WriteChunkHeader(poppedHeader);
+                var poppedHeader = PopHeader();
+                WriteChunkHeader(poppedHeader);
             }
 
             return header;
@@ -154,12 +149,11 @@
         /// Writes the chunk identified by the <paramref name="header"/> to the <see cref="P:CurrentStream"/>.
         /// </summary>
         /// <param name="header">Must not be null and must NOT be on the <see cref="P:ChunkFileContext.HeaderStack"/>.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public void WriteChunkHeader(FileChunkHeader header)
         {
             Check.IfArgumentNull(header, "header");
 
-            var stream = this.CurrentStream;
+            var stream = CurrentStream;
 
             if (Object.ReferenceEquals(header.DataStream, stream))
             {
@@ -170,16 +164,16 @@
             header.ChunkId.WriteTo(stream);
 
             // data length
-            this.numberWriter.WriteInt32(header.DataStream.Position, stream);
+            _numberWriter.WriteInt32(header.DataStream.Position, stream);
 
             // write chunk body
             header.DataStream.Position = 0;
             header.DataStream.CopyTo(stream);
 
             // optionally align each chunk
-            if (this.streamNavigator != null)
+            if (_streamNavigator != null)
             {
-                this.streamNavigator.AlignPosition(stream);
+                _streamNavigator.AlignPosition(stream);
             }
         }
 
@@ -214,19 +208,19 @@
                             var listChunk = new ListChunk();
                             listChunk.InnerChunks = collection;
 
-                            this.WriteNextChunk(listChunk);
+                            WriteNextChunk(listChunk);
                         }
                         else
                         {
                             foreach (var item in collection)
                             {
-                                this.WriteNextChunk(item);
+                                WriteNextChunk(item);
                             }
                         }
                     }
                     else
                     {
-                        this.WriteNextChunk(childObject);
+                        WriteNextChunk(childObject);
                     }
                 }
             }
@@ -243,12 +237,12 @@
         {
             get
             {
-                if (this.context.HeaderStack.Count > 0)
+                if (_context.HeaderStack.Count > 0)
                 {
-                    return this.context.HeaderStack.Peek().DataStream;
+                    return _context.HeaderStack.Peek().DataStream;
                 }
 
-                return this.context.ChunkFile.BaseStream;
+                return _context.ChunkFile.BaseStream;
             }
         }
 
@@ -258,7 +252,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteByte(byte value)
         {
-            var writer = new BinaryWriter(this.CurrentStream);
+            var writer = new BinaryWriter(CurrentStream);
 
             writer.Write(value);
         }
@@ -269,7 +263,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteChar(char value)
         {
-            var writer = new BinaryWriter(this.CurrentStream);
+            var writer = new BinaryWriter(CurrentStream);
 
             writer.Write(value);
         }
@@ -280,7 +274,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteInt16(short value)
         {
-            this.numberWriter.WriteInt16(value, this.CurrentStream);
+            _numberWriter.WriteInt16(value, CurrentStream);
         }
 
         /// <summary>
@@ -289,7 +283,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteInt32(int value)
         {
-            this.numberWriter.WriteInt32(value, this.CurrentStream);
+            _numberWriter.WriteInt32(value, CurrentStream);
         }
 
         /// <summary>
@@ -298,7 +292,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteInt64(long value)
         {
-            this.numberWriter.WriteInt64(value, this.CurrentStream);
+            _numberWriter.WriteInt64(value, CurrentStream);
         }
 
         /// <summary>
@@ -307,7 +301,7 @@
         /// <param name="value">The value to be written.</param>
         public void WriteString(string value)
         {
-            this.stringWriter.WriteString(this.CurrentStream, value);
+            _stringWriter.WriteString(CurrentStream, value);
         }
 
         /// <summary>
@@ -318,7 +312,7 @@
         {
             if (value != null)
             {
-                value.WriteTo(this.CurrentStream);
+                value.WriteTo(CurrentStream);
             }
         }
 
@@ -329,7 +323,7 @@
         [CLSCompliant(false)]
         public void WriteUInt16(ushort value)
         {
-            this.numberWriter.WriteInt16((short)value, this.CurrentStream);
+            _numberWriter.WriteInt16((short)value, CurrentStream);
         }
 
         /// <summary>
@@ -339,7 +333,7 @@
         [CLSCompliant(false)]
         public void WriteUInt32(uint value)
         {
-            this.numberWriter.WriteInt32((int)value, this.CurrentStream);
+            _numberWriter.WriteInt32((int)value, CurrentStream);
         }
 
         /// <summary>
@@ -349,26 +343,24 @@
         [CLSCompliant(false)]
         public void WriteUInt64(ulong value)
         {
-            this.numberWriter.WriteInt64((long)value, this.CurrentStream);
+            _numberWriter.WriteInt64((long)value, CurrentStream);
         }
 
         /// <summary>
         /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
         /// </summary>
         /// <param name="value">The value to be written.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public void WriteBuffer(byte[] value)
         {
             Check.IfArgumentNull(value, "value");
 
-            this.CurrentStream.Write(value, 0, value.Length);
+            CurrentStream.Write(value, 0, value.Length);
         }
 
         /// <summary>
         /// Writes the <paramref name="value"/> to the <see cref="CurrentStream"/>.
         /// </summary>
         /// <param name="value">The value to be written.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public void WriteStream(Stream value)
         {
             Check.IfArgumentNull(value, "value");
@@ -386,7 +378,7 @@
                 value.Position = 0;
             }
 
-            value.CopyTo(this.CurrentStream);
+            value.CopyTo(CurrentStream);
         }
     }
 }

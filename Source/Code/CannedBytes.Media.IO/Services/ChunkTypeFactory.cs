@@ -1,13 +1,11 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
     using System.Reflection;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Implementation of the <see cref="IChunkTypeFactory"/> interface.
@@ -19,7 +17,7 @@
         /// <summary>
         /// The Type lookup table.
         /// </summary>
-        private Dictionary<string, Type> chunkMap = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> chunkMap = new Dictionary<string, Type>();
 
         /// <summary>
         /// Constructs a new instance.
@@ -38,10 +36,8 @@
         /// <param name="assembly">Must not be null.</param>
         /// <param name="replace">If true the Type found in the <paramref name="assembly"/> will replace
         /// an already registered type.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public void AddChunksFrom(Assembly assembly, bool replace)
         {
-            Contract.Requires(assembly != null);
             Check.IfArgumentNull(assembly, "assembly");
 
             var result = from type in assembly.GetTypes()
@@ -83,7 +79,6 @@
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual Type LookupChunkObjectType(FourCharacterCode chunkTypeId)
         {
             Check.IfArgumentNull(chunkTypeId, "chunkTypeId");

@@ -2,7 +2,6 @@ namespace CannedBytes.Media.IO.Services
 {
     using System;
     using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     /// <summary>
@@ -44,7 +43,6 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "1", Justification = "Check is not recognized")]
         public void WriteInt64(long value, Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");

@@ -1,7 +1,6 @@
 namespace CannedBytes.Media
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
     using System.Security;
 
@@ -39,7 +38,6 @@ namespace CannedBytes.Media
         /// <param name="caps">A reference to the <see cref="TimerCaps"/> structure.</param>
         /// <param name="sizeOfTimerCaps">The size of the structure in bytes.</param>
         /// <returns>Returns an error code.</returns>
-        [SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage", Justification = "Performance")]
         [DllImport("winmm.dll")]
         public static extern uint timeGetDevCaps(ref TimerCaps caps, uint sizeOfTimerCaps);
 
@@ -48,7 +46,6 @@ namespace CannedBytes.Media
         /// </summary>
         /// <param name="id">The identification of the timer instance.</param>
         /// <returns>Returns an error code.</returns>
-        [SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage", Justification = "Performance")]
         [DllImport("winmm.dll")]
         public static extern uint timeKillEvent(uint id);
 
@@ -67,7 +64,6 @@ namespace CannedBytes.Media
         /// <param name="mode">Timer event type.</param>
         /// <returns>Returns an identifier for the timer event if successful or an error otherwise. This function returns
         /// NULL if it fails and the timer event was not created. This identifier is also passed to the callback function.</returns>
-        [SuppressMessage("Microsoft.Security", "CA2118:ReviewSuppressUnmanagedCodeSecurityUsage", Justification = "Performance")]
         [DllImport("winmm.dll")]
         public static extern uint timeSetEvent(uint delay, uint resolution, TimerProc proc, IntPtr user, uint mode);
 

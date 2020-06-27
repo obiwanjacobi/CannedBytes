@@ -15,7 +15,7 @@ namespace CannedBytes.Media
         public TickTimer()
             : base(TimerMode.Periodic)
         {
-            this.Period = Timer.MinPeriod;
+            Period = Timer.MinPeriod;
         }
 
         /// <summary>
@@ -23,21 +23,21 @@ namespace CannedBytes.Media
         /// </summary>
         protected override void OnTimerExpired()
         {
-            Interlocked.Increment(ref this.ticks);
+            Interlocked.Increment(ref _ticks);
 
             // don't need to call the base class
             // 'cause it only handles one-shot mode.
         }
 
         /// <summary>Backing field for the <see cref="Ticks"/> property.</summary>
-        private long ticks;
+        private long _ticks;
 
         /// <summary>
         /// Gets the tick count.
         /// </summary>
         public long Ticks
         {
-            get { return this.ticks; }
+            get { return _ticks; }
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace CannedBytes.Media
         {
             ThrowIfRunning();
 
-            Interlocked.Exchange(ref this.ticks, 0);
+            Interlocked.Exchange(ref _ticks, 0);
         }
     }
 }

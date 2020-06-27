@@ -1,6 +1,10 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
+#if NET4
     using System.ComponentModel.Composition;
+#else
+    using System.Composition;
+#endif
     using System.IO;
 
     /// <summary>

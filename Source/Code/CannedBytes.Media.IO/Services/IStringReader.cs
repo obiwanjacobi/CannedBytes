@@ -1,12 +1,10 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
     /// Generic string reader interface.
     /// </summary>
-    [ContractClass(typeof(StringReaderContract))]
     public interface IStringReader
     {
         /// <summary>

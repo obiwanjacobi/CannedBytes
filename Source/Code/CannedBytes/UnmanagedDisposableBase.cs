@@ -1,7 +1,5 @@
 namespace CannedBytes
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Implements the Dispose implementation pattern for classes that own unmanaged resources.
     /// </summary>
@@ -13,7 +11,6 @@ namespace CannedBytes
         /// <summary>
         /// Destructor called by the GC.
         /// </summary>
-        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "We don't have Dispose(bool).")]
         ~UnmanagedDisposableBase()
         {
             Dispose(DisposeObjectKind.UnmanagedResourcesOnly);

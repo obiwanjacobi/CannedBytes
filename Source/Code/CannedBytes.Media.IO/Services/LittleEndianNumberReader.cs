@@ -1,7 +1,11 @@
 namespace CannedBytes.Media.IO.Services
 {
+#if NET4
     using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
+#else
+    using System.Composition;
+#endif
+
     using System.IO;
 
     /// <summary>
@@ -27,7 +31,6 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <inheritdocs/>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public long ReadInt64(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");
@@ -40,9 +43,9 @@ namespace CannedBytes.Media.IO.Services
                 throw new EndOfStreamException();
             }
 
-            int lowWord = (((buffer[3] << 0x18) | (buffer[2] << 0x10)) | (buffer[1] << 8)) | buffer[0];
-            int highWord = (((buffer[7] << 0x18) | (buffer[6] << 0x10)) | (buffer[5] << 8)) | buffer[4];
-            return (long)(((ulong)lowWord) | (ulong)(highWord << 0x20));
+            ulong lowWord = (ulong)((((buffer[3] << 0x18) | (buffer[2] << 0x10)) | (buffer[1] << 8)) | buffer[0]);
+            ulong highWord = (ulong)((((buffer[7] << 0x18) | (buffer[6] << 0x10)) | (buffer[5] << 8)) | buffer[4]);
+            return (long)(lowWord | (highWord << 0x20));
         }
 
         /// <inheritdocs/>
@@ -56,7 +59,6 @@ namespace CannedBytes.Media.IO.Services
         public long ReadUInt32AsInt64(Stream stream)
         {
             Check.IfArgumentNull(stream, "stream");
-
             return (long)ReadUInt32(stream);
         }
 

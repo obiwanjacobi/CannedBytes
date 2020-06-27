@@ -1,11 +1,9 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.ComponentModel.Composition;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.Linq;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Manages the available <see cref="IFileChunkHandler"/> implementations.
@@ -35,11 +33,8 @@
         /// <param name="chunkId">Must not be null.</param>
         /// <returns>Never returns null.</returns>
         /// <remarks>If no specific chunk handler could be found, the default handler is returned.</remarks>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public IFileChunkHandler GetChunkHandler(FourCharacterCode chunkId)
         {
-            Contract.Requires(chunkId != null);
-            Contract.Ensures(Contract.Result<IFileChunkHandler>() != null);
             Check.IfArgumentNull(chunkId, "chunkId");
 
             return GetChunkHandler(chunkId.ToString());
@@ -53,11 +48,9 @@
         /// <remarks>If no specific chunk handler could be found, the default handler is returned.</remarks>
         public IFileChunkHandler GetChunkHandler(string chunkId)
         {
-            Contract.Requires(!String.IsNullOrEmpty(chunkId));
-            Contract.Ensures(Contract.Result<IFileChunkHandler>() != null);
             Check.IfArgumentNullOrEmpty(chunkId, "chunkId");
 
-            var handler = (from pair in this.chunkHandlers
+            var handler = (from pair in chunkHandlers
                            where pair.Metadata.ChunkId.ToString() != DefaultHandlerChunkId
                            where chunkId.MatchesWith(pair.Metadata.ChunkId.ToString())
                            select pair.Value).FirstOrDefault();
@@ -65,7 +58,7 @@
             if (handler == null)
             {
                 // retrieve default handler
-                handler = (from pair in this.chunkHandlers
+                handler = (from pair in chunkHandlers
                            where pair.Metadata.ChunkId.ToString() == DefaultHandlerChunkId
                            select pair.Value).FirstOrDefault();
             }

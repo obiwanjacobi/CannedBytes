@@ -1,12 +1,10 @@
 namespace CannedBytes.Media.IO.Services
 {
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
     /// General interface for writing numbers to a <see cref="Stream"/>.
     /// </summary>
-    [ContractClass(typeof(NumberWriterContract))]
     public interface INumberWriter
     {
         /// <summary>

@@ -3,7 +3,6 @@ namespace CannedBytes.Media
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -12,24 +11,24 @@ namespace CannedBytes.Media
     public abstract class Timer : UnmanagedDisposableBase
     {
         /// <summary>A handle to this instance used in the callback procedure.</summary>
-        private GCHandle instanceHandle;
+        private GCHandle _instanceHandle;
 
         /// <summary>The unique id of this timer instance.</summary>
-        private uint timerId;
+        private uint _timerId;
 
         /// <summary>Timer capabilities.</summary>
-        private static TimerCaps timerCaps;
+        private static TimerCaps TimerCaps;
 
         /// <summary>
         /// Fetches the timer capabilities.
         /// </summary>
         private static void LoadTimerCaps()
         {
-            var result = NativeMethods.timeGetDevCaps(ref timerCaps, NativeMethods.TimerCapsSize);
+            var result = NativeMethods.timeGetDevCaps(ref TimerCaps, NativeMethods.TimerCapsSize);
 
             if (result != NativeMethods.TIMERR_NOERROR)
             {
-                Console.WriteLine(Properties.Resources.Timer_FailedToGetCaps);
+                throw new TimerException(String.Format(Properties.Resources.Timer_FailedToGetCaps, result));
             }
         }
 
@@ -40,12 +39,12 @@ namespace CannedBytes.Media
         {
             get
             {
-                if (timerCaps.PeriodMax == 0)
+                if (TimerCaps.PeriodMax == 0)
                 {
                     LoadTimerCaps();
                 }
 
-                return timerCaps.PeriodMax;
+                return TimerCaps.PeriodMax;
             }
         }
 
@@ -56,12 +55,12 @@ namespace CannedBytes.Media
         {
             get
             {
-                if (timerCaps.PeriodMax == 0)
+                if (TimerCaps.PeriodMax == 0)
                 {
                     LoadTimerCaps();
                 }
 
-                return timerCaps.PeriodMin;
+                return TimerCaps.PeriodMin;
             }
         }
 
@@ -71,8 +70,8 @@ namespace CannedBytes.Media
         /// <param name="timerMode">The mode of the timer.</param>
         protected Timer(TimerMode timerMode)
         {
-            this.mode = timerMode;
-            this.instanceHandle = GCHandle.Alloc(this, GCHandleType.Weak);
+            _mode = timerMode;
+            _instanceHandle = GCHandle.Alloc(this, GCHandleType.Weak);
         }
 
         /// <summary>
@@ -80,11 +79,11 @@ namespace CannedBytes.Media
         /// </summary>
         public bool IsRunning
         {
-            get { return this.timerId != 0; }
+            get { return _timerId != 0; }
         }
 
         /// <summary>Backing field for the <see cref="Period"/> property.</summary>
-        private uint period;
+        private uint _period;
 
         /// <summary>
         /// Gets or sets the period (recurrence) in milliseconds the timer will fire.
@@ -97,21 +96,21 @@ namespace CannedBytes.Media
         {
             get
             {
-                return this.period;
+                return _period;
             }
 
             set
             {
                 ThrowIfDisposed();
-                this.ThrowIfRunning();
+                ThrowIfRunning();
                 Check.IfArgumentOutOfRange(value, MinPeriod, MaxPeriod, "Period");
 
-                this.period = (uint)value;
+                _period = (uint)value;
             }
         }
 
         /// <summary>Backing field for the <see cref="Resolution"/> property.</summary>
-        private uint resolution;
+        private uint _resolution;
 
         /// <summary>
         /// Gets or sets the resolution of the timer in milliseconds.
@@ -120,21 +119,21 @@ namespace CannedBytes.Media
         {
             get
             {
-                return this.resolution;
+                return _resolution;
             }
 
             set
             {
                 ThrowIfDisposed();
-                this.ThrowIfRunning();
+                ThrowIfRunning();
                 Check.IfArgumentOutOfRange(value, 0, uint.MaxValue, "Resolution");
 
-                this.resolution = (uint)value;
+                _resolution = (uint)value;
             }
         }
 
         /// <summary>Backing field for the <see cref="Mode"/> property.</summary>
-        private TimerMode mode;
+        private TimerMode _mode;
 
         /// <summary>
         /// Gets or sets the mode of the timer.
@@ -143,15 +142,15 @@ namespace CannedBytes.Media
         {
             get
             {
-                return this.mode;
+                return _mode;
             }
 
             protected set
             {
                 ThrowIfDisposed();
-                this.ThrowIfRunning();
+                ThrowIfRunning();
 
-                this.mode = value;
+                _mode = value;
             }
         }
 
@@ -161,16 +160,16 @@ namespace CannedBytes.Media
         public virtual void StartTimer()
         {
             ThrowIfDisposed();
-            this.ThrowIfRunning();
+            ThrowIfRunning();
 
-            this.timerId = NativeMethods.timeSetEvent(
-                           this.period,
-                           this.resolution,
+            _timerId = NativeMethods.timeSetEvent(
+                           _period,
+                           _resolution,
                            TimerProcedure,
-                           this.ToIntPtr(),
-                           (uint)this.Mode | NativeMethods.TIME_KILL_SYNCHRONOUS);
+                           ToIntPtr(),
+                           (uint)Mode | NativeMethods.TIME_KILL_SYNCHRONOUS);
 
-            if (this.timerId == 0)
+            if (_timerId == 0)
             {
                 int errorCode = Marshal.GetLastWin32Error();
                 throw new TimerException("Could not create the timer.", new Win32Exception(errorCode));
@@ -182,16 +181,16 @@ namespace CannedBytes.Media
         /// </summary>
         public virtual void StopTimer()
         {
-            if (this.IsRunning)
+            if (IsRunning)
             {
-                var result = NativeMethods.timeKillEvent(this.timerId);
+                var result = NativeMethods.timeKillEvent(_timerId);
 
                 if (result == NativeMethods.MMSYSERR_INVALPARAM)
                 {
                     throw new TimerException("The timer identification is invalid (already closed?).");
                 }
 
-                this.timerId = 0;
+                _timerId = 0;
             }
 
             ThrowIfDisposed();
@@ -206,7 +205,7 @@ namespace CannedBytes.Media
         {
             ThrowIfDisposed();
 
-            return GCHandle.ToIntPtr(this.instanceHandle);
+            return GCHandle.ToIntPtr(_instanceHandle);
         }
 
         /// <summary>
@@ -215,17 +214,14 @@ namespace CannedBytes.Media
         /// <param name="disposeKind">The type if resources to dispose.</param>
         protected override void Dispose(DisposeObjectKind disposeKind)
         {
-            if (!IsDisposed)
+            if (!IsDisposed && _timerId != 0)
             {
-                if (this.timerId != 0)
-                {
-                    var result = NativeMethods.timeKillEvent(this.timerId);
-                    this.timerId = 0;
+                var result = NativeMethods.timeKillEvent(_timerId);
+                _timerId = 0;
 
-                    if (result != NativeMethods.TIMERR_NOERROR)
-                    {
-                        Console.WriteLine(Properties.Resources.Timer_FailedToKillTimer);
-                    }
+                if (result != NativeMethods.TIMERR_NOERROR)
+                {
+                    Console.WriteLine(Properties.Resources.Timer_FailedToKillTimer);
                 }
             }
         }
@@ -236,7 +232,7 @@ namespace CannedBytes.Media
         /// <exception cref="InvalidOperationException">Thrown when the timer is running.</exception>
         protected void ThrowIfRunning()
         {
-            if (this.IsRunning)
+            if (IsRunning)
             {
                 throw new InvalidOperationException("The timer is running.");
             }
@@ -247,9 +243,9 @@ namespace CannedBytes.Media
         /// </summary>
         protected virtual void OnTimerExpired()
         {
-            if (this.mode == TimerMode.OneShot)
+            if (_mode == TimerMode.OneShot)
             {
-                this.StopTimer();
+                StopTimer();
             }
         }
 
@@ -266,17 +262,16 @@ namespace CannedBytes.Media
         /// <param name="userData">A reference to the <see cref="Timer"/> object.</param>
         /// <param name="parameter1">Not used.</param>
         /// <param name="parameter2">Not used.</param>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We don't want to leak any exceptions into Win32.")]
         private static void OnTimerCallback(uint timerId, uint msg, IntPtr userData, IntPtr parameter1, IntPtr parameter2)
         {
             try
             {
-                GCHandle instanceHandle = GCHandle.FromIntPtr(userData);
+                var instanceHandle = GCHandle.FromIntPtr(userData);
 
-                if (instanceHandle != null && instanceHandle.Target != null)
+                if (instanceHandle.Target != null)
                 {
                     var timer = (Timer)instanceHandle.Target;
-                    Debug.Assert(timer.timerId == timerId, "Callback provided an invalid instance or timerId.");
+                    Debug.Assert(timer._timerId == timerId, "Callback provided an invalid instance or timerId.");
 
                     timer.OnTimerExpired();
                 }

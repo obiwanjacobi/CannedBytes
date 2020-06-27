@@ -1,8 +1,7 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
     using CannedBytes.Media.IO.SchemaAttributes;
+    using System;
 
     /// <summary>
     /// An abstract base implementation for a chunk handler class.
@@ -13,10 +12,9 @@
         /// <summary>
         /// Retrieves the <see cref="FileChunkHandlerAttribute"/> and initializes the <see cref="P:ChunkId"/> property.
         /// </summary>
-        [SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "FileChunkHandlerExportAttribute", Justification = "We want to indicate the type.")]
         protected FileChunkHandler()
         {
-            var attrs = this.GetType().GetCustomAttributes(typeof(FileChunkHandlerAttribute), true);
+            var attrs = GetType().GetCustomAttributes(typeof(FileChunkHandlerAttribute), true);
 
             if (attrs == null || attrs.Length == 0)
             {
@@ -24,7 +22,7 @@
                     "A File Chunk Handler derived class must be marked with the FileChunkHandlerExportAttribute.");
             }
 
-            this.ChunkId = new FourCharacterCode(((FileChunkHandlerAttribute)attrs[0]).ChunkId);
+            ChunkId = new FourCharacterCode(((FileChunkHandlerAttribute)attrs[0]).ChunkId);
         }
 
         /// <summary>
@@ -37,12 +35,11 @@
         /// </summary>
         /// <param name="chunk">File chunk info. Must not be null.</param>
         /// <returns>Returns true if the chunk can be read by this handler.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized")]
         public virtual bool CanRead(FileChunk chunk)
         {
             Check.IfArgumentNull(chunk, "chunk");
 
-            return (chunk.ChunkId.ToString() == this.ChunkId.ToString() &&
+            return (chunk.ChunkId.ToString() == ChunkId.ToString() &&
                 chunk.DataStream != null && chunk.DataStream.CanRead);
         }
 

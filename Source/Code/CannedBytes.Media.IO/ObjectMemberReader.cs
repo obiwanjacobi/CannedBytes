@@ -1,11 +1,10 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using CannedBytes.Media.IO.SchemaAttributes;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-    using CannedBytes.Media.IO.SchemaAttributes;
 
     /// <summary>
     /// Provides access to an object's members for reading.
@@ -22,14 +21,13 @@
         /// Constructs a new instance.
         /// </summary>
         /// <param name="instance">Must not be null.</param>
-        [SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Check is not recognized.")]
         public ObjectMemberReader(object instance)
         {
             Check.IfArgumentNull(instance, "instance");
 
-            this.Instance = instance;
-            this.ObjectType = instance.GetType();
-            this.members = new ObjectMemberList(this.ObjectType);
+            Instance = instance;
+            ObjectType = instance.GetType();
+            members = new ObjectMemberList(ObjectType);
         }
 
         /// <summary>
@@ -49,7 +47,7 @@
         {
             get
             {
-                var result = from member in this.members
+                var result = from member in members
                              where member.ChunkIds != null
                              where member.ChunkIds.Count > 0
                              select member;
@@ -66,9 +64,9 @@
         {
             get
             {
-                return this.enumerator != null &&
-                       this.enumerator.Current != null &&
-                       this.enumerator.Current.IsCollection;
+                return enumerator != null &&
+                       enumerator.Current != null &&
+                       enumerator.Current.IsCollection;
             }
         }
 
@@ -80,10 +78,10 @@
         {
             get
             {
-                return this.enumerator != null &&
-                       this.enumerator.Current != null &&
-                       this.enumerator.Current.IsCollection &&
-                       !this.enumerator.Current.ChunkIdsAreChunkTypes;
+                return enumerator != null &&
+                       enumerator.Current != null &&
+                       enumerator.Current.IsCollection &&
+                       !enumerator.Current.ChunkIdsAreChunkTypes;
             }
         }
 
@@ -92,21 +90,19 @@
         /// </summary>
         /// <param name="chunkObject">The value of the 'current' member.</param>
         /// <returns>Returns false if there are no more members.</returns>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "We need both the object and the bool.")]
-        [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Not possible to use generics.")]
         public bool GetNextChunkObject(out object chunkObject)
         {
-            if (this.enumerator == null)
+            if (enumerator == null)
             {
-                this.enumerator = this.members.GetEnumerator();
+                enumerator = members.GetEnumerator();
             }
 
-            while (this.enumerator.MoveNext())
+            while (enumerator.MoveNext())
             {
-                if (this.enumerator.Current.ChunkIds != null &&
-                    this.enumerator.Current.ChunkIds.Count > 0)
+                if (enumerator.Current.ChunkIds != null &&
+                    enumerator.Current.ChunkIds.Count > 0)
                 {
-                    chunkObject = this.enumerator.Current.GetValue(this.Instance);
+                    chunkObject = enumerator.Current.GetValue(Instance);
                     return true;
                 }
             }
@@ -121,14 +117,14 @@
         /// <param name="writer">Must not be null.</param>
         public void WriteFields(FileChunkWriter writer)
         {
-            foreach (var member in this.members)
+            foreach (var member in members)
             {
                 if (member.ChunkIds != null && member.ChunkIds.Count > 0)
                 {
                     throw new NotSupportedException("This method does not support writing chunks. No mixed (chunks and data) types allowed.");
                 }
 
-                this.WritePropertyValue(member, writer);
+                WritePropertyValue(member, writer);
             }
         }
 
@@ -139,7 +135,7 @@
         /// <param name="writer">Must not be null.</param>
         private void WritePropertyValue(ObjectMemberData member, FileChunkWriter writer)
         {
-            var value = member.GetValue(this.Instance);
+            var value = member.GetValue(Instance);
             var type = member.DataType;
 
             if (value != null)

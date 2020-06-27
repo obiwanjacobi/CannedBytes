@@ -1,87 +1,37 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes", "CannedBytes\CannedBytes.csproj", "{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes", "CannedBytes\CannedBytes.csproj", "{20DB4F2E-5F52-4818-AD8A-62524FEAFAD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.IO", "CannedBytes.IO\CannedBytes.IO.csproj", "{6E403582-FE82-4FED-A478-03E7DB0E50B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CannedBytes.Media", "CannedBytes.Media\CannedBytes.Media.csproj", "{36201C05-8459-4FC9-BAED-E7C0B936467E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO", "CannedBytes.Media.IO\CannedBytes.Media.IO.csproj", "{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO.UnitTests", "CannedBytes.Media.IO.UnitTests\CannedBytes.Media.IO.UnitTests.csproj", "{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B19CB88B-6167-4DBA-8114-9F6CB82029BC}"
-	ProjectSection(SolutionItems) = preProject
-		AssemblyInfo.CannedBytes.cs = AssemblyInfo.CannedBytes.cs
-		CannedBytes.vsmdi = CannedBytes.vsmdi
-		CodeAnalysis.ruleset = CodeAnalysis.ruleset
-		Local.testsettings = Local.testsettings
-		Settings.StyleCop = Settings.StyleCop
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media", "CannedBytes.Media\CannedBytes.Media.csproj", "{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.UnitTests", "CannedBytes.Media.UnitTests\CannedBytes.Media.UnitTests.csproj", "{C4DBCF98-7875-4B88-89BF-685FEFE25ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CannedBytes.Media.IO", "CannedBytes.Media.IO\CannedBytes.Media.IO.csproj", "{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs01
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = CannedBytes\\CannedBytes.csproj
-		SccProjectName1 = CannedBytes
-		SccLocalPath1 = CannedBytes
-		SccProjectUniqueName2 = CannedBytes.IO\\CannedBytes.IO.csproj
-		SccProjectName2 = CannedBytes.IO
-		SccLocalPath2 = CannedBytes.IO
-		SccProjectUniqueName3 = CannedBytes.Media.IO\\CannedBytes.Media.IO.csproj
-		SccProjectName3 = CannedBytes.Media.IO
-		SccLocalPath3 = CannedBytes.Media.IO
-		SccProjectUniqueName4 = CannedBytes.Media.IO.UnitTests\\CannedBytes.Media.IO.UnitTests.csproj
-		SccProjectName4 = CannedBytes.Media.IO.UnitTests
-		SccLocalPath4 = CannedBytes.Media.IO.UnitTests
-		SccProjectUniqueName5 = CannedBytes.Media\\CannedBytes.Media.csproj
-		SccProjectName5 = CannedBytes.Media
-		SccLocalPath5 = CannedBytes.Media
-		SccProjectUniqueName6 = CannedBytes.Media.UnitTests\\CannedBytes.Media.UnitTests.csproj
-		SccProjectName6 = CannedBytes.Media.UnitTests
-		SccLocalPath6 = CannedBytes.Media.UnitTests
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = CannedBytes.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E918C72-D05F-45D2-A0A0-1271BEDC5FBC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E403582-FE82-4FED-A478-03E7DB0E50B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6487EB4-F9A0-4AB6-B747-940A5CA01A05}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9873CE29-E8F6-4BDF-8D03-B7A90D6AD75A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{809CDFAA-D7B1-4D1D-A96B-2B32816C2AFC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4DBCF98-7875-4B88-89BF-685FEFE25ADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4DBCF98-7875-4B88-89BF-685FEFE25ADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4DBCF98-7875-4B88-89BF-685FEFE25ADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4DBCF98-7875-4B88-89BF-685FEFE25ADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20DB4F2E-5F52-4818-AD8A-62524FEAFAD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20DB4F2E-5F52-4818-AD8A-62524FEAFAD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20DB4F2E-5F52-4818-AD8A-62524FEAFAD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20DB4F2E-5F52-4818-AD8A-62524FEAFAD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36201C05-8459-4FC9-BAED-E7C0B936467E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36201C05-8459-4FC9-BAED-E7C0B936467E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36201C05-8459-4FC9-BAED-E7C0B936467E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36201C05-8459-4FC9-BAED-E7C0B936467E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{364BB850-408C-4DB5-AEFB-7CE005F6DCA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6165614-E26B-4ED0-9FE9-13CA2C1F3600}
 	EndGlobalSection
 EndGlobal

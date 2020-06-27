@@ -1,8 +1,13 @@
 ﻿namespace CannedBytes.Media.IO.Services
 {
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
+#if NET4
+    using System.ComponentModel.Composition;
+#else
+    using System.Composition;
+#endif
+
 
     /// <summary>
     /// A string writer implementation that prefixes the length of the string before the string is written.

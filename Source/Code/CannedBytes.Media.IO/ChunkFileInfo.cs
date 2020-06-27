@@ -1,8 +1,5 @@
 ﻿namespace CannedBytes.Media.IO
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Diagnostics.Contracts;
     using System.IO;
 
     /// <summary>
@@ -16,11 +13,10 @@
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
         public ChunkFileInfo(string filePath)
         {
-            Contract.Requires(!String.IsNullOrEmpty(filePath));
             Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
-            this.FilePath = filePath;
-            this.FileExtension = Path.GetExtension(filePath);
+            FilePath = filePath;
+            FileExtension = Path.GetExtension(filePath);
         }
 
         /// <summary>
@@ -43,35 +39,14 @@
         /// </summary>
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
         /// <returns>Never returns null.</returns>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Implemented the suggested pattern.")]
         public static ChunkFileInfo OpenRead(string filePath)
         {
-            Contract.Requires(!String.IsNullOrEmpty(filePath));
-            Contract.Ensures(Contract.Result<ChunkFileInfo>() != null);
-            Contract.Ensures(Contract.Result<ChunkFileInfo>().BaseStream != null);
-
             Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
-            ChunkFileInfo chunkFile = null;
-            ChunkFileInfo cf = null;
-
-            try
+            return new ChunkFileInfo(filePath)
             {
-                cf = new ChunkFileInfo(filePath);
-                cf.BaseStream = File.OpenRead(filePath);
-
-                chunkFile = cf;
-                cf = null;
-            }
-            finally
-            {
-                if (cf != null)
-                {
-                    cf.Dispose();
-                }
-            }
-
-            return chunkFile;
+                BaseStream = File.OpenRead(filePath)
+            };
         }
 
         /// <summary>
@@ -80,46 +55,23 @@
         /// <param name="filePath">Must not be null or empty.</param>
         /// <returns>Never returns null.</returns>
         /// <remarks>Not implemented yet.</remarks>
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "Implemented suggested pattern.")]
         public static ChunkFileInfo OpenWrite(string filePath)
         {
-            Contract.Requires(!String.IsNullOrEmpty(filePath));
-            Contract.Ensures(Contract.Result<ChunkFileInfo>() != null);
-            Contract.Ensures(Contract.Result<ChunkFileInfo>().BaseStream != null);
-
             Check.IfArgumentNullOrEmpty(filePath, "filePath");
 
-            ChunkFileInfo chunkFile = null;
-            ChunkFileInfo cf = null;
-
-            try
+            return new ChunkFileInfo(filePath)
             {
-                cf = new ChunkFileInfo(filePath);
-                cf.BaseStream = File.OpenWrite(filePath);
-
-                chunkFile = cf;
-                cf = null;
-            }
-            finally
-            {
-                if (cf != null)
-                {
-                    cf.Dispose();
-                }
-            }
-
-            return chunkFile;
+                BaseStream = File.OpenWrite(filePath)
+            };
         }
 
         /// <inheritdocs/>
         protected override void Dispose(DisposeObjectKind disposeKind)
         {
-            if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources)
+            if (disposeKind == DisposeObjectKind.ManagedAndUnmanagedResources &&
+                BaseStream != null)
             {
-                if (this.BaseStream != null)
-                {
-                    this.BaseStream.Dispose();
-                }
+                BaseStream.Dispose();
             }
         }
     }
