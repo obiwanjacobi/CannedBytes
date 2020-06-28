@@ -15,6 +15,12 @@
     <PackageProjectUrl>https://github.com/obiwanjacobi/CannedBytes</PackageProjectUrl>
     <RepositoryUrl>https://github.com/obiwanjacobi/CannedBytes</RepositoryUrl>
   </PropertyGroup>
+
+  <PropertyGroup Condition="Exists('../../../../../../_keyfile/CannedBytes.snk')">
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>../../../../../../_keyfile/CannedBytes.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net4'">
     <!--<PackageReference Include="Microsoft.Windows.">
