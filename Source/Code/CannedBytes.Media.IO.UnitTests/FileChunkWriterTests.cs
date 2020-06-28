@@ -16,6 +16,7 @@ namespace CannedBytes.Media.IO.UnitTests
         {
             var context = new ChunkFileContextBuilder()
                 .Endianness(Endianness.LittleEndian)
+                .ByteAllign(2)
                 .ForWriting(filePath)
                 .Discover(GetType().Assembly)
                 .Build();

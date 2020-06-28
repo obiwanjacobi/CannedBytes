@@ -62,7 +62,7 @@ namespace CannedBytes.Media.UnitTests
 #endif
                 timer.StartTimer();
 
-                Thread.Sleep(50);
+                Thread.Sleep(75);
 
                 callback1Count.Should().BeGreaterThan(0);
                 callback2Count.Should().BeGreaterThan(0);

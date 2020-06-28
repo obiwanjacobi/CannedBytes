@@ -19,7 +19,7 @@
             Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
             Check.IfArgumentOutOfRange(chunkId.Length, 4, 4, nameof(chunkId.Length));
 
-            this.ChunkId = chunkId;
+            ChunkId = chunkId;
         }
 
         /// <summary>

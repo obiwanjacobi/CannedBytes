@@ -19,7 +19,7 @@
         {
             Check.IfArgumentNullOrEmpty(chunkTypeId, nameof(chunkTypeId));
 
-            this.ChunkTypeId = new FourCharacterCode(chunkTypeId);
+            ChunkTypeId = new FourCharacterCode(chunkTypeId);
         }
 
         /// <summary>

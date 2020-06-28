@@ -37,7 +37,6 @@ namespace CannedBytes.Media.IO.UnitTests
             ctx.Services.GetService<IChunkTypeFactory>().Should().NotBeNull();
             ctx.Services.GetService<INumberReader>().Should().NotBeNull();
             ctx.Services.GetService<INumberWriter>().Should().NotBeNull();
-            ctx.Services.GetService<IStreamNavigator>().Should().NotBeNull();
             ctx.Services.GetService<IStringReader>().Should().NotBeNull();
             ctx.Services.GetService<IStringWriter>().Should().NotBeNull();
         }

@@ -12,6 +12,7 @@ namespace CannedBytes.Media.IO
     {
         private readonly AddMode _addMode = AddMode.OverwriteExisting;
         private Endianness _endianness;
+        private int _byteAllignment = 1;
         private ChunkFileInfo _chunkFileInfo;
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private readonly List<Type> _chunkTypes = new List<Type>();
@@ -36,6 +37,13 @@ namespace CannedBytes.Media.IO
         public ChunkFileContextBuilder Endianness(Endianness endianness)
         {
             _endianness = endianness;
+            return this;
+        }
+
+        public ChunkFileContextBuilder ByteAllign(int byteAllignment)
+        {
+            Check.IfArgumentOutOfRange(byteAllignment, 1, 512, nameof(byteAllignment));
+            _byteAllignment = byteAllignment;
             return this;
         }
 
@@ -140,6 +148,7 @@ namespace CannedBytes.Media.IO
             var services = CreateServices();
             CreateChunkTypeFactory(services);
             CreateChunkHandlerManager(services);
+            CreateStreamNavigator(services);
 
             return new ChunkFileContext
             {
@@ -170,6 +179,14 @@ namespace CannedBytes.Media.IO
             services.AddService(typeof(FileChunkHandlerManager), handlerMgr);
         }
 
+        private void CreateStreamNavigator(ServiceContainer services)
+        {
+            if (_byteAllignment > 1)
+            {
+                services.AddService(typeof(IStreamNavigator), new StreamNavigator { ByteAlignment = _byteAllignment });
+            }
+        }
+
         private ServiceContainer CreateServices()
         {
             var services = new ServiceContainer();
@@ -196,7 +213,6 @@ namespace CannedBytes.Media.IO
                 services.AddService(typeof(INumberWriter), new BigEndianNumberWriter());
             }
 
-            services.AddService(typeof(IStreamNavigator), new StreamNavigator());
             services.AddService(typeof(IStringReader), new SizePrefixedStringReader());
             services.AddService(typeof(IStringWriter), new SizePrefixedStringWriter());
         }

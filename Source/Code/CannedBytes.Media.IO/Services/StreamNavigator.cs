@@ -5,7 +5,6 @@
     /// <summary>
     /// Implements the <see cref="IStreamNavigator"/> interface.
     /// </summary>
-//    [Export(typeof(IStreamNavigator))]
     public class StreamNavigator : IStreamNavigator
     {
         /// <summary>Backing field for the current stream position marker.</summary>
@@ -21,7 +20,7 @@
         /// </summary>
         public StreamNavigator()
         {
-            this.ByteAlignment = DefaultByteAlignment;
+            ByteAlignment = DefaultByteAlignment;
         }
 
         /// <inheritdocs/>
@@ -32,8 +31,8 @@
         {
             Check.IfArgumentNull(stream, nameof(stream));
 
-            this.currentMarker = stream.Position;
-            return this.currentMarker;
+            currentMarker = stream.Position;
+            return currentMarker;
         }
 
         /// <inheritdocs/>
@@ -43,7 +42,7 @@
 
             if (stream.CanSeek)
             {
-                stream.Seek(this.currentMarker, SeekOrigin.Begin);
+                stream.Seek(currentMarker, SeekOrigin.Begin);
                 return true;
             }
 
@@ -55,12 +54,12 @@
         {
             Check.IfArgumentNull(stream, nameof(stream));
 
-            if (this.ByteAlignment <= 0)
+            if (ByteAlignment <= 0)
             {
                 return 0;
             }
 
-            var rest = (int)(stream.Position % this.ByteAlignment);
+            var rest = (int)(stream.Position % ByteAlignment);
 
             if (rest > 0)
             {
