@@ -31,7 +31,7 @@
         /// an already registered type.</param>
         public void AddChunksFrom(Assembly assembly, AddMode addMode)
         {
-            Check.IfArgumentNull(assembly, "assembly");
+            Check.IfArgumentNull(assembly, nameof(assembly));
 
             var result = from type in assembly.GetTypes()
                          where type.IsClass && type.IsChunk()
@@ -72,7 +72,7 @@
         /// <inheritdocs/>
         public virtual object CreateChunkObject(FourCharacterCode chunkTypeId)
         {
-            Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
+            Check.IfArgumentNull(chunkTypeId, nameof(chunkTypeId));
 
             Type result = LookupChunkObjectType(chunkTypeId);
 
@@ -87,7 +87,7 @@
         /// <inheritdocs/>
         public virtual Type LookupChunkObjectType(FourCharacterCode chunkTypeId)
         {
-            Check.IfArgumentNull(chunkTypeId, "chunkTypeId");
+            Check.IfArgumentNull(chunkTypeId, nameof(chunkTypeId));
 
             var chunkId = chunkTypeId.ToString();
 

@@ -70,7 +70,7 @@
         /// <remarks>The <paramref name="chunk"/> is added as a child to the current top chunk.</remarks>
         public void PushChunk(FileChunk chunk)
         {
-            Check.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk, nameof(chunk));
 
             var parentChunk = CurrentChunk;
 

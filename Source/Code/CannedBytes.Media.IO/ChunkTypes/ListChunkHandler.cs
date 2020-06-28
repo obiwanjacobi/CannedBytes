@@ -21,10 +21,10 @@
         /// <returns>Returns the runtime object instance or null when no type was found.</returns>
         public override object Read(ChunkFileContext context)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
-            Check.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
-            Check.IfArgumentNull(context.Services, "context.CompositionContainer");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(context.ChunkStack, nameof(context.ChunkStack));
+            Check.IfArgumentNull(context.ChunkStack.CurrentChunk, nameof(context.ChunkStack.CurrentChunk));
+            Check.IfArgumentNull(context.Services, nameof(context.Services));
 
             // create instance and read type
             if (!(base.Read(context) is ListChunk listChunk))
@@ -98,9 +98,9 @@
         /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="ListChunk"/> and not null.</param>
         public override void Write(ChunkFileContext context, object instance)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(instance, "instance");
-            Check.IfArgumentNotOfType<ListChunk>(instance, "instance");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(instance, nameof(instance));
+            Check.IfArgumentNotOfType<ListChunk>(instance, nameof(instance));
 
             var listChunk = (ListChunk)instance;
 

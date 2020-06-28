@@ -17,7 +17,7 @@
         /// <param name="chunkTypeId">The chunk id of the chunk type.</param>
         public ChunkTypeAttribute(string chunkTypeId)
         {
-            Check.IfArgumentNullOrEmpty(chunkTypeId, "chunkTypeId");
+            Check.IfArgumentNullOrEmpty(chunkTypeId, nameof(chunkTypeId));
 
             this.ChunkTypeId = new FourCharacterCode(chunkTypeId);
         }
@@ -34,7 +34,7 @@
         /// <returns>Returns true if any chunk types are found.</returns>
         public static bool HasChunkTypes(MemberInfo member)
         {
-            Check.IfArgumentNull(member, "member");
+            Check.IfArgumentNull(member, nameof(member));
 
             var types = GetChunkTypes(member);
 
@@ -48,7 +48,7 @@
         /// <returns>Never returns null.</returns>
         public static string[] GetChunkTypes(MemberInfo member)
         {
-            Check.IfArgumentNull(member, "member");
+            Check.IfArgumentNull(member, nameof(member));
 
             var result = from attr in member.GetCustomAttributes(typeof(ChunkTypeAttribute), false)
                          where attr != null

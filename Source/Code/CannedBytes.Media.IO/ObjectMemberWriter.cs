@@ -14,7 +14,7 @@
         /// <summary>
         /// Backing field for a list of writable public fields or properties.
         /// </summary>
-        private ObjectMemberList members;
+        private readonly ObjectMemberList _members;
 
         /// <summary>
         /// Constructs a new instance on the specified runtime object.
@@ -22,11 +22,11 @@
         /// <param name="instance">Must not be null.</param>
         public ObjectMemberWriter(object instance)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             Instance = instance;
             ObjectType = instance.GetType();
-            members = new ObjectMemberList(ObjectType);
+            _members = new ObjectMemberList(ObjectType);
         }
 
         /// <summary>
@@ -45,10 +45,10 @@
         /// <param name="reader">Must not be null.</param>
         public void ReadFields(FileChunkReader reader)
         {
-            Check.IfArgumentNull(reader, "reader");
+            Check.IfArgumentNull(reader, nameof(reader));
 
             // keep processing native data type members
-            foreach (var member in members)
+            foreach (var member in _members)
             {
                 if (!reader.CurrentStreamCanRead)
                 {
@@ -91,7 +91,7 @@
         /// <remarks>Once a property is set it will not be overwritten by subsequent calls to this method.</remarks>
         public bool WriteChunkObject(object value)
         {
-            Check.IfArgumentNull(value, "runtimeObject");
+            Check.IfArgumentNull(value, nameof(value));
 
             bool isCollection = false;
             var type = value.GetType();
@@ -112,7 +112,7 @@
 
             var chunkId = ChunkAttribute.GetChunkId(type);
 
-            foreach (var member in members)
+            foreach (var member in _members)
             {
                 if (member.ChunkMatches(chunkId) &&
                     member.CanSetValue)
@@ -134,8 +134,8 @@
         /// <returns>Returns the value read or null if type is unsupported.</returns>
         protected virtual object ReadValueForType(Type type, FileChunkReader reader)
         {
-            Check.IfArgumentNull(type, "type");
-            Check.IfArgumentNull(reader, "reader");
+            Check.IfArgumentNull(type, nameof(type));
+            Check.IfArgumentNull(reader, nameof(reader));
 
             switch (Type.GetTypeCode(type))
             {
@@ -177,8 +177,8 @@
         /// <returns>Returns null if the custom type is not supported.</returns>
         protected virtual object ReadValueForCustomType(Type type, FileChunkReader reader)
         {
-            Check.IfArgumentNull(type, "type");
-            Check.IfArgumentNull(reader, "reader");
+            Check.IfArgumentNull(type, nameof(type));
+            Check.IfArgumentNull(reader, nameof(reader));
 
             if (type.FullName == typeof(FourCharacterCode).FullName)
             {

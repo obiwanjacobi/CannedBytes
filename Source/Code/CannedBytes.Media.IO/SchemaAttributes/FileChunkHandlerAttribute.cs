@@ -16,8 +16,8 @@
         public FileChunkHandlerAttribute(string chunkId)
         //            : base(typeof(IFileChunkHandler))
         {
-            Check.IfArgumentNullOrEmpty(chunkId, "chunkId");
-            Check.IfArgumentOutOfRange(chunkId.Length, 4, 4, "chunkId.Length");
+            Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
+            Check.IfArgumentOutOfRange(chunkId.Length, 4, 4, nameof(chunkId.Length));
 
             this.ChunkId = chunkId;
         }
@@ -34,7 +34,7 @@
         /// <returns>Returns null if not found.</returns>
         public static string GetChunkId(Type type)
         {
-            Check.IfArgumentNull(type, "type");
+            Check.IfArgumentNull(type, nameof(type));
 
             var result = (from attr in type.GetCustomAttributes(typeof(FileChunkHandlerAttribute), false)
                           where attr != null

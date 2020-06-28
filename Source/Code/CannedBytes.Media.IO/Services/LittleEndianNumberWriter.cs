@@ -12,7 +12,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt16(short value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             WriteUInt16((ushort)value, stream);
         }
@@ -20,7 +20,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt16(int value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             WriteUInt16((ushort)value, stream);
         }
@@ -28,7 +28,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt32(int value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             WriteUInt32((uint)value, stream);
         }
@@ -36,7 +36,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt32(long value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             WriteUInt32((uint)value, stream);
         }
@@ -44,7 +44,7 @@ namespace CannedBytes.Media.IO.Services
         /// <inheritdocs/>
         public void WriteInt64(long value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             byte[] buffer = BitConverter.GetBytes(value);
 
@@ -52,13 +52,13 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <summary>
-        /// Writes an unsigned integer to the <paramref name="stream"/>.
+        /// Writes an unsigned integer to the <paramref name=nameof(stream)/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="stream">Must not be null.</param>
+        /// <param name=nameof(stream)>Must not be null.</param>
         private static void WriteUInt16(ushort value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             byte[] buffer = BitConverter.GetBytes(value);
 
@@ -66,13 +66,13 @@ namespace CannedBytes.Media.IO.Services
         }
 
         /// <summary>
-        /// Writes an unsigned integer to the <paramref name="stream"/>.
+        /// Writes an unsigned integer to the <paramref name=nameof(stream)/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="stream">Must not be null.</param>
+        /// <param name=nameof(stream)>Must not be null.</param>
         private static void WriteUInt32(uint value, Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             byte[] buffer = BitConverter.GetBytes(value);
 

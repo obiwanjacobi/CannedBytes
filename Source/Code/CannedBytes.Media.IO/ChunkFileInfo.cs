@@ -13,7 +13,7 @@
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
         protected ChunkFileInfo(string filePath)
         {
-            Check.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, nameof(filePath));
 
             FilePath = filePath;
             FileExtension = Path.GetExtension(filePath);
@@ -46,7 +46,7 @@
         /// <returns>Never returns null.</returns>
         public static ChunkFileInfo OpenRead(string filePath)
         {
-            Check.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, nameof(filePath));
 
             return new ChunkFileInfo(filePath)
             {
@@ -63,7 +63,7 @@
         /// <remarks>Not implemented yet.</remarks>
         public static ChunkFileInfo OpenWrite(string filePath)
         {
-            Check.IfArgumentNullOrEmpty(filePath, "filePath");
+            Check.IfArgumentNullOrEmpty(filePath, nameof(filePath));
 
             return new ChunkFileInfo(filePath)
             {

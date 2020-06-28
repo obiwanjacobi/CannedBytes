@@ -19,7 +19,7 @@
         /// <param name="type">The type of the object to get its members from.</param>
         public ObjectMemberList(Type type)
         {
-            Check.IfArgumentNull(type, "type");
+            Check.IfArgumentNull(type, nameof(type));
 
             var list = BuildMemberList(type);
 
@@ -36,7 +36,7 @@
         /// <returns>Never returns null.</returns>
         private static IEnumerable<ObjectMemberData> BuildMemberList(Type type)
         {
-            Check.IfArgumentNull(type, "type");
+            Check.IfArgumentNull(type, nameof(type));
 
             var members = (from member in type.GetMembers()
                            where member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Field

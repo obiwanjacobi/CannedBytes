@@ -11,7 +11,7 @@
         /// <inheritdocs/>
         public string ReadString(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             throw new System.NotImplementedException();
         }

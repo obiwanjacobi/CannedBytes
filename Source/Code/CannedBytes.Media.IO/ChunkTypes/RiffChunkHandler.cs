@@ -59,9 +59,9 @@
         /// <param name="instance">The chunk object to write to the stream. Must be of type <see cref="RiffChunk"/> and not null.</param>
         public override void Write(ChunkFileContext context, object instance)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(instance, "instance");
-            Check.IfArgumentNotOfType<RiffChunk>(instance, "instance");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(instance, nameof(instance));
+            Check.IfArgumentNotOfType<RiffChunk>(instance, nameof(instance));
 
             var chunk = (RiffChunk)instance;
             if (chunk.InnerChunk == null)

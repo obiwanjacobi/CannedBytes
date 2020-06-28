@@ -17,7 +17,7 @@
         /// <param name="handler">Must not be null.</param>
         internal EventHandlerRegistration(Delegate handler)
         {
-            Check.IfArgumentNull(handler, "handler");
+            Check.IfArgumentNull(handler, nameof(handler));
 
             Handler = handler;
         }
@@ -49,7 +49,7 @@
         /// <param name="parameters">Usually 2 parameters: object sender and EventArgs (or derived) e.</param>
         public void InvokeHandler(Dispatcher dispatcher, params object[] parameters)
         {
-            Check.IfArgumentNull(dispatcher, "dispatcher");
+            Check.IfArgumentNull(dispatcher, nameof(dispatcher));
 
             var handler = Handler;
 

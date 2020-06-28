@@ -71,7 +71,7 @@ namespace CannedBytes.Media
         /// <param name="registration">The event handler callback registration. Must not be null.</param>
         private void InvokeEventHandler(EventHandlerRegistration<CallbackRegistration> registration)
         {
-            Check.IfArgumentNull(registration, "registration");
+            Check.IfArgumentNull(registration, nameof(registration));
 
             if (registration.UserData != null)
             {

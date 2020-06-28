@@ -103,7 +103,7 @@ namespace CannedBytes.Media
             {
                 ThrowIfDisposed();
                 ThrowIfRunning();
-                Check.IfArgumentOutOfRange(value, MinPeriod, MaxPeriod, "Period");
+                Check.IfArgumentOutOfRange(value, MinPeriod, MaxPeriod, nameof(Period));
 
                 _period = (uint)value;
             }
@@ -126,7 +126,7 @@ namespace CannedBytes.Media
             {
                 ThrowIfDisposed();
                 ThrowIfRunning();
-                Check.IfArgumentOutOfRange(value, 0, uint.MaxValue, "Resolution");
+                Check.IfArgumentOutOfRange(value, 0, uint.MaxValue, nameof(Resolution));
 
                 _resolution = (uint)value;
             }

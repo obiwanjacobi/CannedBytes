@@ -23,8 +23,8 @@
         public FileChunkReader(ChunkFileContext context)
             : base(context)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(context.Services, "context.CompositionContainer");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(context.Services, nameof(context.Services));
 
             _streamNavigator = context.Services.GetService<IStreamNavigator>();
             _chunkTypeFactory = context.Services.GetService<IChunkTypeFactory>();
@@ -64,7 +64,7 @@
         /// <returns>Returns null when there was no runtime chunk type found to represent the chunk read.</returns>
         public object ReadNextChunk(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             object chunkObject = null;
 
@@ -144,8 +144,8 @@
         /// <remarks>The underlying file stream is aligned using the <see cref="IStreamNavigator"/> implementation if available.</remarks>
         protected void SkipChunk(FileChunk chunk)
         {
-            Check.IfArgumentNull(chunk, "chunk");
-            Check.IfArgumentNull(chunk.DataStream, "chunk.DataStream");
+            Check.IfArgumentNull(chunk, nameof(chunk));
+            Check.IfArgumentNull(chunk.DataStream, nameof(chunk.DataStream));
 
             EndStream(chunk.DataStream);
 
@@ -165,7 +165,7 @@
         /// the bytes are read which requires a buffer allocation.</remarks>
         protected void EndStream(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (stream.CanSeek)
             {
@@ -189,7 +189,7 @@
         /// and <see cref="P:FileChunk.DataStream"/>.</remarks>
         public FileChunk ReadChunkHeader(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (ValidateStreamPosition(8))
             {
@@ -219,8 +219,8 @@
         /// Use the <see cref="M:ReadRuntimteContainerChunkType"/> to read sub chunks.</remarks>
         public object ReadRuntimeChunkType(Stream stream, FourCharacterCode chunkId)
         {
-            Check.IfArgumentNull(stream, "stream");
-            Check.IfArgumentNull(chunkId, "chunkId");
+            Check.IfArgumentNull(stream, nameof(stream));
+            Check.IfArgumentNull(chunkId, nameof(chunkId));
 
             var runtimeObject = _chunkTypeFactory.CreateChunkObject(chunkId);
 
@@ -245,8 +245,8 @@
         /// Use the <see cref="M:ReadRuntimteChunkType"/> to read data.</remarks>
         public object ReadRuntimeContainerChunkType(Stream stream, FourCharacterCode chunkId)
         {
-            Check.IfArgumentNull(stream, "stream");
-            Check.IfArgumentNull(chunkId, "chunkId");
+            Check.IfArgumentNull(stream, nameof(stream));
+            Check.IfArgumentNull(chunkId, nameof(chunkId));
 
             var runtimeObject = _chunkTypeFactory.CreateChunkObject(chunkId);
 
@@ -282,7 +282,7 @@
         /// <returns>Returns true when there is enough room in the file stream.</returns>
         protected bool ValidateStreamPosition(long byteCount)
         {
-            Check.IfArgumentOutOfRange(byteCount, 0, int.MaxValue, "byteCount");
+            Check.IfArgumentOutOfRange(byteCount, 0, int.MaxValue, nameof(byteCount));
 
             var stream = Context.ChunkFile.BaseStream;
             long curPos = stream.Position;

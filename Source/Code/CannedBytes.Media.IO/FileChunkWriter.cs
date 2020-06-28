@@ -25,8 +25,8 @@
         public FileChunkWriter(ChunkFileContext context)
             : base(context)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(context.Services, "context.CompositionContainer");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(context.Services, nameof(context.Services));
 
             _streamNavigator = context.Services.GetService<IStreamNavigator>();
             _handlerMgr = context.Services.GetService<FileChunkHandlerManager>();
@@ -70,7 +70,7 @@
         /// <returns>Returns the header information for the chunk that has just been written.</returns>
         public FileChunkHeader WriteNextChunk(object chunk)
         {
-            Check.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk, nameof(chunk));
 
             // find chunk id
             var chunkId = ChunkAttribute.GetChunkId(chunk);
@@ -98,9 +98,9 @@
             if (!chunkHandler.CanWrite(chunk))
             {
                 var msg = String.Format(
-                          CultureInfo.InvariantCulture,
-                          "The chunk handler '{0}' cannot write the specified runtime object.",
-                          chunkHandler.ChunkId);
+                    CultureInfo.InvariantCulture,
+                    "The chunk handler '{0}' cannot write the specified runtime object.",
+                    chunkHandler.ChunkId);
 
                 throw new ArgumentException(msg);
             }
@@ -126,13 +126,13 @@
         /// <param name="header">Must not be null and must NOT be on the <see cref="P:ChunkFileContext.HeaderStack"/>.</param>
         public void WriteChunkHeader(FileChunkHeader header)
         {
-            Check.IfArgumentNull(header, "header");
+            Check.IfArgumentNull(header, nameof(header));
 
             var stream = CurrentStream;
 
             if (Object.ReferenceEquals(header.DataStream, stream))
             {
-                throw new ArgumentException("Specified header is still on the stack.", "header");
+                throw new ArgumentException("Specified header is still on the stack.", nameof(header));
             }
 
             // write chunk header
@@ -324,7 +324,7 @@
         /// <param name="buffer">The value to be written.</param>
         public void WriteBuffer(byte[] buffer)
         {
-            Check.IfArgumentNull(buffer, "value");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             CurrentStream.Write(buffer, 0, buffer.Length);
         }
@@ -335,7 +335,7 @@
         /// <param name="stream">The value to be written.</param>
         public void WriteStream(Stream stream)
         {
-            Check.IfArgumentNull(stream, "value");
+            Check.IfArgumentNull(stream, nameof(stream));
             if (!stream.CanRead)
             {
                 throw new ArgumentException("Cannot read from stream.", nameof(stream));

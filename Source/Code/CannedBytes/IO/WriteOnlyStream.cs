@@ -35,7 +35,7 @@ namespace CannedBytes.IO
         /// <param name="stream">Must not be null.</param>
         private static void ValidateStreamIsWritable(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (!stream.CanWrite)
             {

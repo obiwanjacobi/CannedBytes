@@ -27,8 +27,8 @@ namespace CannedBytes.Media.IO
         /// <param name="fourCC">A byte buffer of (at least) 4 characters.</param>
         public FourCharacterCode(byte[] fourCC)
         {
-            Check.IfArgumentNull(fourCC, "fourCC");
-            Check.IfArgumentOutOfRange(fourCC.Length, 4, int.MaxValue, "fourCC.Length");
+            Check.IfArgumentNull(fourCC, nameof(fourCC));
+            Check.IfArgumentOutOfRange(fourCC.Length, 4, int.MaxValue, nameof(fourCC.Length));
 
             _fourCC = new byte[4];
             fourCC.CopyTo(_fourCC, 0);
@@ -40,8 +40,8 @@ namespace CannedBytes.Media.IO
         /// <param name="fourCC">A string of exactly 4 characters long.</param>
         public FourCharacterCode(string fourCC)
         {
-            Check.IfArgumentNull(fourCC, "fourCC");
-            Check.IfArgumentOutOfRange(fourCC.Length, 4, 4, "fourCC.Length");
+            Check.IfArgumentNull(fourCC, nameof(fourCC));
+            Check.IfArgumentOutOfRange(fourCC.Length, 4, 4, nameof(fourCC.Length));
 
             _fourCC = Encoding.ASCII.GetBytes(fourCC);
         }
@@ -53,7 +53,7 @@ namespace CannedBytes.Media.IO
         /// <returns>Never return null.</returns>
         public static FourCharacterCode ReadFrom(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (!stream.CanRead)
             {
@@ -81,11 +81,11 @@ namespace CannedBytes.Media.IO
         /// <param name="stream">Must not be null.</param>
         public void WriteTo(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (!stream.CanWrite)
             {
-                throw new ArgumentException("The stream does not support writing.", "stream");
+                throw new ArgumentException("The stream does not support writing.", nameof(stream));
             }
 
             stream.Write(_fourCC, 0, 4);

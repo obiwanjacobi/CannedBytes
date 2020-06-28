@@ -37,7 +37,7 @@
         /// <returns>Returns true if the chunk can be read by this handler.</returns>
         public virtual bool CanRead(FileChunk chunk)
         {
-            Check.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk, nameof(chunk));
 
             return (chunk.ChunkId.ToString() == ChunkId.ToString() &&
                 chunk.DataStream != null && chunk.DataStream.CanRead);

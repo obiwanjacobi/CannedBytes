@@ -39,7 +39,7 @@
         /// <returns>Returns the registration object that contains the user data. Never returns null.</returns>
         public EventHandlerRegistration<TUserData> AddEventRegistration(string eventName, Delegate handler)
         {
-            Check.IfArgumentNull(handler, "handler");
+            Check.IfArgumentNull(handler, nameof(handler));
 
             if (!_registrations.TryGetValue(eventName, out List<EventHandlerRegistration<TUserData>> regList))
             {
@@ -61,7 +61,7 @@
         /// <returns>Returns the registration object that is no longer in the collection.</returns>
         public EventHandlerRegistration<TUserData> RemoveEventRegistration(string eventName, Delegate handler)
         {
-            Check.IfArgumentNull(handler, "handler");
+            Check.IfArgumentNull(handler, nameof(handler));
 
             if (_registrations.TryGetValue(eventName, out List<EventHandlerRegistration<TUserData>> regList))
             {

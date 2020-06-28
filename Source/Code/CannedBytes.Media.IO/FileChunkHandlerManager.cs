@@ -40,7 +40,7 @@
         /// <remarks>If no specific chunk handler could be found, the default handler is returned.</remarks>
         public IFileChunkHandler GetChunkHandler(FourCharacterCode chunkId)
         {
-            Check.IfArgumentNull(chunkId, "chunkId");
+            Check.IfArgumentNull(chunkId, nameof(chunkId));
             return GetChunkHandler(chunkId.ToString());
         }
 
@@ -52,7 +52,7 @@
         /// <remarks>If no specific chunk handler could be found, the default handler is returned.</remarks>
         public IFileChunkHandler GetChunkHandler(string chunkId)
         {
-            Check.IfArgumentNullOrEmpty(chunkId, "chunkId");
+            Check.IfArgumentNullOrEmpty(chunkId, nameof(chunkId));
             if (chunkId.Length != 4)
             {
                 throw new ArgumentException("A Chunk Id must be 4 characters exactly.", nameof(chunkId));

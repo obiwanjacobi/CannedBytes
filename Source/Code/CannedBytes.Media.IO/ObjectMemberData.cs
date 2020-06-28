@@ -83,7 +83,7 @@
         /// <param name="isCollection">An indication if the <paramref name="value"/> is a collection.</param>
         public void SetValue(object instance, object value, bool isCollection)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             if (IsCollection && !isCollection)
             {
@@ -111,7 +111,7 @@
         /// <remarks>Set <see cref="F:ValueAssigned"/> to true.</remarks>
         private void SetMemberValue(object instance, object value)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             if (FieldInfo != null)
             {
@@ -133,7 +133,7 @@
         /// <returns>Can return null.</returns>
         public object GetValue(object instance)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             if (FieldInfo != null)
             {

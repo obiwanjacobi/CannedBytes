@@ -33,7 +33,7 @@
         /// <returns>Returns null if not found.</returns>
         public static string GetChunkId(Type type)
         {
-            Check.IfArgumentNull(type, "type");
+            Check.IfArgumentNull(type, nameof(type));
 
             var result = (from attr in type.GetCustomAttributes(typeof(ChunkAttribute), false)
                           where attr != null
@@ -49,7 +49,7 @@
         /// <returns>Returns null if not found.</returns>
         public static string GetChunkId(object instance)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             return GetChunkId(instance.GetType());
         }

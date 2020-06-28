@@ -30,7 +30,7 @@
         /// <inheritdocs/>
         public long SetCurrentMarker(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             this.currentMarker = stream.Position;
             return this.currentMarker;
@@ -39,7 +39,7 @@
         /// <inheritdocs/>
         public bool SeekToCurrentMarker(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (stream.CanSeek)
             {
@@ -53,7 +53,7 @@
         /// <inheritdocs/>
         public int AlignPosition(Stream stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             if (this.ByteAlignment <= 0)
             {

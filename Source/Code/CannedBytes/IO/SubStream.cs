@@ -24,7 +24,7 @@ namespace CannedBytes.IO
         protected SubStream(Stream stream, bool canSeek)
             : base(stream, canSeek)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             _streamOffset = stream.Position;
         }
@@ -37,7 +37,7 @@ namespace CannedBytes.IO
         public SubStream(Stream stream, long length)
             : base(stream)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             _streamOffset = stream.Position;
             SetSubLength(length);
@@ -52,7 +52,7 @@ namespace CannedBytes.IO
         public SubStream(Stream stream, bool canSeek, long length)
             : base(stream, canSeek)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             _streamOffset = stream.Position;
             SetSubLength(length);
@@ -139,11 +139,12 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             if (!AdjustCount(ref count))
             {
-                throw new ArgumentOutOfRangeException("count", count, "The count does not lie within range of this sub-stream's length.");
+                throw new ArgumentOutOfRangeException(nameof(count), count, 
+                    "The count does not lie within range of this sub-stream's length.");
             }
 
             return base.BeginRead(buffer, offset, count, callback, state);
@@ -152,11 +153,12 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             if (!AdjustCount(ref count))
             {
-                throw new ArgumentOutOfRangeException("count", count, "The count does not lie within range of this sub-stream's length.");
+                throw new ArgumentOutOfRangeException(nameof(count), count, 
+                    "The count does not lie within range of this sub-stream's length.");
             }
 
             return base.BeginWrite(buffer, offset, count, callback, state);
@@ -165,7 +167,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             if (AdjustCount(ref count))
             {
@@ -233,7 +235,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             if (AdjustCount(ref count))
             {

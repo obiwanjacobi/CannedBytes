@@ -12,7 +12,7 @@
     public class ObjectMemberReader
     {
         /// <summary>The list with object members.</summary>
-        private ObjectMemberList members;
+        private readonly ObjectMemberList _members;
 
         /// <summary>An enumerator for multi-call iteration.</summary>
         private IEnumerator<ObjectMemberData> enumerator;
@@ -23,11 +23,11 @@
         /// <param name="instance">Must not be null.</param>
         public ObjectMemberReader(object instance)
         {
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(instance, nameof(instance));
 
             Instance = instance;
             ObjectType = instance.GetType();
-            members = new ObjectMemberList(ObjectType);
+            _members = new ObjectMemberList(ObjectType);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@
         {
             get
             {
-                var result = from member in members
+                var result = from member in _members
                              where member.ChunkIds != null
                              where member.ChunkIds.Count > 0
                              select member;
@@ -94,7 +94,7 @@
         {
             if (enumerator == null)
             {
-                enumerator = members.GetEnumerator();
+                enumerator = _members.GetEnumerator();
             }
 
             while (enumerator.MoveNext())
@@ -117,7 +117,7 @@
         /// <param name="writer">Must not be null.</param>
         public void WriteFields(FileChunkWriter writer)
         {
-            foreach (var member in members)
+            foreach (var member in _members)
             {
                 if (member.ChunkIds != null && member.ChunkIds.Count > 0)
                 {

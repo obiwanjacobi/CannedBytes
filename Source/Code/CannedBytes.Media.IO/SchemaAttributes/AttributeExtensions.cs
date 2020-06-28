@@ -15,7 +15,7 @@
         /// <returns>Returns true when the <see cref="ChunkAttribute"/> is applied to the <paramref name="type"/>.</returns>
         public static bool IsChunk(this Type type)
         {
-            Check.IfArgumentNull(type, "type");
+            Check.IfArgumentNull(type, nameof(type));
             return type.GetCustomAttributes(typeof(ChunkAttribute), false)
                 .Any(a => a != null);
         }

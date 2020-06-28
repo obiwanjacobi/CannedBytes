@@ -34,7 +34,7 @@ namespace CannedBytes.IO
         /// which also depends on the wrapped <paramref name="stream"/>- but it will not prohibit it.</remarks>
         protected WrappedStream(Stream stream, bool canSeek)
         {
-            Check.IfArgumentNull(stream, "stream");
+            Check.IfArgumentNull(stream, nameof(stream));
 
             _stream = stream;
             _canSeek = canSeek;
@@ -51,7 +51,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             return _stream.BeginRead(buffer, offset, count, callback, state);
         }
@@ -59,7 +59,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             return _stream.BeginWrite(buffer, offset, count, callback, state);
         }
@@ -91,7 +91,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             return _stream.Read(buffer, offset, count);
         }
@@ -122,7 +122,7 @@ namespace CannedBytes.IO
         /// <inheritdocs/>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Check.IfArgumentNull(buffer, "buffer");
+            Check.IfArgumentNull(buffer, nameof(buffer));
 
             _stream.Write(buffer, offset, count);
         }

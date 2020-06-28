@@ -17,7 +17,7 @@
         /// <returns>Returns true if the <paramref name="chunk"/> can be read.</returns>
         public override bool CanRead(FileChunk chunk)
         {
-            Check.IfArgumentNull(chunk, "chunk");
+            Check.IfArgumentNull(chunk, nameof(chunk));
 
             return chunk.DataStream != null && chunk.DataStream.CanRead;
         }
@@ -29,11 +29,11 @@
         /// <returns>Returns null if there was no runtime type found for the current chunk.</returns>
         public override object Read(ChunkFileContext context)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(context.ChunkStack, "context.ChunkStack");
-            Check.IfArgumentNull(context.ChunkStack.CurrentChunk, "context.ChunkStack.CurrentChunk");
-            Check.IfArgumentNull(context.ChunkFile, "context.ChunkFile");
-            Check.IfArgumentNull(context.ChunkFile.BaseStream, "context.ChunkFile.BaseStream");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(context.ChunkStack, nameof(context.ChunkStack));
+            Check.IfArgumentNull(context.ChunkStack.CurrentChunk, nameof(context.ChunkStack.CurrentChunk));
+            Check.IfArgumentNull(context.ChunkFile, nameof(context.ChunkFile));
+            Check.IfArgumentNull(context.ChunkFile.BaseStream, nameof(context.ChunkFile.BaseStream));
 
             var reader = context.Services.GetService<FileChunkReader>();
             var stream = context.ChunkFile.BaseStream;
@@ -62,8 +62,8 @@
         /// <inheritdocs/>
         public override void Write(ChunkFileContext context, object instance)
         {
-            Check.IfArgumentNull(context, "context");
-            Check.IfArgumentNull(instance, "instance");
+            Check.IfArgumentNull(context, nameof(context));
+            Check.IfArgumentNull(instance, nameof(instance));
 
             var writer = context.Services.GetService<FileChunkWriter>();
 
