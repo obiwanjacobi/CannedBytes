@@ -10,8 +10,10 @@
 
         public ChunkFileContext Context { get; private set; }
 
-        public ChunkFileContext Detach()
+        public virtual ChunkFileContext Detach()
         {
+            Context.Services.RemoveService(GetType());
+
             var context = Context;
             Context = null;
             return context;
