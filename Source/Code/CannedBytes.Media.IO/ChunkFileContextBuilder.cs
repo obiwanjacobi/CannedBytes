@@ -3,6 +3,7 @@ using CannedBytes.Media.IO.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -51,10 +52,21 @@ namespace CannedBytes.Media.IO
         {
             if (_chunkFileInfo != null)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("File already opened.");
             }
 
             _chunkFileInfo = ChunkFileInfo.OpenRead(filePath);
+            return this;
+        }
+
+        public ChunkFileContextBuilder ForReading(Stream stream)
+        {
+            if (_chunkFileInfo != null)
+            {
+                throw new InvalidOperationException("File already opened.");
+            }
+
+            _chunkFileInfo = ChunkFileInfo.CreateRead(stream);
             return this;
         }
 
@@ -62,10 +74,21 @@ namespace CannedBytes.Media.IO
         {
             if (_chunkFileInfo != null)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("File already opened.");
             }
 
             _chunkFileInfo = ChunkFileInfo.OpenWrite(filePath);
+            return this;
+        }
+
+        public ChunkFileContextBuilder ForWriting(Stream stream)
+        {
+            if (_chunkFileInfo != null)
+            {
+                throw new InvalidOperationException("File already opened.");
+            }
+
+            _chunkFileInfo = ChunkFileInfo.CreateWrite(stream);
             return this;
         }
 

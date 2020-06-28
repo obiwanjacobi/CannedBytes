@@ -1,5 +1,6 @@
 ﻿namespace CannedBytes.Media.IO
 {
+    using System;
     using System.IO;
 
     /// <summary>
@@ -8,10 +9,20 @@
     public class ChunkFileInfo : DisposableBase
     {
         /// <summary>
+        /// Constructs a new instance.
+        /// </summary>
+        /// <remarks><see cref="FilePath"/> and <see cref="FileExtension"/> will be empty.</remarks>
+        public ChunkFileInfo()
+        {
+            FilePath = String.Empty;
+            FileExtension = String.Empty;
+        }
+
+        /// <summary>
         /// Constructs a new instance for the specified <paramref name="filePath"/>.
         /// </summary>
         /// <param name="filePath">Must not be null or empty and the file must exist.</param>
-        protected ChunkFileInfo(string filePath)
+        public ChunkFileInfo(string filePath)
         {
             Check.IfArgumentNullOrEmpty(filePath, nameof(filePath));
 
@@ -55,6 +66,21 @@
             };
         }
 
+        public static ChunkFileInfo CreateRead(Stream stream)
+        {
+            Check.IfArgumentNull(stream, nameof(stream));
+            if (!stream.CanRead)
+            {
+                throw new ArgumentException("Stream not opened for reading.", nameof(stream));
+            }
+
+            return new ChunkFileInfo()
+            {
+                BaseStream = stream,
+                FileAccess = FileAccess.Read
+            };
+        }
+
         /// <summary>
         /// Opens a file for writing.
         /// </summary>
@@ -68,6 +94,21 @@
             return new ChunkFileInfo(filePath)
             {
                 BaseStream = File.OpenWrite(filePath),
+                FileAccess = FileAccess.Write
+            };
+        }
+
+        public static ChunkFileInfo CreateWrite(Stream stream)
+        {
+            Check.IfArgumentNull(stream, nameof(stream));
+            if (!stream.CanWrite)
+            {
+                throw new ArgumentException("Stream not opened for writing.", nameof(stream));
+            }
+
+            return new ChunkFileInfo()
+            {
+                BaseStream = stream,
                 FileAccess = FileAccess.Write
             };
         }
