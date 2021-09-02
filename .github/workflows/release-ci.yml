@@ -23,18 +23,3 @@ jobs:
       run: dotnet build Source/Code/CannedBytes.sln --configuration Release --no-restore
     - name: Test
       run: dotnet test Source/Code/CannedBytes.sln --no-restore --verbosity normal --filter TestCategory!=LocalOnly
-    - name: Publish CannedBytes
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-          PROJECT_FILE_PATH: Source/Code/CannedBytes/CannedBytes.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish CannedBytes.Media
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-          PROJECT_FILE_PATH: Source/Code/CannedBytes.Media/CannedBytes.Media.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-    - name: Publish CannedBytes.Media.IO
-      uses: brandedoutcast/publish-nuget@v2.5.2
-      with:
-          PROJECT_FILE_PATH: Source/Code/CannedBytes.Media.IO/CannedBytes.Media.IO.csproj
-          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
